@@ -123,7 +123,7 @@
 - [x] T045a [US1] Write unit tests for RegistrationSchema in services/onboarding-service/tests/unit/test_registration_schema.py
 - [x] T045b [US1] Write unit tests for RateLimiter in services/onboarding-service/tests/unit/test_rate_limiter.py
 - [x] T046 [US1] Write unit tests for RegistrationService in services/onboarding-service/tests/unit/test_registration_service.py
-- [ ] T047 [US1] Write unit tests for VerificationService in services/onboarding-service/tests/unit/test_verification_service.py
+- [x] T047 [US1] Write unit tests for VerificationService in services/onboarding-service/tests/unit/test_verification_service.py
 
 ### Frontend Implementation for User Story 1
 
@@ -465,14 +465,14 @@ With 3 developers after Foundational phase:
 |-------|-------|-------|-----------|-------------|
 | 1 | - | 8 | 8 | Setup |
 | 2 | - | 18 | 18 | Foundational |
-| 3 | US1 | 32 | 22 | Registration |
+| 3 | US1 | 32 | 23 | Registration |
 | 4 | US2 | 14 | 7 | OAuth |
 | 5 | US3 | 23 | 16 | Workspace |
 | 6 | US4 | 9 | 4 | Resend |
 | 7 | US5 | 17 | 11 | Progress |
 | 8 | US6 | 10 | 4 | Checklist |
 | 9 | - | 13 | 2 | Polish |
-| **Total** | - | **144** | **81** | **56% complete** |
+| **Total** | - | **144** | **82** | **57% complete** |
 
 ---
 
