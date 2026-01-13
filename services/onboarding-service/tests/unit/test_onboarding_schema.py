@@ -131,3 +131,16 @@ class TestActivationChecklistItem:
         )
         assert item.action_url == "/settings/team"
         assert item.completed_at is None
+
+    def test_checklist_item_missing_required_fields(self):
+        """Test checklist item validation for missing required fields."""
+        with pytest.raises(ValidationError) as exc_info:
+            ActivationChecklistItem(
+                id="test_item",
+                # Missing: title, description, action_url
+            )
+        errors = exc_info.value.errors()
+        missing_fields = [e["loc"][0] for e in errors]
+        assert "title" in missing_fields
+        assert "description" in missing_fields
+        assert "action_url" in missing_fields
