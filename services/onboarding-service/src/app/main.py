@@ -99,8 +99,13 @@ app.add_middleware(
 # Request timing middleware
 @app.middleware("http")
 async def add_timing_middleware(request: Request, call_next):
-    """Add request timing and metrics collection."""
+    """Add request timing, request ID, and metrics collection."""
+    import uuid
+
     start_time = time.time()
+
+    # Generate or extract request ID for tracing
+    request_id = request.headers.get("X-Request-ID", str(uuid.uuid4()))
 
     response = await call_next(request)
 
@@ -112,7 +117,8 @@ async def add_timing_middleware(request: Request, call_next):
         duration=duration,
     )
 
-    # Add timing header
+    # Add tracing and timing headers
+    response.headers["X-Request-ID"] = request_id
     response.headers["X-Response-Time"] = f"{duration:.3f}s"
 
     return response

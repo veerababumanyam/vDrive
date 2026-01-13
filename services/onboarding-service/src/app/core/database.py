@@ -7,6 +7,7 @@ Provides async SQLAlchemy engine and session factory following vDrive patterns.
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase
 
@@ -101,7 +102,7 @@ async def check_db_connection() -> bool:
     """
     try:
         async with async_session_factory() as session:
-            await session.execute("SELECT 1")
+            await session.execute(text("SELECT 1"))
             return True
     except Exception:
         return False

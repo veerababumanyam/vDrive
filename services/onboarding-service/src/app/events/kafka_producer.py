@@ -129,6 +129,10 @@ class KafkaProducer:
         if not self._started:
             await self.start()
 
+        import logging
+
+        logger = logging.getLogger(__name__)
+
         try:
             # Use event_id as key if not provided
             key = key or event.event_id
@@ -141,7 +145,10 @@ class KafkaProducer:
             return True
         except Exception as e:
             # Log error but don't raise - events are best-effort
-            print(f"Failed to send event to {topic}: {e}")
+            logger.error(
+                "Failed to send event to Kafka",
+                extra={"topic": topic, "event_type": event.event_type, "error": str(e)},
+            )
             return False
 
     async def publish_user_registered(self, event: UserRegisteredEvent) -> bool:
