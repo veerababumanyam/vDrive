@@ -137,11 +137,11 @@ async def get_activation_checklist(
     "/activation-checklist/{item_id}/complete",
     response_model=List[ActivationChecklistItem],
     summary="Complete checklist item",
-    description="Mark a checklist item as completed",
+    description="Mark a checklist item as completed. Valid item_id values: create_gallery, upload_logo, invite_team, connect_payment",
     responses={
         200: {"description": "Updated checklist"},
         401: {"description": "Authentication required"},
-        404: {"description": "Item not found"},
+        404: {"description": "Item not found or invalid item_id"},
     },
 )
 async def complete_checklist_item(
@@ -152,6 +152,8 @@ async def complete_checklist_item(
 ) -> List[ActivationChecklistItem]:
     """
     Mark a checklist item as completed.
+
+    Valid item_id values: create_gallery, upload_logo, invite_team, connect_payment
 
     - Updates item completion status
     - Records completion timestamp
