@@ -34,6 +34,14 @@ class OnboardingStateService:
 
     CACHE_TTL = 86400  # 24 hours
 
+    # Valid checklist item IDs for validation
+    VALID_CHECKLIST_ITEMS = frozenset([
+        "create_gallery",
+        "upload_logo",
+        "invite_team",
+        "connect_payment",
+    ])
+
     def __init__(
         self,
         db: AsyncSession,
@@ -268,6 +276,13 @@ class OnboardingStateService:
         Returns:
             Updated checklist
         """
+        # Validate item_id against allowed checklist items
+        if item_id not in self.VALID_CHECKLIST_ITEMS:
+            raise NotFoundError(
+                message=f"Invalid checklist item: {item_id}",
+                details=[{"field": "item_id", "message": f"Must be one of: {', '.join(self.VALID_CHECKLIST_ITEMS)}"}],
+            )
+
         state = await self.onboarding_repo.get_by_user_id(user_id)
         if not state:
             raise NotFoundError(message="Onboarding state not found")
