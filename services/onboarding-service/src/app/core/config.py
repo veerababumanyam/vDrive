@@ -187,6 +187,19 @@ class Settings(BaseSettings):
                 v = v.replace("postgresql://", "postgresql+asyncpg://", 1)
         return v
 
+    @field_validator("JWT_SECRET")
+    @classmethod
+    def validate_jwt_secret(cls, v: str, info) -> str:
+        """Ensure JWT_SECRET is secure in production environments."""
+        # Get APP_ENV from the values dict (model_validate passes parsed values)
+        app_env = info.data.get("APP_ENV", "development") if info.data else "development"
+        if app_env in ("production", "staging"):
+            if not v or len(v) < 32:
+                raise ValueError(
+                    "JWT_SECRET must be at least 32 characters in production/staging environments"
+                )
+        return v
+
 
 @lru_cache()
 def get_settings() -> Settings:
