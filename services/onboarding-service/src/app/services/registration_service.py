@@ -151,8 +151,8 @@ class RegistrationService:
             }
         )
 
-        # TODO: Send verification email via notification service
-        # This would be handled by the VerificationService.send_verification_email
+        # Note: Verification email is sent by the calling endpoint after registration
+        # The endpoint uses VerificationService.send_verification_email for this
 
         return RegistrationResponse(
             user_id=user.id,
