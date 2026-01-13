@@ -33,9 +33,9 @@
 - [x] T001 Create onboarding service directory structure per plan.md in services/onboarding-service/
 - [x] T002 Initialize Python 3.11 project with pyproject.toml in services/onboarding-service/pyproject.toml
 - [x] T003 [P] Create requirements.txt with FastAPI, SQLAlchemy, Pydantic, argon2-cffi, aiohttp in services/onboarding-service/requirements.txt
-- [ ] T004 [P] Create requirements-dev.txt with pytest, pytest-asyncio, httpx in services/onboarding-service/requirements-dev.txt
-- [ ] T005 [P] Configure alembic for database migrations in services/onboarding-service/alembic.ini
-- [ ] T006 [P] Create alembic env.py with async support in services/onboarding-service/alembic/env.py
+- [x] T004 [P] Create requirements-dev.txt with pytest, pytest-asyncio, httpx in services/onboarding-service/requirements-dev.txt
+- [x] T005 [P] Configure alembic for database migrations in services/onboarding-service/alembic.ini
+- [x] T006 [P] Create alembic env.py with async support in services/onboarding-service/alembic/env.py
 - [x] T007 Create pytest configuration in services/onboarding-service/pytest.ini
 - [x] T008 [P] Create test fixtures and conftest.py in services/onboarding-service/tests/conftest.py
 
@@ -107,7 +107,7 @@
 
 - [x] T031 [P] [US1] Create User SQLAlchemy model with email, password_hash, verification fields in services/onboarding-service/src/app/models/user.py
 - [x] T032 [P] [US1] Create EmailVerificationToken model with token_hash, expires_at, status in services/onboarding-service/src/app/models/verification_token.py
-- [ ] T033 [US1] Create database migration for users and verification_tokens tables in services/onboarding-service/alembic/versions/001_initial_schema.py
+- [x] T033 [US1] Create database migration for users and verification_tokens tables in services/onboarding-service/alembic/versions/001_initial_schema.py
 - [x] T034 [P] [US1] Create RegistrationRequest Pydantic schema with password validation in services/onboarding-service/src/app/schemas/registration.py
 - [x] T035 [P] [US1] Create RegistrationResponse Pydantic schema in services/onboarding-service/src/app/schemas/registration.py
 - [x] T036 [P] [US1] Create VerificationResponse Pydantic schema in services/onboarding-service/src/app/schemas/verification.py
@@ -120,7 +120,9 @@
 - [x] T043 [US1] Implement POST /check-email endpoint in services/onboarding-service/src/app/api/v1/registration.py
 - [x] T044 [US1] Implement GET /verify-email endpoint in services/onboarding-service/src/app/api/v1/verification.py
 - [x] T045 [US1] Add rate limiting to registration endpoint (5/IP/15min) in services/onboarding-service/src/app/api/v1/registration.py
-- [ ] T046 [US1] Write unit tests for RegistrationService in services/onboarding-service/tests/unit/test_registration_service.py
+- [x] T045a [US1] Write unit tests for RegistrationSchema in services/onboarding-service/tests/unit/test_registration_schema.py
+- [x] T045b [US1] Write unit tests for RateLimiter in services/onboarding-service/tests/unit/test_rate_limiter.py
+- [x] T046 [US1] Write unit tests for RegistrationService in services/onboarding-service/tests/unit/test_registration_service.py
 - [ ] T047 [US1] Write unit tests for VerificationService in services/onboarding-service/tests/unit/test_verification_service.py
 
 ### Frontend Implementation for User Story 1
@@ -200,6 +202,7 @@
 - [x] T085 [US3] Implement POST /workspaces/check-slug endpoint in services/onboarding-service/src/app/api/v1/workspace.py
 - [x] T086 [US3] Implement POST /workspaces/suggest-slug endpoint in services/onboarding-service/src/app/api/v1/workspace.py
 - [x] T087 [US3] Write unit tests for WorkspaceService in services/onboarding-service/tests/unit/test_workspace_service.py
+- [x] T087a [US3] Write unit tests for WorkspaceSchema in services/onboarding-service/tests/unit/test_workspace_schema.py
 
 ### Frontend Implementation for User Story 3
 
@@ -264,6 +267,7 @@
 - [x] T111 [US5] Implement PATCH /state endpoint in services/onboarding-service/src/app/api/v1/onboarding.py
 - [x] T112 [US5] Implement POST /state/reset endpoint in services/onboarding-service/src/app/api/v1/onboarding.py
 - [x] T113 [US5] Create OnboardingCompletedEvent in services/onboarding-service/src/app/events/kafka_producer.py
+- [x] T113a [US5] Write unit tests for OnboardingSchema in services/onboarding-service/tests/unit/test_onboarding_schema.py
 - [ ] T114 [US5] Write unit tests for OnboardingStateService in services/onboarding-service/tests/unit/test_onboarding_service.py
 
 ### Frontend Implementation for User Story 5
@@ -457,18 +461,18 @@ With 3 developers after Foundational phase:
 
 ## Task Summary
 
-| Phase | Story | Tasks | Parallel | Description |
-|-------|-------|-------|----------|-------------|
-| 1 | - | 8 | 5 | Setup |
-| 2 | - | 18 | 14 | Foundational |
-| 3 | US1 | 30 | 15 | Registration |
-| 4 | US2 | 14 | 5 | OAuth |
-| 5 | US3 | 22 | 10 | Workspace |
-| 6 | US4 | 9 | 2 | Resend |
-| 7 | US5 | 16 | 5 | Progress |
-| 8 | US6 | 10 | 3 | Checklist |
-| 9 | - | 13 | 9 | Polish |
-| **Total** | - | **140** | **68** | - |
+| Phase | Story | Tasks | Completed | Description |
+|-------|-------|-------|-----------|-------------|
+| 1 | - | 8 | 8 | Setup |
+| 2 | - | 18 | 18 | Foundational |
+| 3 | US1 | 32 | 22 | Registration |
+| 4 | US2 | 14 | 7 | OAuth |
+| 5 | US3 | 23 | 16 | Workspace |
+| 6 | US4 | 9 | 4 | Resend |
+| 7 | US5 | 17 | 11 | Progress |
+| 8 | US6 | 10 | 4 | Checklist |
+| 9 | - | 13 | 2 | Polish |
+| **Total** | - | **144** | **81** | **56% complete** |
 
 ---
 
