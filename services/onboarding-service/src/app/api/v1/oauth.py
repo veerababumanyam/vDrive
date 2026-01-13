@@ -4,6 +4,8 @@ OAuth API endpoints.
 Handles Google OAuth authentication flow.
 """
 
+from urllib.parse import quote
+
 from fastapi import APIRouter, Depends, Query, status
 from fastapi.responses import RedirectResponse
 from redis.asyncio import Redis
@@ -71,9 +73,10 @@ async def google_oauth_callback(
 
     On error, redirects to login page with error message.
     """
-    # Handle OAuth errors
+    # Handle OAuth errors (URL-encode message to prevent open redirect/XSS)
     if error:
-        error_url = f"{settings.APP_URL}/login?error=oauth_denied&message={error}"
+        safe_error = quote(error, safe="")
+        error_url = f"{settings.APP_URL}/login?error=oauth_denied&message={safe_error}"
         return RedirectResponse(url=error_url, status_code=status.HTTP_302_FOUND)
 
     try:
