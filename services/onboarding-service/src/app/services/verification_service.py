@@ -2,6 +2,7 @@
 Email verification service for handling verification tokens.
 """
 
+import logging
 from typing import Optional
 
 import httpx
@@ -235,8 +236,6 @@ class VerificationService:
         Returns:
             True if sent successfully
         """
-        import logging
-
         logger = logging.getLogger(__name__)
         verification_url = f"{settings.APP_URL}/verify-email?token={token}"
 
@@ -290,8 +289,6 @@ class VerificationService:
         Returns:
             True if sent successfully
         """
-        import logging
-
         logger = logging.getLogger(__name__)
 
         try:
