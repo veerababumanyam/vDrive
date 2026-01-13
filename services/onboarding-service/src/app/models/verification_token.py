@@ -9,10 +9,9 @@ from typing import TYPE_CHECKING, Optional
 from uuid import uuid4
 
 from sqlalchemy import DateTime, ForeignKey, String, func
-from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from src.app.core.database import Base
+from src.app.core.database import Base, GUID
 
 if TYPE_CHECKING:
     from src.app.models.user import User
@@ -29,14 +28,14 @@ class VerificationToken(Base):
 
     # Primary key
     id: Mapped[str] = mapped_column(
-        UUID(as_uuid=False),
+        GUID(),
         primary_key=True,
         default=lambda: str(uuid4()),
     )
 
     # Foreign key to user
     user_id: Mapped[str] = mapped_column(
-        UUID(as_uuid=False),
+        GUID(),
         ForeignKey("users.id", ondelete="CASCADE"),
         nullable=False,
         index=True,

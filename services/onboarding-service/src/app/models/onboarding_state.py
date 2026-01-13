@@ -9,11 +9,10 @@ from enum import Enum
 from typing import TYPE_CHECKING, Dict, List, Optional
 from uuid import uuid4
 
-from sqlalchemy import DateTime, Enum as SQLEnum, ForeignKey, func
-from sqlalchemy.dialects.postgresql import JSONB, UUID
+from sqlalchemy import JSON, Boolean, DateTime, Enum as SQLEnum, ForeignKey, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from src.app.core.database import Base
+from src.app.core.database import Base, GUID
 
 if TYPE_CHECKING:
     from src.app.models.user import User
@@ -52,14 +51,14 @@ class OnboardingState(Base):
 
     # Primary key
     id: Mapped[str] = mapped_column(
-        UUID(as_uuid=False),
+        GUID(),
         primary_key=True,
         default=lambda: str(uuid4()),
     )
 
     # Foreign key to user (one-to-one)
     user_id: Mapped[str] = mapped_column(
-        UUID(as_uuid=False),
+        GUID(),
         ForeignKey("users.id", ondelete="CASCADE"),
         nullable=False,
         unique=True,
@@ -75,21 +74,21 @@ class OnboardingState(Base):
 
     # Completed steps (for progress tracking and resumption)
     completed_steps: Mapped[List[str]] = mapped_column(
-        JSONB,
+        JSON,
         nullable=False,
         default=list,
     )
 
     # Partial form data (for resumption)
     form_data: Mapped[Dict] = mapped_column(
-        JSONB,
+        JSON,
         nullable=False,
         default=dict,
     )
 
     # Activation checklist state
     activation_checklist: Mapped[Dict] = mapped_column(
-        JSONB,
+        JSON,
         nullable=False,
         default=dict,
     )

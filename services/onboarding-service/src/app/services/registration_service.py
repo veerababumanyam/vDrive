@@ -2,10 +2,13 @@
 Registration service for user signup business logic.
 """
 
+import logging
 from typing import Dict, Optional
 
+import httpx
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.app.core.config import settings
 from src.app.core.security import (
     create_access_token,
     generate_verification_token,
@@ -24,6 +27,8 @@ from src.app.schemas.registration import (
     RegistrationRequest,
     RegistrationResponse,
 )
+
+logger = logging.getLogger(__name__)
 
 
 class RegistrationService:

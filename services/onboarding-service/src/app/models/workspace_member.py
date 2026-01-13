@@ -9,11 +9,10 @@ from enum import Enum
 from typing import TYPE_CHECKING, Dict, List
 from uuid import uuid4
 
-from sqlalchemy import DateTime, Enum as SQLEnum, ForeignKey, String, UniqueConstraint, func
-from sqlalchemy.dialects.postgresql import JSONB, UUID
+from sqlalchemy import JSON, DateTime, Enum as SQLEnum, ForeignKey, String, UniqueConstraint, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from src.app.core.database import Base
+from src.app.core.database import Base, GUID
 
 if TYPE_CHECKING:
     from src.app.models.user import User
@@ -83,20 +82,20 @@ class WorkspaceMember(Base):
 
     # Primary key
     id: Mapped[str] = mapped_column(
-        UUID(as_uuid=False),
+        GUID(),
         primary_key=True,
         default=lambda: str(uuid4()),
     )
 
     # Foreign keys
     user_id: Mapped[str] = mapped_column(
-        UUID(as_uuid=False),
+        GUID(),
         ForeignKey("users.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
     workspace_id: Mapped[str] = mapped_column(
-        UUID(as_uuid=False),
+        GUID(),
         ForeignKey("workspaces.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
@@ -111,7 +110,7 @@ class WorkspaceMember(Base):
 
     # Custom permissions (overrides role defaults if set)
     permissions: Mapped[Dict] = mapped_column(
-        JSONB,
+        JSON,
         nullable=False,
         default=dict,
     )

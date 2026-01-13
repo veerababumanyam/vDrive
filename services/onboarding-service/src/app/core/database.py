@@ -7,11 +7,41 @@ Provides async SQLAlchemy engine and session factory following vDrive patterns.
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
-from sqlalchemy import text
+from sqlalchemy import String, text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.types import CHAR, TypeDecorator
 
 from src.app.core.config import settings
+
+
+class GUID(TypeDecorator):
+    """
+    Platform-independent UUID type.
+
+    Uses PostgreSQL's UUID type when available, otherwise uses CHAR(36)
+    for compatibility with SQLite (used in testing).
+    """
+
+    impl = CHAR
+    cache_ok = True
+
+    def load_dialect_impl(self, dialect):
+        if dialect.name == "postgresql":
+            from sqlalchemy.dialects.postgresql import UUID
+            return dialect.type_descriptor(UUID(as_uuid=False))
+        else:
+            return dialect.type_descriptor(CHAR(36))
+
+    def process_bind_param(self, value, dialect):
+        if value is None:
+            return value
+        return str(value)
+
+    def process_result_value(self, value, dialect):
+        if value is None:
+            return value
+        return str(value)
 
 
 class Base(DeclarativeBase):
