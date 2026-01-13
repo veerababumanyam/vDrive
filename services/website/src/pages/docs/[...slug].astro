@@ -1,0 +1,25 @@
+---
+/**
+ * Individual Documentation Page
+ * Renders MDX content from the docs collection using DocsLayout
+ */
+import DocsLayout from '@/components/docs/DocsLayout.astro';
+import { getCollection, type CollectionEntry } from 'astro:content';
+
+export async function getStaticPaths() {
+  const docs = await getCollection('docs');
+  return docs.map((doc) => ({
+    params: { slug: doc.slug },
+    props: doc,
+  }));
+}
+
+type Props = CollectionEntry<'docs'>;
+
+const doc = Astro.props;
+const { Content } = await doc.render();
+---
+
+<DocsLayout doc={doc}>
+  <Content />
+</DocsLayout>

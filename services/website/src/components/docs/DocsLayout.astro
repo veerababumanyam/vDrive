@@ -1,0 +1,152 @@
+---
+/**
+ * Documentation Layout Component
+ * Provides consistent layout for all documentation pages
+ * with sidebar navigation and content area.
+ */
+import BaseLayout from '@/components/layout/BaseLayout.astro';
+import JsonLd from '@/components/seo/JsonLd.astro';
+import { getCollection, type CollectionEntry } from 'astro:content';
+import { generateArticleSchema, generateBreadcrumbSchema } from '@/utils/schema';
+
+interface Props {
+  doc: CollectionEntry<'docs'>;
+}
+
+const { doc } = Astro.props;
+
+// Get all docs for sidebar
+const allDocs = (await getCollection('docs'))
+  .filter((d) => !d.data.draft)
+  .sort((a, b) => a.data.order - b.data.order);
+
+// Group docs by section
+const sections = allDocs.reduce(
+  (acc, d) => {
+    const section = d.data.section || 'General';
+    if (!acc[section]) {
+      acc[section] = [];
+    }
+    acc[section].push(d);
+    return acc;
+  },
+  {} as Record<string, typeof allDocs>
+);
+
+const schemas = [
+  generateArticleSchema({
+    title: doc.data.title,
+    description: doc.data.description,
+    slug: doc.slug,
+    section: doc.data.section || 'General',
+    lastUpdated: doc.data.lastUpdated,
+  }),
+  generateBreadcrumbSchema([
+    { name: 'Home', url: '/' },
+    { name: 'Documentation', url: '/docs' },
+    { name: doc.data.title },
+  ]),
+];
+---
+
+<BaseLayout title={doc.data.title} description={doc.data.description}>
+  <JsonLd slot="head" schema={schemas} />
+  <section class="section">
+    <div class="container-lg">
+      <div class="grid gap-12 lg:grid-cols-4">
+        <!-- Sidebar -->
+        <aside class="lg:col-span-1">
+          <nav class="sticky top-24" aria-label="Documentation navigation">
+            <a
+              href="/docs"
+              class="mb-4 inline-flex items-center gap-2 text-sm text-primary-500 hover:text-primary-600 transition-colors"
+            >
+              <svg
+                class="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                />
+              </svg>
+              All Docs
+            </a>
+            <ul class="space-y-1" role="list">
+              {
+                Object.entries(sections).map(([section, items]) => (
+                  <li>
+                    <span class="block py-2 text-sm font-medium text-neutral-900 dark:text-white">
+                      {section}
+                    </span>
+                    <ul
+                      class="ml-3 space-y-1 border-l border-neutral-200 dark:border-neutral-800"
+                      role="list"
+                    >
+                      {items.map((d) => (
+                        <li>
+                          <a
+                            href={`/docs/${d.slug}`}
+                            class:list={[
+                              'block py-1 pl-4 text-sm transition-colors',
+                              d.slug === doc.slug
+                                ? 'border-l-2 border-primary-500 -ml-px font-medium text-primary-600 dark:text-primary-400'
+                                : 'text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white',
+                            ]}
+                            aria-current={d.slug === doc.slug ? 'page' : undefined}
+                          >
+                            {d.data.title}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </li>
+                ))
+              }
+            </ul>
+          </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="lg:col-span-3" id="doc-content">
+          <div class="max-w-3xl">
+            <header class="mb-8">
+              {doc.data.section && (
+                <span class="text-sm font-medium text-primary-600 dark:text-primary-400">
+                  {doc.data.section}
+                </span>
+              )}
+              <h1 class="mt-2 text-4xl font-bold tracking-tight text-neutral-900 dark:text-white">
+                {doc.data.title}
+              </h1>
+              <p class="mt-4 text-lg text-neutral-600 dark:text-neutral-400">
+                {doc.data.description}
+              </p>
+              {doc.data.lastUpdated && (
+                <p class="mt-2 text-sm text-neutral-500">
+                  Last updated:{' '}
+                  <time datetime={doc.data.lastUpdated.toISOString()}>
+                    {doc.data.lastUpdated.toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    })}
+                  </time>
+                </p>
+              )}
+            </header>
+
+            <div class="prose-custom">
+              <slot />
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
