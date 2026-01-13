@@ -1,0 +1,222 @@
+---
+/**
+ * FeatureCard Component
+ * Displays a feature with icon, gradient, and expandable details.
+ * Used in the features section to showcase individual capabilities.
+ */
+
+interface Props {
+  name: string;
+  tagline: string;
+  description: string;
+  icon: string;
+  benefits: string[];
+  useCases?: string[];
+  gradient?: string;
+}
+
+const {
+  name,
+  tagline,
+  description,
+  icon,
+  benefits,
+  useCases = [],
+  gradient = 'from-primary-500 to-accent-500',
+} = Astro.props;
+
+// Map icon names to SVG paths
+const iconPaths: Record<string, string> = {
+  Sparkles: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />`,
+  Users: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />`,
+  BookImage: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 19.5A2.5 2.5 0 016.5 17H20M4 19.5A2.5 2.5 0 016.5 17H20M4 19.5V6.5A2.5 2.5 0 016.5 4H20v13H6.5c-1.38 0-2.5 1.12-2.5 2.5zM8 8l4 4 4-4" />`,
+  ScanFace: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />`,
+  Contact: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />`,
+  CloudUpload: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15zm9-7v6m-3-3l3-3 3 3" />`,
+};
+
+const iconPath = iconPaths[icon] || iconPaths.Sparkles;
+const uniqueId = `feature-${name.toLowerCase().replace(/\s+/g, '-')}`;
+---
+
+<div
+  class="feature-card card-hover group relative overflow-hidden"
+  data-feature-card
+>
+  <!-- Gradient Overlay -->
+  <div
+    class={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-0 transition-opacity duration-300 group-hover:opacity-5`}
+  ></div>
+
+  <!-- Content -->
+  <div class="relative">
+    <!-- Icon -->
+    <div
+      class={`mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${gradient} text-white shadow-lg`}
+    >
+      <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <Fragment set:html={iconPath} />
+      </svg>
+    </div>
+
+    <!-- Header -->
+    <h3 class="text-xl font-semibold text-neutral-900 dark:text-white">
+      {name}
+    </h3>
+    <p class="mt-2 text-neutral-600 dark:text-neutral-400">
+      {tagline}
+    </p>
+
+    <!-- Benefits List -->
+    <ul class="mt-4 space-y-2">
+      {benefits.slice(0, 3).map((benefit) => (
+        <li class="flex items-start gap-2 text-sm text-neutral-600 dark:text-neutral-400">
+          <svg
+            class="mt-0.5 h-4 w-4 flex-shrink-0 text-primary-500"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M5 13l4 4L19 7"
+            />
+          </svg>
+          <span>{benefit}</span>
+        </li>
+      ))}
+    </ul>
+
+    <!-- Expandable Details Button -->
+    <button
+      type="button"
+      class="mt-4 flex items-center gap-1 text-sm font-medium text-primary-500 hover:text-primary-600 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 rounded"
+      aria-expanded="false"
+      aria-controls={`${uniqueId}-details`}
+      data-expand-btn
+    >
+      <span class="expand-text">Show more</span>
+      <svg
+        class="h-4 w-4 transition-transform expand-icon"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M19 9l-7 7-7-7"
+        />
+      </svg>
+    </button>
+
+    <!-- Expandable Content -->
+    <div
+      id={`${uniqueId}-details`}
+      class="mt-4 hidden overflow-hidden"
+      data-expand-content
+    >
+      <div class="border-t border-neutral-200 pt-4 dark:border-neutral-700">
+        <!-- Full Description -->
+        <p class="text-sm text-neutral-600 dark:text-neutral-400">
+          {description}
+        </p>
+
+        <!-- Use Cases (if provided) -->
+        {useCases.length > 0 && (
+          <div class="mt-4">
+            <h4 class="text-sm font-medium text-neutral-900 dark:text-white">
+              Use Cases
+            </h4>
+            <ul class="mt-2 space-y-1">
+              {useCases.map((useCase) => (
+                <li class="flex items-start gap-2 text-sm text-neutral-600 dark:text-neutral-400">
+                  <span class="text-primary-500">→</span>
+                  <span>{useCase}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        <!-- Additional Benefits -->
+        {benefits.length > 3 && (
+          <div class="mt-4">
+            <h4 class="text-sm font-medium text-neutral-900 dark:text-white">
+              More Benefits
+            </h4>
+            <ul class="mt-2 space-y-1">
+              {benefits.slice(3).map((benefit) => (
+                <li class="flex items-start gap-2 text-sm text-neutral-600 dark:text-neutral-400">
+                  <svg
+                    class="mt-0.5 h-4 w-4 flex-shrink-0 text-primary-500"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>
+                  <span>{benefit}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function initFeatureCards() {
+    const cards = document.querySelectorAll('[data-feature-card]');
+
+    cards.forEach((card) => {
+      const expandBtn = card.querySelector('[data-expand-btn]');
+      const expandContent = card.querySelector('[data-expand-content]');
+      const expandText = expandBtn?.querySelector('.expand-text');
+      const expandIcon = expandBtn?.querySelector('.expand-icon');
+
+      expandBtn?.addEventListener('click', () => {
+        const isExpanded = expandBtn.getAttribute('aria-expanded') === 'true';
+
+        expandBtn.setAttribute('aria-expanded', String(!isExpanded));
+        expandContent?.classList.toggle('hidden');
+
+        if (expandText) {
+          expandText.textContent = isExpanded ? 'Show more' : 'Show less';
+        }
+
+        if (expandIcon) {
+          expandIcon.classList.toggle('rotate-180');
+        }
+      });
+
+      // Keyboard support for card focus
+      card.addEventListener('keydown', (event) => {
+        const e = event as KeyboardEvent;
+        if (e.key === 'Enter' || e.key === ' ') {
+          const target = e.target as HTMLElement;
+          if (target === card) {
+            e.preventDefault();
+            (expandBtn as HTMLButtonElement)?.click();
+          }
+        }
+      });
+    });
+  }
+
+  // Initialize on page load
+  initFeatureCards();
+
+  // Re-initialize on Astro view transitions
+  document.addEventListener('astro:after-swap', initFeatureCards);
+</script>
