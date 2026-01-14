@@ -69,9 +69,15 @@ async def get_kafka_producer() -> Optional[AIOKafkaProducer]:
     if _kafka_producer is None:
         try:
             await init_kafka_producer()
-        except Exception:
-            # Kafka is optional - service should work without it
-            pass
+        except Exception as e:
+            # Import logger inline to avoid circular dependency
+            from src.app.core.logging import logger
+
+            logger.warning(
+                "Failed to initialize Kafka producer - events will not be published",
+                error=str(e),
+                kafka_servers=settings.KAFKA_BOOTSTRAP_SERVERS,
+            )
     return _kafka_producer
 
 
@@ -92,9 +98,15 @@ async def send_event(topic: str, event: BaseEvent, key: str) -> None:
         event: Domain event to send
         key: Partition key (typically entity ID)
     """
+    from src.app.core.logging import logger
+
     producer = await get_kafka_producer()
     if producer is None:
-        # Kafka unavailable - log warning but don't fail request
+        logger.warning(
+            "Kafka producer unavailable - event not published",
+            event_type=event.event_type,
+            topic=topic,
+        )
         return
 
     try:
@@ -103,6 +115,11 @@ async def send_event(topic: str, event: BaseEvent, key: str) -> None:
             value=event.model_dump(mode="json"),
             key=key.encode("utf-8"),
         )
-    except Exception:
-        # Best-effort delivery - don't fail requests if Kafka is down
-        pass
+        logger.debug("Event published to Kafka", event_type=event.event_type, topic=topic)
+    except Exception as e:
+        logger.error(
+            "Failed to publish event to Kafka",
+            event_type=event.event_type,
+            topic=topic,
+            error=str(e),
+        )

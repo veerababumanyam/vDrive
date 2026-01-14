@@ -23,11 +23,17 @@ async def init_redis() -> Redis:
     return _redis_pool
 
 
-async def get_redis() -> Redis:
-    """Get Redis connection."""
+async def get_redis() -> Optional[Redis]:
+    """Get Redis connection (returns None if unavailable)."""
     global _redis_pool
     if _redis_pool is None:
-        await init_redis()
+        try:
+            await init_redis()
+        except Exception as e:
+            from src.app.core.logging import logger
+
+            logger.warning("Failed to connect to Redis", error=str(e))
+            return None
     return _redis_pool
 
 

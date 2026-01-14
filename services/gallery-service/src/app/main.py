@@ -71,13 +71,12 @@ async def health():
 
 @app.get("/ready")
 async def ready():
-    """Readiness probe endpoint."""
-    # TODO: Check database, Redis, Kafka connectivity
-    return {
-        "status": "ready",
-        "service": settings.SERVICE_NAME,
-        "version": settings.SERVICE_VERSION,
-    }
+    """Readiness probe endpoint with dependency checks."""
+    from src.app.core.health import readiness_check
+
+    result = await readiness_check()
+    status_code = 200 if result["status"] == "ready" else 503
+    return JSONResponse(content=result, status_code=status_code)
 
 
 @app.get("/metrics")

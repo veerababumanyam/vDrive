@@ -1,7 +1,7 @@
 """Database configuration and session management for Gallery Service"""
 
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator, Optional
+from typing import AsyncGenerator
 
 from sqlalchemy import CHAR, TypeDecorator
 from sqlalchemy.dialects.postgresql import UUID
@@ -14,10 +14,6 @@ from sqlalchemy.ext.asyncio import (
 from sqlalchemy.orm import DeclarativeBase
 
 from src.app.core.config import settings
-
-# Global engine and session factory
-_engine: Optional[AsyncEngine] = None
-_async_session_factory: Optional[async_sessionmaker[AsyncSession]] = None
 
 
 class GUID(TypeDecorator):
@@ -54,34 +50,24 @@ class Base(DeclarativeBase):
     pass
 
 
-def get_engine() -> AsyncEngine:
-    """Get or create async database engine."""
-    global _engine
-    if _engine is None:
-        _engine = create_async_engine(
-            settings.DATABASE_URL,
-            pool_size=settings.DB_POOL_MIN_SIZE,
-            max_overflow=settings.DB_POOL_MAX_SIZE - settings.DB_POOL_MIN_SIZE,
-            pool_recycle=settings.DB_POOL_MAX_LIFETIME_SEC,
-            pool_pre_ping=True,  # Health check connections before use
-            echo=settings.DB_ECHO,
-        )
-    return _engine
+# Create async engine with connection pooling (module-level)
+engine: AsyncEngine = create_async_engine(
+    settings.DATABASE_URL,
+    pool_size=settings.DB_POOL_MIN_SIZE,
+    max_overflow=settings.DB_POOL_MAX_SIZE - settings.DB_POOL_MIN_SIZE,
+    pool_recycle=settings.DB_POOL_MAX_LIFETIME_SEC,
+    pool_pre_ping=True,  # Health check connections before use
+    echo=settings.DB_ECHO,
+)
 
-
-def get_session_factory() -> async_sessionmaker[AsyncSession]:
-    """Get or create async session factory."""
-    global _async_session_factory
-    if _async_session_factory is None:
-        engine = get_engine()
-        _async_session_factory = async_sessionmaker(
-            engine,
-            class_=AsyncSession,
-            expire_on_commit=False,
-            autocommit=False,
-            autoflush=False,
-        )
-    return _async_session_factory
+# Session factory (module-level)
+async_session_factory: async_sessionmaker[AsyncSession] = async_sessionmaker(
+    engine,
+    class_=AsyncSession,
+    expire_on_commit=False,
+    autocommit=False,
+    autoflush=False,
+)
 
 
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
@@ -93,8 +79,7 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
         async def endpoint(db: AsyncSession = Depends(get_db)):
             ...
     """
-    session_factory = get_session_factory()
-    async with session_factory() as session:
+    async with async_session_factory() as session:
         try:
             yield session
         except Exception:
@@ -113,8 +98,7 @@ async def get_db_context() -> AsyncGenerator[AsyncSession, None]:
         async with get_db_context() as db:
             ...
     """
-    session_factory = get_session_factory()
-    async with session_factory() as session:
+    async with async_session_factory() as session:
         try:
             yield session
             await session.commit()  # Auto-commit on success
@@ -127,7 +111,5 @@ async def get_db_context() -> AsyncGenerator[AsyncSession, None]:
 
 async def close_db() -> None:
     """Close database engine (called on shutdown)."""
-    global _engine
-    if _engine is not None:
-        await _engine.dispose()
-        _engine = None
+    await engine.dispose()
+
