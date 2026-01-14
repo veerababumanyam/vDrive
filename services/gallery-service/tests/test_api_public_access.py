@@ -17,7 +17,7 @@ class TestVerifyLinkEndpoint:
         """Test verifying a valid magic link."""
         # Create gallery and share link
         gallery = Gallery(
-            workspace_id="workspace-123",
+            workspace_id="00000000-0000-0000-0000-000000000123",
             title="Test Gallery",
             status="published",
         )
@@ -61,7 +61,7 @@ class TestVerifyLinkEndpoint:
     async def test_verify_expired_link(self, client: AsyncClient, test_db_session):
         """Test verifying an expired magic link."""
         gallery = Gallery(
-            workspace_id="workspace-123",
+            workspace_id="00000000-0000-0000-0000-000000000123",
             title="Test Gallery",
             status="published",
         )
@@ -89,7 +89,7 @@ class TestVerifyLinkEndpoint:
     async def test_verify_password_required(self, client: AsyncClient, test_db_session):
         """Test link requiring password."""
         gallery = Gallery(
-            workspace_id="workspace-123",
+            workspace_id="00000000-0000-0000-0000-000000000123",
             title="Protected Gallery",
             status="published",
             password_hash=hash_password("secret123"),
@@ -121,7 +121,7 @@ class TestVerifyLinkEndpoint:
     ):
         """Test link with correct password."""
         gallery = Gallery(
-            workspace_id="workspace-123",
+            workspace_id="00000000-0000-0000-0000-000000000123",
             title="Protected Gallery",
             status="published",
             password_hash=hash_password("secret123"),
@@ -153,7 +153,7 @@ class TestVerifyLinkEndpoint:
     ):
         """Test link with wrong password."""
         gallery = Gallery(
-            workspace_id="workspace-123",
+            workspace_id="00000000-0000-0000-0000-000000000123",
             title="Protected Gallery",
             status="published",
             password_hash=hash_password("secret123"),
@@ -188,7 +188,7 @@ class TestGetGalleryPhotosEndpoint:
     async def test_get_gallery_photos(self, client: AsyncClient, test_db_session):
         """Test getting gallery photos."""
         gallery = Gallery(
-            workspace_id="workspace-123",
+            workspace_id="00000000-0000-0000-0000-000000000123",
             title="Test Gallery",
             status="published",
         )
@@ -220,7 +220,7 @@ class TestGetGalleryPhotosEndpoint:
     ):
         """Test gallery photos pagination."""
         gallery = Gallery(
-            workspace_id="workspace-123",
+            workspace_id="00000000-0000-0000-0000-000000000123",
             title="Test Gallery",
             status="published",
         )
@@ -264,7 +264,7 @@ class TestVerifyPinEndpoint:
     async def test_verify_correct_pin(self, client: AsyncClient, test_db_session):
         """Test verifying correct PIN."""
         gallery = Gallery(
-            workspace_id="workspace-123",
+            workspace_id="00000000-0000-0000-0000-000000000123",
             title="Test Gallery",
             status="published",
         )
@@ -294,7 +294,7 @@ class TestVerifyPinEndpoint:
     async def test_verify_wrong_pin(self, client: AsyncClient, test_db_session):
         """Test verifying wrong PIN."""
         gallery = Gallery(
-            workspace_id="workspace-123",
+            workspace_id="00000000-0000-0000-0000-000000000123",
             title="Test Gallery",
             status="published",
         )

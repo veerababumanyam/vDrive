@@ -35,7 +35,7 @@ class Gallery(Base):
         UUID(as_uuid=False),
         primary_key=True,
         default=lambda: str(uuid4()),
-        server_default=text("gen_random_uuid()::text"),
+        server_default=text("gen_random_uuid()"),
     )
 
     # Multi-tenancy

@@ -1,13 +1,17 @@
 """Pytest fixtures for Gallery Service tests."""
 
 import asyncio
+from datetime import datetime
 from typing import AsyncGenerator, Generator
+from uuid import uuid4
 
 import pytest
 import pytest_asyncio
 from httpx import AsyncClient
+from sqlalchemy import DateTime, String, text
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import Mapped, mapped_column, sessionmaker
 from sqlalchemy.pool import NullPool
 
 from src.app.core.config import settings
@@ -16,6 +20,28 @@ from src.app.main import app
 
 # Test database URL (use separate test database)
 TEST_DATABASE_URL = settings.DATABASE_URL.replace("/vdrive", "/vdrive_test")
+
+
+# Stub Workspaces model for testing (foreign key constraint)
+class Workspace(Base):
+    """Stub Workspace model for testing foreign key constraints."""
+
+    __tablename__ = "workspaces"
+
+    id: Mapped[str] = mapped_column(
+        UUID(as_uuid=False),
+        primary_key=True,
+        default=lambda: str(uuid4()),
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=datetime.utcnow,
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+    )
 
 
 @pytest.fixture(scope="session")
@@ -35,16 +61,24 @@ async def test_db_engine():
         echo=False,
     )
 
-    # Create all tables
+    # Clean slate: drop and recreate public schema to remove all dependencies
     async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
+        await conn.execute(text("DROP SCHEMA IF EXISTS public CASCADE"))
+        await conn.execute(text("CREATE SCHEMA public"))
         await conn.run_sync(Base.metadata.create_all)
+
+        # Insert test workspace for foreign key constraint
+        await conn.execute(text("""
+            INSERT INTO workspaces (id, created_at, updated_at)
+            VALUES ('00000000-0000-0000-0000-000000000123', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+        """))
 
     yield engine
 
-    # Drop all tables after test
+    # Cleanup: drop all tables
     async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
+        await conn.execute(text("DROP SCHEMA IF EXISTS public CASCADE"))
+        await conn.execute(text("CREATE SCHEMA public"))
 
     await engine.dispose()
 

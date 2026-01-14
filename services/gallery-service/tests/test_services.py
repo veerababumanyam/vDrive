@@ -20,7 +20,7 @@ class TestShareLinkService:
         """Test successful link verification."""
         # Create gallery and share link
         gallery = Gallery(
-            workspace_id="workspace-123",
+            workspace_id="00000000-0000-0000-0000-000000000123",
             title="Test Gallery",
             status="published",
         )
@@ -61,7 +61,7 @@ class TestShareLinkService:
     async def test_verify_link_expired(self, test_db_session):
         """Test expired link verification."""
         gallery = Gallery(
-            workspace_id="workspace-123",
+            workspace_id="00000000-0000-0000-0000-000000000123",
             title="Test Gallery",
             status="published",
         )
@@ -88,7 +88,7 @@ class TestShareLinkService:
     async def test_verify_link_password_required(self, test_db_session):
         """Test link requiring password."""
         gallery = Gallery(
-            workspace_id="workspace-123",
+            workspace_id="00000000-0000-0000-0000-000000000123",
             title="Test Gallery",
             status="published",
             password_hash=hash_password("secret123"),
@@ -117,7 +117,7 @@ class TestShareLinkService:
     async def test_verify_link_invalid_password(self, test_db_session):
         """Test link with invalid password."""
         gallery = Gallery(
-            workspace_id="workspace-123",
+            workspace_id="00000000-0000-0000-0000-000000000123",
             title="Test Gallery",
             status="published",
             password_hash=hash_password("secret123"),
@@ -146,7 +146,7 @@ class TestShareLinkService:
     async def test_verify_link_correct_password(self, test_db_session):
         """Test link with correct password."""
         gallery = Gallery(
-            workspace_id="workspace-123",
+            workspace_id="00000000-0000-0000-0000-000000000123",
             title="Test Gallery",
             status="published",
             password_hash=hash_password("secret123"),
@@ -176,7 +176,7 @@ class TestShareLinkService:
     async def test_increment_access_count(self, test_db_session):
         """Test incrementing access count."""
         gallery = Gallery(
-            workspace_id="workspace-123",
+            workspace_id="00000000-0000-0000-0000-000000000123",
             title="Test Gallery",
             status="published",
         )
@@ -206,7 +206,7 @@ class TestGalleryService:
     async def test_get_by_id_success(self, test_db_session):
         """Test getting gallery by ID."""
         gallery = Gallery(
-            workspace_id="workspace-123",
+            workspace_id="00000000-0000-0000-0000-000000000123",
             title="Test Gallery",
             status="published",
         )
@@ -229,7 +229,7 @@ class TestGalleryService:
     async def test_get_gallery_assets(self, test_db_session):
         """Test getting gallery assets with pagination."""
         gallery = Gallery(
-            workspace_id="workspace-123",
+            workspace_id="00000000-0000-0000-0000-000000000123",
             title="Test Gallery",
             status="published",
         )
@@ -260,7 +260,7 @@ class TestGalleryService:
     async def test_get_gallery_assets_no_more(self, test_db_session):
         """Test getting gallery assets when no more results."""
         gallery = Gallery(
-            workspace_id="workspace-123",
+            workspace_id="00000000-0000-0000-0000-000000000123",
             title="Test Gallery",
             status="published",
         )
@@ -291,7 +291,7 @@ class TestGalleryService:
     async def test_increment_asset_interaction(self, test_db_session):
         """Test incrementing asset interaction counts."""
         gallery = Gallery(
-            workspace_id="workspace-123",
+            workspace_id="00000000-0000-0000-0000-000000000123",
             title="Test Gallery",
             status="published",
         )

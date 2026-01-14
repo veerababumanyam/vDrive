@@ -19,7 +19,7 @@ class TestGalleryModel:
     async def test_gallery_creation(self, test_db_session):
         """Test creating a gallery."""
         gallery = Gallery(
-            workspace_id="workspace-123",
+            workspace_id="00000000-0000-0000-0000-000000000123",
             title="Test Gallery",
             description="Test description",
             status="published",
@@ -40,7 +40,7 @@ class TestGalleryModel:
     async def test_gallery_to_dict(self, test_db_session):
         """Test gallery to_dict method."""
         gallery = Gallery(
-            workspace_id="workspace-123",
+            workspace_id="00000000-0000-0000-0000-000000000123",
             title="Test Gallery",
             status="published",
         )
@@ -65,7 +65,7 @@ class TestSubGalleryModel:
         """Test creating a sub-gallery."""
         # Create parent gallery
         gallery = Gallery(
-            workspace_id="workspace-123",
+            workspace_id="00000000-0000-0000-0000-000000000123",
             title="Parent Gallery",
             status="published",
         )
@@ -98,7 +98,7 @@ class TestShareLinkModel:
         """Test creating a share link."""
         # Create gallery
         gallery = Gallery(
-            workspace_id="workspace-123",
+            workspace_id="00000000-0000-0000-0000-000000000123",
             title="Test Gallery",
             status="published",
         )
@@ -125,7 +125,7 @@ class TestShareLinkModel:
     async def test_share_link_is_expired_status(self, test_db_session):
         """Test share link expiration by status."""
         gallery = Gallery(
-            workspace_id="workspace-123",
+            workspace_id="00000000-0000-0000-0000-000000000123",
             title="Test Gallery",
             status="published",
         )
@@ -143,7 +143,7 @@ class TestShareLinkModel:
     async def test_share_link_is_expired_max_accesses(self, test_db_session):
         """Test share link expiration by max accesses."""
         gallery = Gallery(
-            workspace_id="workspace-123",
+            workspace_id="00000000-0000-0000-0000-000000000123",
             title="Test Gallery",
             status="published",
         )
@@ -169,7 +169,7 @@ class TestGalleryAssetModel:
         """Test creating a gallery asset."""
         # Create gallery
         gallery = Gallery(
-            workspace_id="workspace-123",
+            workspace_id="00000000-0000-0000-0000-000000000123",
             title="Test Gallery",
             status="published",
         )
@@ -197,7 +197,7 @@ class TestGalleryAssetModel:
     async def test_gallery_asset_to_dict(self, test_db_session):
         """Test gallery asset to_dict method."""
         gallery = Gallery(
-            workspace_id="workspace-123",
+            workspace_id="00000000-0000-0000-0000-000000000123",
             title="Test Gallery",
             status="published",
         )
@@ -230,7 +230,7 @@ class TestSecurityAuditLogModel:
         """Test creating a security audit log entry."""
         # Create gallery
         gallery = Gallery(
-            workspace_id="workspace-123",
+            workspace_id="00000000-0000-0000-0000-000000000123",
             title="Test Gallery",
             status="published",
         )
