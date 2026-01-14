@@ -54,6 +54,29 @@ export interface ApiError {
 }
 
 /**
+ * SECURITY: In-memory token storage (never localStorage)
+ * This module-level variable is only accessible within JavaScript runtime
+ * Protected from XSS attacks that target localStorage
+ */
+let memoryAccessToken: string | null = null;
+
+/**
+ * Set access token in memory (called by AuthContext)
+ * @internal - Only for use by AuthContext
+ */
+export function setTokenInMemory(token: string | null): void {
+  memoryAccessToken = token;
+}
+
+/**
+ * Get access token from memory
+ * @internal - Only for use by axios interceptors
+ */
+export function getTokenFromMemory(): string | null {
+  return memoryAccessToken;
+}
+
+/**
  * Create axios instance with default configuration
  */
 function createAuthClient(): AxiosInstance {
@@ -66,11 +89,11 @@ function createAuthClient(): AxiosInstance {
     withCredentials: true, // For HttpOnly refresh token cookie
   });
 
-  // Request interceptor - add auth token
+  // Request interceptor - add auth token from MEMORY (not localStorage)
   client.interceptors.request.use(
     (config) => {
-      // Get token from memory (will be managed by AuthContext)
-      const token = localStorage.getItem('access_token');
+      // SECURITY: Get token from module memory, NOT localStorage
+      const token = getTokenFromMemory();
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
@@ -103,15 +126,15 @@ function createAuthClient(): AxiosInstance {
           const refreshResponse = await authApi.refreshToken();
           const newToken = refreshResponse.access_token;
 
-          // Update token in storage
-          localStorage.setItem('access_token', newToken);
+          // SECURITY: Update token in memory (not localStorage)
+          setTokenInMemory(newToken);
 
           // Retry original request with new token
           originalRequest.headers.Authorization = `Bearer ${newToken}`;
           return client(originalRequest);
         } catch (refreshError) {
-          // Refresh failed - redirect to login
-          localStorage.removeItem('access_token');
+          // Refresh failed - clear memory and redirect to login
+          setTokenInMemory(null);
           window.location.href = '/signin';
           return Promise.reject(refreshError);
         }
@@ -136,7 +159,7 @@ export const authApi = {
    * Phase 3: User Story 1 - Email/Password Signin
    */
   async login(request: LoginRequest): Promise<LoginResponse> {
-    const response = await authClient.post<LoginResponse>('/login', request);
+    const response = await authClient.post<LoginResponse>('/auth/login', request);
     return response.data;
   },
 
@@ -145,7 +168,7 @@ export const authApi = {
    * Phase 4: User Story 2 - Google OAuth Signin
    */
   async googleSignin(): Promise<{ redirect_url: string }> {
-    const response = await authClient.get<{ redirect_url: string }>('/oauth/google/signin');
+    const response = await authClient.get<{ redirect_url: string }>('/oauth/google');
     return response.data;
   },
 
@@ -154,7 +177,7 @@ export const authApi = {
    * Phase 4: User Story 2 - Google OAuth Signin
    */
   async googleCallback(code: string, state: string): Promise<LoginResponse> {
-    const response = await authClient.get<LoginResponse>('/oauth/google/signin/callback', {
+    const response = await authClient.get<LoginResponse>('/oauth/google/callback', {
       params: { code, state },
     });
     return response.data;
@@ -165,7 +188,7 @@ export const authApi = {
    * Phase 5: User Story 3 - Session Refresh
    */
   async refreshToken(): Promise<RefreshResponse> {
-    const response = await authClient.post<RefreshResponse>('/refresh');
+    const response = await authClient.post<RefreshResponse>('/auth/refresh');
     return response.data;
   },
 
@@ -174,7 +197,7 @@ export const authApi = {
    * Phase 6: User Story 4 - Logout
    */
   async logout(): Promise<LogoutResponse> {
-    const response = await authClient.post<LogoutResponse>('/logout');
+    const response = await authClient.post<LogoutResponse>('/auth/logout');
     return response.data;
   },
 
@@ -183,7 +206,7 @@ export const authApi = {
    * Phase 6: User Story 4 - Logout
    */
   async logoutAll(): Promise<LogoutResponse> {
-    const response = await authClient.post<LogoutResponse>('/logout/all');
+    const response = await authClient.post<LogoutResponse>('/auth/logout/all');
     return response.data;
   },
 };

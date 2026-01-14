@@ -1,0 +1,1182 @@
+openapi: 3.1.0
+info:
+  title: vDrive Gallery Service API
+  version: 1.0.0
+  description: |
+    Gallery Service microservice for high-traffic public gallery viewing, Magic Links,
+    real-time proofing with WebSocket, and lead capture.
+
+    **Key Features**:
+    - Magic Link access with passwordless authentication
+    - Real-time WebSocket updates for favorites/selections
+    - LQIP placeholders and signed URL generation
+    - KEDA autoscaling (5-50 replicas)
+    - Multi-tenant workspace isolation
+
+  contact:
+    name: vDrive API Support
+    url: https://vdrive.io/support
+    email: support@vdrive.io
+
+servers:
+  - url: http://localhost:8004
+    description: Development (Docker Compose)
+  - url: https://app.vdrive.io/api/gallery
+    description: Production (Kubernetes + Traefik)
+
+tags:
+  - name: Public Gallery Access
+    description: Magic Link verification and gallery viewing for clients
+  - name: Gallery Viewing
+    description: Photo retrieval, pagination, and lightbox navigation
+  - name: Real-Time Proofing
+    description: WebSocket endpoints for live favorites/selections
+  - name: Batch Operations
+    description: Bulk photo management for staff
+  - name: Email Registration
+    description: Lead capture and visitor tracking
+  - name: Download Management
+    description: Download policy enforcement and signed URL generation
+  - name: QR Code Generation
+    description: Generate QR codes for Magic Links
+  - name: Staff Management
+    description: Gallery creation, settings, and analytics
+  - name: Health & Metrics
+    description: Kubernetes health checks and Prometheus metrics
+
+security:
+  - MagicLinkToken: []
+  - BearerAuth: []
+
+paths:
+  # ============================================================================
+  # Public Gallery Access (FR-006 to FR-010)
+  # ============================================================================
+
+  /public/verify-link:
+    post:
+      tags:
+        - Public Gallery Access
+      summary: Verify Magic Link token
+      description: |
+        Verifies Magic Link token and returns gallery access metadata. Checks:
+        - Link status (active)
+        - Expiration (expires_at > now)
+        - Max accesses (access_count < max_accesses)
+
+        **Rate Limiting**: 100 req/min per Magic Link token (FR-042)
+        **Functional Requirements**: FR-006, FR-007
+      operationId: verifyMagicLink
+      security:
+        - {} # Public endpoint (no auth required)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - link_id
+              properties:
+                link_id:
+                  type: string
+                  format: uuid
+                  description: Magic Link ID from URL query parameter
+                  example: "550e8400-e29b-41d4-a716-446655440000"
+                password:
+                  type: string
+                  description: Gallery password (if password_protected = true)
+                  example: "SecurePassword123"
+      responses:
+        '200':
+          description: Link verified successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MagicLinkAccessResponse'
+        '401':
+          description: Invalid or expired Magic Link
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                expired:
+                  value:
+                    error: "link_expired"
+                    message: "This Magic Link has expired"
+                max_accesses:
+                  value:
+                    error: "max_accesses_exceeded"
+                    message: "This Magic Link has reached its maximum number of accesses"
+        '403':
+          description: Password required or incorrect
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "password_required"
+                message: "This gallery requires a password"
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "rate_limit_exceeded"
+                message: "Too many attempts. Please try again in 15 minutes."
+
+  /public/gallery/{gallery_id}/photos:
+    get:
+      tags:
+        - Gallery Viewing
+      summary: Get gallery photos (paginated)
+      description: |
+        Returns paginated list of photos in a gallery with LQIP placeholders and signed URLs.
+
+        **Performance**:
+        - P95 latency: <300ms (FR-025)
+        - LQIP delivery: <50ms (FR-012)
+        - Cursor-based pagination for O(1) performance (FR-015)
+
+        **Caching**:
+        - Redis cache: 10-minute TTL (FR-023)
+        - Response headers: `Cache-Control: private, max-age=600`
+
+        **Functional Requirements**: FR-011 to FR-015, FR-021, FR-025
+      operationId: getGalleryPhotos
+      security:
+        - MagicLinkToken: []
+      parameters:
+        - name: gallery_id
+          in: path
+          required: true
+          description: Gallery UUID
+          schema:
+            type: string
+            format: uuid
+        - name: cursor
+          in: query
+          required: false
+          description: Cursor for pagination (base64-encoded timestamp|id)
+          schema:
+            type: string
+            example: "MjAyNi0wMS0xNFQxMjowMDowMFp8NTUwZTg0MDAtZTI5Yi00MWQ0LWE3MTYtNDQ2NjU1NDQwMDAw"
+        - name: limit
+          in: query
+          required: false
+          description: Number of photos per page (default: 50, max: 100)
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 50
+        - name: sub_gallery_id
+          in: query
+          required: false
+          description: Filter by sub-gallery (optional)
+          schema:
+            type: string
+            format: uuid
+        - name: include_private
+          in: query
+          required: false
+          description: Whether to include PIN-protected photos (requires PIN verification)
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: Photos retrieved successfully
+          headers:
+            Cache-Control:
+              description: Cache directives
+              schema:
+                type: string
+                example: "private, max-age=600"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GalleryPhotosResponse'
+        '401':
+          description: Unauthorized (invalid Magic Link token)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Gallery not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /public/photo/{asset_id}/verify-pin:
+    post:
+      tags:
+        - Gallery Viewing
+      summary: Verify PIN for private photo
+      description: |
+        Verifies PIN for PIN-protected photos. Returns signed URL on success.
+
+        **Security**:
+        - Argon2id PIN hashing (FR-009)
+        - Rate limiting: 5 attempts per 15 minutes (FR-044)
+        - Progressive delays: 1s, 2s, 4s, 8s, 16s (FR-044)
+
+        **Functional Requirements**: FR-009, FR-041, FR-044
+      operationId: verifyPhotoPin
+      security:
+        - MagicLinkToken: []
+      parameters:
+        - name: asset_id
+          in: path
+          required: true
+          description: Asset UUID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - pin
+              properties:
+                pin:
+                  type: string
+                  description: 4-6 digit PIN
+                  example: "1234"
+      responses:
+        '200':
+          description: PIN verified successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  thumbnail_url:
+                    type: string
+                    format: uri
+                    description: Signed URL for thumbnail (4-hour TTL)
+                  full_url:
+                    type: string
+                    format: uri
+                    description: Signed URL for original (1-hour TTL)
+        '403':
+          description: Incorrect PIN
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "incorrect_pin"
+                message: "Incorrect PIN. 3 attempts remaining."
+        '429':
+          description: Rate limit exceeded (5 attempts in 15 min)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "pin_lockout"
+                message: "Too many incorrect PIN attempts. Locked for 15 minutes."
+
+  # ============================================================================
+  # Real-Time Proofing WebSocket (FR-016 to FR-020)
+  # ============================================================================
+
+  /ws/gallery/{gallery_id}:
+    get:
+      tags:
+        - Real-Time Proofing
+      summary: WebSocket connection for real-time updates
+      description: |
+        Establishes WebSocket connection for live proofing. Broadcasts favorites, selections, and comments.
+
+        **Connection Limits**: 500 connections per pod (FR-018)
+        **Scaling**: KEDA triggers when connection count > 500 (FR-046)
+        **Reconnection**: Exponential backoff (1s, 2s, 4s, 8s, max 30s) (FR-019)
+        **Graceful Shutdown**: 30-second grace period during pod termination (FR-020)
+
+        **Message Format**:
+        ```json
+        {
+          "event_id": "uuid",
+          "event_type": "favorite_added",
+          "asset_id": "uuid",
+          "user_id": "uuid",
+          "timestamp": "2026-01-14T12:00:00Z",
+          "sequence_number": 42,
+          "payload": { ... }
+        }
+        ```
+
+        **Client → Server Messages**:
+        - `{"type": "favorite_add", "asset_id": "uuid"}` - Add favorite
+        - `{"type": "selection_add", "asset_id": "uuid"}` - Add selection
+        - `{"type": "comment_add", "asset_id": "uuid", "text": "Great shot!"}` - Add comment
+        - `{"type": "sync", "lastSeq": 35}` - Request missed events since sequence 35
+
+        **Server → Client Messages**:
+        - `{"event_type": "favorite_added", "asset_id": "uuid", ...}` - Favorite broadcast
+        - `{"event_type": "selection_added", "asset_id": "uuid", ...}` - Selection broadcast
+        - `{"event_type": "comment_added", "asset_id": "uuid", ...}` - Comment broadcast
+        - `{"event_type": "connection_opened", ...}` - Connection confirmation
+        - `{"event_type": "sync_response", "events": [...]}` - Missed events
+
+        **Functional Requirements**: FR-016 to FR-020
+      operationId: websocketGalleryProofing
+      security:
+        - MagicLinkToken: []
+      parameters:
+        - name: gallery_id
+          in: path
+          required: true
+          description: Gallery UUID
+          schema:
+            type: string
+            format: uuid
+        - name: lastSeq
+          in: query
+          required: false
+          description: Last sequence number received (for reconnection sync)
+          schema:
+            type: integer
+            example: 35
+      responses:
+        '101':
+          description: Switching Protocols (WebSocket established)
+        '401':
+          description: Unauthorized (invalid Magic Link token)
+        '503':
+          description: Service unavailable (connection limit reached)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "connection_limit_reached"
+                message: "Gallery has reached maximum concurrent viewers. Please try again shortly."
+
+  # ============================================================================
+  # Batch Operations (FR-026 to FR-030)
+  # ============================================================================
+
+  /staff/gallery/{gallery_id}/batch/visibility:
+    post:
+      tags:
+        - Batch Operations
+      summary: Batch toggle photo visibility
+      description: |
+        Toggles visibility for up to 500 photos in a single atomic transaction.
+
+        **Performance**: 30-second timeout (FR-030)
+        **Authorization**: Staff only (JWT required)
+
+        **Functional Requirements**: FR-026
+      operationId: batchToggleVisibility
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: gallery_id
+          in: path
+          required: true
+          description: Gallery UUID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - asset_ids
+                - visible
+              properties:
+                asset_ids:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+                  maxItems: 500
+                  description: Array of asset IDs to update (max 500)
+                  example: ["uuid1", "uuid2", "uuid3"]
+                visible:
+                  type: boolean
+                  description: Target visibility state
+                  example: false
+      responses:
+        '200':
+          description: Batch operation completed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  updated_count:
+                    type: integer
+                    description: Number of photos updated
+                    example: 250
+                  failed:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        asset_id:
+                          type: string
+                          format: uuid
+                        error:
+                          type: string
+                    description: Array of failed updates (if any)
+        '400':
+          description: Bad request (e.g., >500 assets)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "batch_size_exceeded"
+                message: "Maximum 500 assets per batch operation. Use background job for larger batches."
+        '408':
+          description: Request timeout (>30 seconds)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "batch_timeout"
+                message: "Batch operation exceeded 30-second timeout. Consider smaller batch size."
+
+  /staff/gallery/{gallery_id}/batch/sub-gallery:
+    post:
+      tags:
+        - Batch Operations
+      summary: Batch reassign photos to sub-gallery
+      description: |
+        Moves up to 500 photos to a different sub-gallery with rollback on failure.
+
+        **Functional Requirements**: FR-027
+      operationId: batchReassignSubGallery
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: gallery_id
+          in: path
+          required: true
+          description: Gallery UUID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - asset_ids
+                - sub_gallery_id
+              properties:
+                asset_ids:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+                  maxItems: 500
+                sub_gallery_id:
+                  type: string
+                  format: uuid
+                  description: Target sub-gallery UUID
+      responses:
+        '200':
+          description: Batch reassignment completed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  updated_count:
+                    type: integer
+                  failed:
+                    type: array
+                    items:
+                      type: object
+
+  /staff/gallery/{gallery_id}/batch/privacy:
+    post:
+      tags:
+        - Batch Operations
+      summary: Batch mark photos as private (PIN-protected)
+      description: |
+        Marks up to 500 photos as private and optionally sets a shared PIN.
+
+        **Functional Requirements**: FR-028
+      operationId: batchMarkPrivate
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: gallery_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - asset_ids
+                - is_private
+              properties:
+                asset_ids:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+                  maxItems: 500
+                is_private:
+                  type: boolean
+                  description: Whether to mark as private
+                pin:
+                  type: string
+                  description: Shared PIN for all selected photos (optional)
+                  example: "1234"
+      responses:
+        '200':
+          description: Batch privacy update completed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  updated_count:
+                    type: integer
+
+  /staff/gallery/{gallery_id}/batch/tags:
+    post:
+      tags:
+        - Batch Operations
+      summary: Batch update tags for photos
+      description: |
+        Adds or removes tags for up to 500 photos with conflict detection.
+
+        **Functional Requirements**: FR-029
+      operationId: batchUpdateTags
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: gallery_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - asset_ids
+                - operation
+                - tags
+              properties:
+                asset_ids:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+                  maxItems: 500
+                operation:
+                  type: string
+                  enum: [add, remove, replace]
+                  description: Tag operation type
+                tags:
+                  type: array
+                  items:
+                    type: string
+                  maxItems: 50
+                  description: Tags to add/remove/replace
+                  example: ["bride", "ceremony", "outdoor"]
+      responses:
+        '200':
+          description: Batch tag update completed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  updated_count:
+                    type: integer
+
+  # ============================================================================
+  # Email Registration (FR-031 to FR-035)
+  # ============================================================================
+
+  /public/register-visitor:
+    post:
+      tags:
+        - Email Registration
+      summary: Register visitor email before gallery access
+      description: |
+        Captures visitor information when `email_registration_required = true`.
+        Skips registration for returning visitors (email + gallery_id match).
+
+        **Validation**:
+        - RFC 5322 email format (FR-032)
+        - Optional: Block disposable email domains (FR-032)
+
+        **Functional Requirements**: FR-031 to FR-035
+      operationId: registerVisitor
+      security:
+        - MagicLinkToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - gallery_id
+                - link_id
+              properties:
+                email:
+                  type: string
+                  format: email
+                  description: Visitor email address
+                  example: "client@example.com"
+                name:
+                  type: string
+                  description: Full name (optional)
+                  example: "Jane Smith"
+                phone:
+                  type: string
+                  description: Phone number in E.164 format (optional)
+                  example: "+14155552671"
+                address:
+                  type: string
+                  description: Mailing address (optional)
+                metadata:
+                  type: object
+                  description: Custom fields (e.g., referral source)
+                  example:
+                    referral_source: "Instagram"
+                gallery_id:
+                  type: string
+                  format: uuid
+                  description: Gallery being accessed
+                link_id:
+                  type: string
+                  format: uuid
+                  description: Magic Link used
+      responses:
+        '200':
+          description: Visitor registered successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  visitor_id:
+                    type: string
+                    format: uuid
+                  skipped_registration:
+                    type: boolean
+                    description: True if visitor already registered for this gallery
+        '400':
+          description: Invalid email format or disposable domain
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalid_format:
+                  value:
+                    error: "invalid_email"
+                    message: "Email address is not valid"
+                disposable:
+                  value:
+                    error: "disposable_email_blocked"
+                    message: "Disposable email addresses are not allowed"
+
+  # ============================================================================
+  # Download Management (FR-036 to FR-040)
+  # ============================================================================
+
+  /public/photo/{asset_id}/download:
+    get:
+      tags:
+        - Download Management
+      summary: Request photo download with policy enforcement
+      description: |
+        Generates signed download URL based on gallery download policy.
+
+        **Download Policies** (FR-036):
+        - `VIEW_ONLY`: No downloads allowed
+        - `WEB_ONLY`: Max 1920px (web-optimized)
+        - `WATERMARKED_ONLY`: Watermark burned in
+        - `ORIGINAL_ALLOWED`: Full resolution
+
+        **Rate Limiting**: 50 downloads per minute per client (FR-038)
+        **Logging**: All downloads logged for analytics (FR-039)
+
+        **Functional Requirements**: FR-036 to FR-040
+      operationId: requestPhotoDownload
+      security:
+        - MagicLinkToken: []
+      parameters:
+        - name: asset_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: variant
+          in: query
+          required: false
+          description: Requested variant (must be allowed by policy)
+          schema:
+            type: string
+            enum: [web, watermarked, original]
+      responses:
+        '200':
+          description: Download URL generated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  download_url:
+                    type: string
+                    format: uri
+                    description: Signed URL (1-hour TTL)
+                  variant:
+                    type: string
+                    enum: [web, watermarked, original]
+                  expires_at:
+                    type: string
+                    format: date-time
+                    description: URL expiration timestamp
+        '403':
+          description: Download not allowed by policy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                view_only:
+                  value:
+                    error: "downloads_not_allowed"
+                    message: "This gallery does not allow downloads"
+                variant_restricted:
+                  value:
+                    error: "variant_not_allowed"
+                    message: "Original downloads are not allowed. Watermarked variant available."
+        '429':
+          description: Rate limit exceeded (50 downloads/min)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "download_rate_limit_exceeded"
+                message: "Too many download requests. Please wait before downloading more photos."
+
+  # ============================================================================
+  # QR Code Generation (FR-010)
+  # ============================================================================
+
+  /staff/share-link/{link_id}/qr-code:
+    get:
+      tags:
+        - QR Code Generation
+      summary: Generate QR code for Magic Link
+      description: |
+        Generates QR code PNG image with customizable size, color, logo, and error correction.
+
+        **QR Code Configuration**:
+        - Size: 300x300 px (default, configurable via query)
+        - Color: #000000 (default, configurable)
+        - Logo: Embedded in center (optional)
+        - Error Correction: M (default), L/Q/H available
+
+        **Functional Requirements**: FR-010
+      operationId: generateQRCode
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: link_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 300
+            enum: [200, 300, 500, 1000]
+        - name: color
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: '^#[0-9A-Fa-f]{6}$'
+            default: "#000000"
+        - name: logo
+          in: query
+          required: false
+          description: Whether to embed logo in center
+          schema:
+            type: boolean
+            default: true
+        - name: error_correction
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [L, M, Q, H]
+            default: M
+      responses:
+        '200':
+          description: QR code PNG image
+          content:
+            image/png:
+              schema:
+                type: string
+                format: binary
+
+  # ============================================================================
+  # Health & Metrics (FR-003, FR-004, FR-051)
+  # ============================================================================
+
+  /health:
+    get:
+      tags:
+        - Health & Metrics
+      summary: Liveness probe
+      description: |
+        Kubernetes liveness probe. Returns 200 if service is alive.
+
+        **Functional Requirements**: FR-004
+      operationId: healthCheck
+      security:
+        - {} # Public endpoint
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "healthy"
+
+  /ready:
+    get:
+      tags:
+        - Health & Metrics
+      summary: Readiness probe
+      description: |
+        Kubernetes readiness probe. Returns 200 if service is ready to accept traffic.
+        Checks:
+        - Database connection
+        - Redis connection
+        - Kafka connection (optional)
+
+        **Functional Requirements**: FR-004
+      operationId: readinessCheck
+      security:
+        - {} # Public endpoint
+      responses:
+        '200':
+          description: Service is ready
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "ready"
+                  checks:
+                    type: object
+                    properties:
+                      database:
+                        type: string
+                        example: "ok"
+                      redis:
+                        type: string
+                        example: "ok"
+        '503':
+          description: Service not ready (dependencies unavailable)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "not_ready"
+                  checks:
+                    type: object
+                    properties:
+                      database:
+                        type: string
+                        example: "error: connection refused"
+
+  /metrics:
+    get:
+      tags:
+        - Health & Metrics
+      summary: Prometheus metrics endpoint
+      description: |
+        Exposes Prometheus metrics for KEDA autoscaling and monitoring.
+
+        **Metrics Exposed** (FR-003, FR-050, FR-051):
+        - `http_requests_total` - Total HTTP requests (counter)
+        - `http_request_duration_seconds` - Request latency histogram (p50/p95/p99)
+        - `websocket_active_connections` - Active WebSocket connections (gauge)
+        - `active_connections` - Total active connections (gauge)
+        - `requests_per_second` - Current RPS (gauge)
+        - `cache_hit_ratio` - Redis cache hit rate (gauge)
+        - `error_rate` - Error rate percentage (gauge)
+
+        **Functional Requirements**: FR-003, FR-050, FR-051
+      operationId: prometheusMetrics
+      security:
+        - {} # Public endpoint (Prometheus scraper)
+      responses:
+        '200':
+          description: Prometheus metrics in text format
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: |
+                  # HELP http_requests_total Total HTTP requests
+                  # TYPE http_requests_total counter
+                  http_requests_total{method="GET",endpoint="/public/gallery/{gallery_id}/photos",status="200"} 1234
+
+                  # HELP http_request_duration_seconds HTTP request latency
+                  # TYPE http_request_duration_seconds histogram
+                  http_request_duration_seconds_bucket{method="GET",endpoint="/public/gallery/{gallery_id}/photos",le="0.1"} 800
+                  http_request_duration_seconds_bucket{method="GET",endpoint="/public/gallery/{gallery_id}/photos",le="0.3"} 1200
+                  http_request_duration_seconds_sum{method="GET",endpoint="/public/gallery/{gallery_id}/photos"} 250.5
+                  http_request_duration_seconds_count{method="GET",endpoint="/public/gallery/{gallery_id}/photos"} 1234
+
+                  # HELP websocket_active_connections Active WebSocket connections
+                  # TYPE websocket_active_connections gauge
+                  websocket_active_connections{gallery_id="550e8400-e29b-41d4-a716-446655440000"} 42
+
+# ============================================================================
+# Components: Reusable Schemas
+# ============================================================================
+
+components:
+  securitySchemes:
+    MagicLinkToken:
+      type: apiKey
+      in: header
+      name: X-Magic-Link-Token
+      description: Magic Link token for public gallery access
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token for staff endpoints
+
+  schemas:
+    ErrorResponse:
+      type: object
+      required:
+        - error
+        - message
+      properties:
+        error:
+          type: string
+          description: Machine-readable error code
+          example: "link_expired"
+        message:
+          type: string
+          description: Human-readable error message
+          example: "This Magic Link has expired"
+        details:
+          type: array
+          items:
+            type: object
+          description: Additional error details (optional)
+
+    MagicLinkAccessResponse:
+      type: object
+      required:
+        - gallery_id
+        - title
+        - layout_style
+        - allowed_actions
+      properties:
+        gallery_id:
+          type: string
+          format: uuid
+        title:
+          type: string
+          example: "Smith Wedding - June 2026"
+        description:
+          type: string
+        client_name:
+          type: string
+        shoot_date:
+          type: string
+          format: date
+        layout_style:
+          type: string
+          enum: [tab, continuous_scroll]
+        theme:
+          type: string
+          example: "light"
+        password_protected:
+          type: boolean
+        email_registration_required:
+          type: boolean
+        allowed_actions:
+          type: array
+          items:
+            type: string
+            enum: [view, favorite, select, comment, download]
+        download_policy:
+          type: string
+          enum: [VIEW_ONLY, WEB_ONLY, WATERMARKED_ONLY, ORIGINAL_ALLOWED]
+        sub_galleries:
+          type: array
+          items:
+            $ref: '#/components/schemas/SubGallery'
+        stats:
+          $ref: '#/components/schemas/GalleryStats'
+
+    SubGallery:
+      type: object
+      properties:
+        sub_gallery_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: "Ceremony"
+        description:
+          type: string
+        sort_order:
+          type: integer
+        visible:
+          type: boolean
+        cover_asset_id:
+          type: string
+          format: uuid
+        photo_count:
+          type: integer
+
+    GalleryStats:
+      type: object
+      properties:
+        photo_count:
+          type: integer
+          example: 250
+        video_count:
+          type: integer
+          example: 5
+        favorites_count:
+          type: integer
+          example: 42
+        total_size_bytes:
+          type: integer
+          format: int64
+          example: 5368709120
+
+    GalleryPhotosResponse:
+      type: object
+      required:
+        - photos
+        - has_more
+      properties:
+        photos:
+          type: array
+          items:
+            $ref: '#/components/schemas/GalleryPhoto'
+        next_cursor:
+          type: string
+          description: Cursor for next page (null if no more pages)
+        has_more:
+          type: boolean
+          description: Whether more pages are available
+        total_count:
+          type: integer
+          description: Total photo count (from denormalized stats)
+
+    GalleryPhoto:
+      type: object
+      required:
+        - asset_id
+        - lqip
+        - thumbnail_url
+      properties:
+        asset_id:
+          type: string
+          format: uuid
+        sub_gallery_id:
+          type: string
+          format: uuid
+        type:
+          type: string
+          enum: [photo, video]
+        width:
+          type: integer
+        height:
+          type: integer
+        lqip:
+          type: string
+          description: Base64-encoded WebP data URI (16x16, ~100-200 bytes)
+          example: "data:image/webp;base64,UklGRiQAAABXRUJQVlA4IBgAAAAwAQCdASoBAAEAAwA0JaQAA3AA/vuUAAA="
+        thumbnail_url:
+          type: string
+          format: uri
+          description: Signed URL for 800x600 thumbnail (4-hour TTL)
+        full_url:
+          type: string
+          format: uri
+          description: Signed URL for full-size photo (1-hour TTL, only if download allowed)
+        title:
+          type: string
+        description:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        is_private:
+          type: boolean
+          description: Whether photo requires PIN to view
+        favorites_count:
+          type: integer
+        selections_count:
+          type: integer
+        date_taken:
+          type: string
+          format: date-time
+        exif_data:
+          type: object
+          description: EXIF metadata (camera model, ISO, aperture, etc.)

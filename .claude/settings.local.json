@@ -230,7 +230,20 @@
       "Bash(export DATABASE_URL:*)",
       "mcp__plugin_serena_serena__list_dir",
       "Bash(pip3 install:*)",
-      "Bash(/opt/homebrew/opt/python@3.11/bin/python3.11:*)"
+      "Bash(/opt/homebrew/opt/python@3.11/bin/python3.11:*)",
+      "Bash(git checkout:*)",
+      "Bash(git reset:*)",
+      "Bash(git commit:*)",
+      "mcp__plugin_serena_serena__get_symbols_overview",
+      "mcp__plugin_serena_serena__find_symbol",
+      "mcp__plugin_serena_serena__find_file",
+      "Bash(docker inspect:*)",
+      "Bash(chmod:*)",
+      "Bash(./test_auth_integration.sh:*)",
+      "Bash(printf:*)",
+      "Bash(jq:*)",
+      "Bash(./test_endpoints.sh:*)",
+      "Bash(./test_rate_limit_header.sh)"
     ]
   }
 }

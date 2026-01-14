@@ -15,6 +15,7 @@ import type { ActivationChecklistItem } from '../types/onboarding';
 import { cn } from '../lib/utils';
 import { useBreakpoint, useHaptic, usePrefersReducedMotion, useSafeArea } from '../hooks/useMobile';
 import { useCallback } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 
 // ============================================
 // Icons
@@ -283,6 +284,7 @@ const quickActions = [
 
 export function DashboardPage() {
   const navigate = useNavigate();
+  const { logout } = useAuth();
   const workspaceName = localStorage.getItem('workspace_name') || 'Your Studio';
 
   // Mobile-first hooks
@@ -307,6 +309,18 @@ export function DashboardPage() {
     haptic.success();
     navigate('/galleries/new');
   }, [haptic, navigate]);
+
+  const handleLogout = useCallback(async () => {
+    haptic.medium();
+    try {
+      await logout();
+      navigate('/signin');
+    } catch (error) {
+      console.error('Logout failed:', error);
+      // Still navigate to signin even if API call fails
+      navigate('/signin');
+    }
+  }, [haptic, logout, navigate]);
 
   return (
     <div className="min-h-screen-dynamic bg-neutral-50 dark:bg-warm-950 transition-colors duration-300 relative overflow-hidden">
@@ -343,6 +357,24 @@ export function DashboardPage() {
           {/* Right side */}
           <div className="flex items-center gap-2 sm:gap-4">
             <ThemeToggle size="sm" />
+            {/* T065: Logout button */}
+            <button
+              onClick={handleLogout}
+              className={cn(
+                "hidden sm:flex items-center gap-2 touch-target px-3 py-1.5 rounded-xl",
+                "bg-neutral-100 dark:bg-white/10",
+                "hover:bg-neutral-200 dark:hover:bg-white/15",
+                "text-neutral-700 dark:text-white/80",
+                "text-sm font-medium",
+                "transition-colors"
+              )}
+              aria-label="Sign out"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+              <span className="hidden lg:inline">Sign Out</span>
+            </button>
             {/* Mobile menu button */}
             <button
               className={cn(

@@ -233,6 +233,7 @@ async def google_signin_init(
     T032: OAuth state storage with "signin" flow type
     """
     import json
+    from src.app.core.security import generate_oauth_state
 
     # Generate state token for CSRF protection (T031)
     state = generate_oauth_state()
@@ -302,6 +303,7 @@ async def google_signin_callback(
     """
     import json
     import httpx
+    from src.app.schemas.auth import LoginResponse, UserResponse
 
     # Extract client context
     client_ip = get_client_ip(request)
@@ -513,6 +515,8 @@ async def refresh_token(
     - New JWT access token (15 min expiry)
     - New refresh token in HttpOnly cookie (token rotation)
     """
+    from src.app.core.security import create_access_token, create_refresh_token, verify_token
+    from src.app.schemas.auth import RefreshResponse
 
     # Extract client context
     client_ip = get_client_ip(request)
@@ -649,6 +653,8 @@ async def logout(
     - Confirmation message
     - Clears HttpOnly refresh token cookie
     """
+    from src.app.core.security import verify_token
+    from src.app.schemas.auth import LogoutResponse
 
     # Extract client context
     client_ip = get_client_ip(request)
@@ -741,6 +747,8 @@ async def logout_all(
     Returns:
     - Confirmation message with number of sessions deleted
     """
+    from src.app.core.security import verify_token
+    from src.app.schemas.auth import LogoutResponse
 
     # Extract client context
     client_ip = get_client_ip(request)

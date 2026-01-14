@@ -6,7 +6,7 @@
  */
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { authApi, type LoginRequest, type LoginResponse, handleAuthError } from '../services/authService';
+import { authApi, type LoginRequest, type LoginResponse, handleAuthError, setTokenInMemory } from '../services/authService';
 
 /**
  * User type from API
@@ -61,21 +61,41 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  // Initialize auth state from localStorage on mount
+  // Initialize auth state on mount
+  // T041: Handle OAuth callback token extraction from URL fragment
+  // SECURITY: Access tokens stored ONLY in memory, never localStorage
+  // Refresh tokens stored in HttpOnly cookies by backend
   useEffect(() => {
     const initializeAuth = () => {
       try {
-        const storedToken = localStorage.getItem('access_token');
-        const storedUser = localStorage.getItem('user');
+        // Check for OAuth callback tokens in URL fragment (from backend redirect)
+        const fragment = window.location.hash.substring(1);
+        const params = new URLSearchParams(fragment);
+        const oauthToken = params.get('access_token');
+        const oauthUser = params.get('user');
 
-        if (storedToken && storedUser) {
-          setAccessToken(storedToken);
-          setUser(JSON.parse(storedUser));
+        if (oauthToken && oauthUser) {
+          // OAuth callback - store in MEMORY ONLY (not localStorage)
+          const userData = JSON.parse(decodeURIComponent(oauthUser));
+          localStorage.setItem('user', JSON.stringify(userData)); // User data OK (not sensitive)
+          setAccessToken(oauthToken); // React state
+          setTokenInMemory(oauthToken); // Axios interceptor access
+          setUser(userData);
+
+          // Clean URL (remove fragment)
+          window.history.replaceState(null, '', window.location.pathname);
+        } else {
+          // Normal initialization from storage
+          const storedUser = localStorage.getItem('user');
+
+          if (storedUser) {
+            setUser(JSON.parse(storedUser));
+            // Access token will be automatically refreshed if needed by interceptor
+          }
         }
       } catch (error) {
         console.error('Failed to initialize auth state:', error);
         // Clear corrupted data
-        localStorage.removeItem('access_token');
         localStorage.removeItem('user');
       } finally {
         setIsLoading(false);
@@ -94,12 +114,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       const response = await authApi.login(request);
 
-      // Store token in localStorage (access token) and memory (user)
-      // Refresh token is stored in HttpOnly cookie by backend
-      localStorage.setItem('access_token', response.access_token);
+      // SECURITY: Store access token ONLY in memory (React state), never localStorage
+      // Refresh token is automatically stored in HttpOnly cookie by backend
+      // User data (non-sensitive) can be stored in localStorage for convenience
       localStorage.setItem('user', JSON.stringify(response.user));
 
-      setAccessToken(response.access_token);
+      setAccessToken(response.access_token); // React state
+      setTokenInMemory(response.access_token); // Axios interceptor access
       setUser(response.user);
 
       return response;
@@ -120,10 +141,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
       console.error('Logout API call failed:', error);
       // Continue with local cleanup even if API fails
     } finally {
-      // Clear local state
-      localStorage.removeItem('access_token');
+      // Clear local state (access token in memory, user data in localStorage)
       localStorage.removeItem('user');
-      setAccessToken(null);
+      setAccessToken(null); // Clear React state
+      setTokenInMemory(null); // Clear axios interceptor token
       setUser(null);
     }
   };
@@ -139,10 +160,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
       console.error('Logout all devices failed:', error);
       // Continue with local cleanup even if API fails
     } finally {
-      // Clear local state
-      localStorage.removeItem('access_token');
+      // Clear local state (access token in memory, user data in localStorage)
       localStorage.removeItem('user');
-      setAccessToken(null);
+      setAccessToken(null); // Clear React state
+      setTokenInMemory(null); // Clear axios interceptor token
       setUser(null);
     }
   };
@@ -156,15 +177,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       const response = await authApi.refreshToken();
 
-      // Update access token
-      localStorage.setItem('access_token', response.access_token);
-      setAccessToken(response.access_token);
+      // SECURITY: Update access token in memory only (never localStorage)
+      setAccessToken(response.access_token); // React state
+      setTokenInMemory(response.access_token); // Axios interceptor access
     } catch (error) {
       console.error('Token refresh failed:', error);
       // If refresh fails, clear auth state and redirect to login
-      localStorage.removeItem('access_token');
       localStorage.removeItem('user');
-      setAccessToken(null);
+      setAccessToken(null); // Clear React state
+      setTokenInMemory(null); // Clear axios interceptor token
       setUser(null);
       throw error;
     }

@@ -7,7 +7,7 @@ from sqlalchemy import String, Text, DateTime, ForeignKey, func, CheckConstraint
 from sqlalchemy.dialects.postgresql import UUID as PGUUID, JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.core.database import Base
+from src.app.core.database import Base
 
 
 class AuthAuditLog(Base):
@@ -54,7 +54,8 @@ class AuthAuditLog(Base):
     session_id: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
 
     # Additional data
-    metadata: Mapped[dict] = mapped_column(
+    event_metadata: Mapped[dict] = mapped_column(
+        "metadata",  # Database column name
         JSONB,
         nullable=False,
         default=dict,

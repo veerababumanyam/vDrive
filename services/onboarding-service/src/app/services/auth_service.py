@@ -47,14 +47,19 @@ class AuthService:
         Check if IP has exceeded login rate limit.
 
         Raises:
-            RateLimitError: If rate limit exceeded
+            RateLimitError: If rate limit exceeded (includes Retry-After header)
         """
         key = f"rate_limit:login:{ip_address}"
         count = await self.redis.get(key)
 
         if count and int(count) >= settings.RATE_LIMIT_LOGIN_MAX:
+            # Get TTL to provide accurate retry_after value
+            ttl = await self.redis.ttl(key)
+            retry_after = ttl if ttl > 0 else settings.RATE_LIMIT_LOGIN_WINDOW_SECONDS
+
             raise RateLimitError(
-                f"Too many login attempts. Try again in {settings.RATE_LIMIT_LOGIN_WINDOW_SECONDS // 60} minutes."
+                f"Too many login attempts. Try again in {retry_after // 60} minutes.",
+                retry_after=retry_after
             )
 
     async def increment_rate_limit(self, ip_address: str) -> None:
@@ -279,7 +284,7 @@ class AuthService:
                 ip_address=ip_address,
                 user_agent=user_agent,
                 session_id=session_id,
-                metadata=metadata or {},
+                event_metadata=metadata or {},
             )
 
             self.db.add(audit_log)

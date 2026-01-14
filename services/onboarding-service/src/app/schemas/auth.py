@@ -112,8 +112,9 @@ class AuthAuditLogResponse(BaseModel):
     ip_address: Optional[str] = None
     user_agent: Optional[str] = None
     session_id: Optional[str] = None
-    metadata: dict = Field(default_factory=dict)
+    metadata: dict = Field(default_factory=dict, validation_alias="event_metadata")
     result: str
 
     class Config:
         from_attributes = True
+        populate_by_name = True

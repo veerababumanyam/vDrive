@@ -14,9 +14,14 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider } from './hooks/useTheme';
 
+// Auth Context & Components
+import { AuthProvider } from './contexts/AuthContext';
+import { ProtectedRoute } from './components/auth/ProtectedRoute';
+
 // Auth Pages
 import { RegisterPage } from './pages/Register';
 import { LoginPage } from './pages/Login';
+
 import { VerifyEmailPage } from './pages/VerifyEmail';
 
 // Onboarding Pages
@@ -44,37 +49,83 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider defaultTheme="dark">
         <BrowserRouter>
-          <Routes>
-            {/* ============================================
-                Auth Routes - Sign In is the default
-                ============================================ */}
-            <Route path="/" element={<Navigate to="/sign-in" replace />} />
-            <Route path="/sign-in" element={<LoginPage />} />
-            <Route path="/login" element={<Navigate to="/sign-in" replace />} />
-            <Route path="/sign-up" element={<RegisterPage />} />
-            <Route path="/register" element={<Navigate to="/sign-up" replace />} />
-            <Route path="/verify-email" element={<VerifyEmailPage />} />
+          {/* T076: Wrap app with AuthProvider for authentication state */}
+          <AuthProvider>
+            <Routes>
+              {/* ============================================
+                  Auth Routes - Sign In is the default
+                  ============================================ */}
+              <Route path="/" element={<Navigate to="/signin" replace />} />
+              <Route path="/signin" element={<LoginPage />} />
+              <Route path="/sign-in" element={<Navigate to="/signin" replace />} />
+              <Route path="/login" element={<Navigate to="/signin" replace />} />
+              <Route path="/sign-up" element={<RegisterPage />} />
+              <Route path="/register" element={<Navigate to="/sign-up" replace />} />
+              <Route path="/verify-email" element={<VerifyEmailPage />} />
 
-            {/* ============================================
-                Onboarding Flow
-                ============================================ */}
-            <Route path="/onboarding/workspace" element={<WorkspaceSetupPage />} />
+              {/* ============================================
+                  Onboarding Flow (Protected)
+                  ============================================ */}
+              <Route
+                path="/onboarding/workspace"
+                element={
+                  <ProtectedRoute>
+                    <WorkspaceSetupPage />
+                  </ProtectedRoute>
+                }
+              />
 
-            {/* ============================================
-                Protected Application Routes
-                ============================================ */}
-            <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/galleries/*" element={<PlaceholderPage />} />
-            <Route path="/upload" element={<PlaceholderPage />} />
-            <Route path="/clients/*" element={<PlaceholderPage />} />
-            <Route path="/settings" element={<PlaceholderPage />} />
+              {/* ============================================
+                  Protected Application Routes
+                  ============================================ */}
+              <Route
+                path="/dashboard"
+                element={
+                  <ProtectedRoute>
+                    <DashboardPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/galleries/*"
+                element={
+                  <ProtectedRoute>
+                    <PlaceholderPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/upload"
+                element={
+                  <ProtectedRoute>
+                    <PlaceholderPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/clients/*"
+                element={
+                  <ProtectedRoute>
+                    <PlaceholderPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/settings"
+                element={
+                  <ProtectedRoute>
+                    <PlaceholderPage />
+                  </ProtectedRoute>
+                }
+              />
 
-            {/* ============================================
-                Fallback Routes
-                ============================================ */}
-            {/* Unknown routes redirect to sign-in */}
-            <Route path="*" element={<Navigate to="/sign-in" replace />} />
-          </Routes>
+              {/* ============================================
+                  Fallback Routes
+                  ============================================ */}
+              {/* Unknown routes redirect to sign-in */}
+              <Route path="*" element={<Navigate to="/signin" replace />} />
+            </Routes>
+          </AuthProvider>
         </BrowserRouter>
       </ThemeProvider>
     </QueryClientProvider>
