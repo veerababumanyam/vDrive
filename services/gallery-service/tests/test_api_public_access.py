@@ -199,7 +199,7 @@ class TestGetGalleryPhotosEndpoint:
         for i in range(3):
             asset = GalleryAsset(
                 gallery_id=gallery.id,
-                asset_id=f"asset-{i}",
+                asset_id=f"00000000-0000-0000-0000-{i:012d}",
                 is_private=False,
             )
             test_db_session.add(asset)
@@ -231,7 +231,7 @@ class TestGetGalleryPhotosEndpoint:
         for i in range(10):
             asset = GalleryAsset(
                 gallery_id=gallery.id,
-                asset_id=f"asset-{i}",
+                asset_id=f"00000000-0000-0000-0000-{i:012d}",
                 is_private=False,
             )
             test_db_session.add(asset)
@@ -273,7 +273,7 @@ class TestVerifyPinEndpoint:
 
         asset = GalleryAsset(
             gallery_id=gallery.id,
-            asset_id="asset-123",
+            asset_id="00000000-0000-0000-0000-000000000123",
             is_private=True,
             pin_hash=hash_password("1234"),
         )
@@ -303,7 +303,7 @@ class TestVerifyPinEndpoint:
 
         asset = GalleryAsset(
             gallery_id=gallery.id,
-            asset_id="asset-123",
+            asset_id="00000000-0000-0000-0000-000000000123",
             is_private=True,
             pin_hash=hash_password("1234"),
         )

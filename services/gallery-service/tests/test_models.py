@@ -179,7 +179,7 @@ class TestGalleryAssetModel:
         # Create asset
         asset = GalleryAsset(
             gallery_id=gallery.id,
-            asset_id="asset-123",
+            asset_id="00000000-0000-0000-0000-000000000123",
             is_private=False,
             tags=["landscape", "nature"],
         )
@@ -206,7 +206,7 @@ class TestGalleryAssetModel:
 
         asset = GalleryAsset(
             gallery_id=gallery.id,
-            asset_id="asset-123",
+            asset_id="00000000-0000-0000-0000-000000000123",
             is_private=True,
             pin_hash=hash_password("1234"),
         )
