@@ -23,7 +23,7 @@ class SignedUrlService:
         if self._s3_client is None:
             self._s3_client = boto3.client(
                 "s3",
-                endpoint_url=settings.R2_ENDPOINT_URL,
+                endpoint_url=settings.R2_ENDPOINT,
                 aws_access_key_id=settings.R2_ACCESS_KEY_ID,
                 aws_secret_access_key=settings.R2_SECRET_ACCESS_KEY,
                 region_name=settings.R2_REGION,
