@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import { ActivationChecklist } from '../components/onboarding/ActivationChecklist';
 import { ThemeToggle } from '../components/onboarding/ThemeToggle';
 import { AnimatedCounter } from '../components/ui/AnimatedCounter';
+import { AppLogo } from '../components/ui/AppLogo';
 import type { ActivationChecklistItem } from '../types/onboarding';
 import { cn } from '../lib/utils';
 import { useBreakpoint, useHaptic, usePrefersReducedMotion, useSafeArea } from '../hooks/useMobile';
@@ -335,12 +336,7 @@ export function DashboardPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-14 sm:h-16 flex items-center justify-between">
           {/* Logo */}
           <a href="/" className="flex items-center gap-2.5 group touch-target">
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl blur-lg opacity-30 group-hover:opacity-50 transition-opacity" />
-              <div className="relative w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-blue-500/25 group-hover:shadow-blue-500/40 transition-shadow">
-                <CameraIcon className="w-5 h-5 text-white" />
-              </div>
-            </div>
+            <AppLogo size="sm" className="transition-transform group-hover:scale-110" />
             <span className="text-lg font-bold text-neutral-900 dark:text-white hidden sm:block">vDrive</span>
           </a>
 
