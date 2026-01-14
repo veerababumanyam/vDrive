@@ -46,7 +46,7 @@ class SecurityAuditService:
             event_type=event_type,
             result=result,
             message=message,
-            metadata=metadata,
+            event_metadata=metadata,
             ip_address=ip_address,
             user_agent=user_agent,
         )

@@ -473,7 +473,7 @@ def upgrade() -> None:
             nullable=False,
         ),  # success, failure, blocked
         sa.Column("message", sa.Text(), nullable=True),
-        sa.Column("metadata", postgresql.JSONB(), nullable=True),
+        sa.Column("event_metadata", postgresql.JSONB(), nullable=True),
         # Client info
         sa.Column("ip_address", sa.String(45), nullable=True, index=True),
         sa.Column("user_agent", sa.Text(), nullable=True),

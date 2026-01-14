@@ -46,7 +46,8 @@ class SecurityAuditLog(Base):
     message: Mapped[str] = mapped_column(Text, nullable=False)
 
     # Event metadata (JSONB for flexible storage)
-    metadata: Mapped[Optional[dict[str, Any]]] = mapped_column(
+    # Note: Using 'event_metadata' instead of 'metadata' to avoid SQLAlchemy reserved name
+    event_metadata: Mapped[Optional[dict[str, Any]]] = mapped_column(
         JSON,
         nullable=True,
     )
@@ -78,7 +79,7 @@ class SecurityAuditLog(Base):
             "event_type": self.event_type,
             "result": self.result,
             "message": self.message,
-            "metadata": self.metadata,
+            "event_metadata": self.event_metadata,
             "ip_address": self.ip_address,
             "user_agent": self.user_agent,
             "created_at": self.created_at.isoformat() if self.created_at else None,

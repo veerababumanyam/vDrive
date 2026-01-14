@@ -10,13 +10,13 @@ from src.app.core.database import get_db
 from src.app.core.logging import logger
 from src.app.schemas.gallery import (
     GalleryResponse,
-    PaginatedGalleryAssetResponse,
     PaginationCursor,
     VerifyLinkRequest,
     VerifyLinkResponse,
 )
 from src.app.schemas.gallery_asset import (
     GalleryAssetResponse,
+    PaginatedGalleryAssetResponse,
     VerifyPinRequest,
     VerifyPinResponse,
 )
