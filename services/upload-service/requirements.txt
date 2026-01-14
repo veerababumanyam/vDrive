@@ -11,6 +11,7 @@ tuspyserver==4.2.3
 sqlalchemy[asyncio]==2.0.23
 asyncpg==0.29.0
 alembic==1.13.1
+pgvector==0.2.4
 
 # Cache & Events
 redis==5.0.1
