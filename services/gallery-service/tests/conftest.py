@@ -99,13 +99,21 @@ async def test_db_session(test_db_engine) -> AsyncGenerator[AsyncSession, None]:
 @pytest_asyncio.fixture(scope="function")
 async def client(test_db_session: AsyncSession) -> AsyncGenerator[AsyncClient, None]:
     """Create test HTTP client with database override."""
+    from src.app.core.config import settings
 
     async def override_get_db():
         yield test_db_session
 
+    # Override dependencies
     app.dependency_overrides[get_db] = override_get_db
 
-    async with AsyncClient(app=app, base_url="http://test") as ac:
+    # Override JWT algorithm for testing (python-jose doesn't support EdDSA)
+    original_algorithm = settings.JWT_ALGORITHM
+    settings.JWT_ALGORITHM = "HS256"
+
+    async with AsyncClient(app=app, base_url="http://test", follow_redirects=False) as ac:
         yield ac
 
+    # Restore original settings
+    settings.JWT_ALGORITHM = original_algorithm
     app.dependency_overrides.clear()

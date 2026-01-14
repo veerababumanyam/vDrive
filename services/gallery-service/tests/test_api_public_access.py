@@ -252,7 +252,7 @@ class TestGetGalleryPhotosEndpoint:
         self, client: AsyncClient, test_db_session
     ):
         """Test getting photos for non-existent gallery."""
-        response = await client.get("/api/v1/public/gallery/nonexistent/photos")
+        response = await client.get("/api/v1/public/gallery/00000000-0000-0000-0000-999999999999/photos")
 
         assert response.status_code == 404
 
@@ -324,7 +324,7 @@ class TestVerifyPinEndpoint:
     async def test_verify_pin_not_found(self, client: AsyncClient, test_db_session):
         """Test verifying PIN for non-existent asset."""
         response = await client.post(
-            "/api/v1/public/photo/nonexistent/verify-pin?gallery_id=test",
+            "/api/v1/public/photo/00000000-0000-0000-0000-999999999999/verify-pin?gallery_id=00000000-0000-0000-0000-999999999999",
             json={"pin": "1234"},
         )
 

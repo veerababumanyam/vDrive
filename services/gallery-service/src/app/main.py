@@ -78,21 +78,28 @@ async def add_timing_middleware(request: Request, call_next):
     # Generate or extract request ID for tracing
     request_id = request.headers.get("X-Request-ID", str(uuid.uuid4()))
 
-    response = await call_next(request)
+    try:
+        response = await call_next(request)
+    except Exception as e:
+        logger.error("Middleware error", error=str(e), request_id=request_id)
+        raise
 
     duration = time.time() - start_time
 
     # Record Prometheus metrics
-    http_requests_total.labels(
-        method=request.method,
-        endpoint=request.url.path,
-        status_code=response.status_code,
-    ).inc()
+    try:
+        http_requests_total.labels(
+            method=request.method,
+            endpoint=request.url.path,
+            status_code=response.status_code,
+        ).inc()
 
-    http_request_duration_seconds.labels(
-        method=request.method,
-        endpoint=request.url.path,
-    ).observe(duration)
+        http_request_duration_seconds.labels(
+            method=request.method,
+            endpoint=request.url.path,
+        ).observe(duration)
+    except Exception as e:
+        logger.warning("Failed to record metrics", error=str(e))
 
     # Add tracing and timing headers
     response.headers["X-Request-ID"] = request_id

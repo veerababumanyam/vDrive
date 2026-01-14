@@ -3,6 +3,7 @@
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
+from fastapi.encoders import jsonable_encoder
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.app.core.auth import create_gallery_access_token
@@ -117,11 +118,14 @@ async def verify_magic_link(
         link_id=share_link.link_id,
     )
 
+    # Convert gallery to dict and ensure JSON-serializable
+    gallery_dict = jsonable_encoder(gallery.to_dict())
+
     # Return success response
     return VerifyLinkResponse(
         access_granted=True,
         access_token=access_token,
-        gallery=GalleryResponse.model_validate(gallery),
+        gallery=GalleryResponse(**gallery_dict),
     )
 
 

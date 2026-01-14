@@ -222,7 +222,7 @@ class TestGalleryService:
 
     async def test_get_by_id_not_found(self, test_db_session):
         """Test getting non-existent gallery."""
-        result = await GalleryService.get_by_id("nonexistent-id", test_db_session)
+        result = await GalleryService.get_by_id("00000000-0000-0000-0000-999999999999", test_db_session)
 
         assert result is None
 

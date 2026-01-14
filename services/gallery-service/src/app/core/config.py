@@ -46,7 +46,8 @@ class Settings(BaseSettings):
     R2_ACCESS_KEY_ID: str = Field(default="")
     R2_SECRET_ACCESS_KEY: str = Field(default="")
     R2_BUCKET_NAME: str = Field(default="vDrive")
-    R2_ENDPOINT: str = Field(default="")
+    R2_ENDPOINT_URL: str = Field(default="")
+    R2_REGION: str = Field(default="auto")
 
     # JWT Configuration (for staff endpoints)
     JWT_SECRET: str = Field(default="your-secret-key-here-change-in-production")

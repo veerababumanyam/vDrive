@@ -190,7 +190,7 @@ class TestGalleryAssetModel:
 
         assert asset.id is not None
         assert asset.gallery_id == gallery.id
-        assert asset.asset_id == "asset-123"
+        assert asset.asset_id == "00000000-0000-0000-0000-000000000123"
         assert asset.tags == ["landscape", "nature"]
         assert asset.view_count == 0
 
