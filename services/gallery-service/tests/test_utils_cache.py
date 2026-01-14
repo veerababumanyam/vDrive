@@ -202,3 +202,72 @@ class TestCacheOperations:
 
         # Cleanup
         await delete_cached(key2)
+
+
+@pytest.mark.asyncio
+class TestCacheErrorHandling:
+    """Test Redis cache error handling and resilience."""
+
+    async def test_get_cached_redis_unavailable(self, mocker):
+        """Test get_cached when Redis is unavailable (returns None)."""
+        mocker.patch("src.app.utils.cache.get_redis", return_value=None)
+        
+        result = await get_cached("test:key")
+        assert result is None
+
+    async def test_get_cached_redis_exception(self, mocker):
+        """Test get_cached when Redis raises exception."""
+        mock_redis = mocker.AsyncMock()
+        mock_redis.get.side_effect = Exception("Redis connection error")
+        mocker.patch("src.app.utils.cache.get_redis", return_value=mock_redis)
+        
+        result = await get_cached("test:key")
+        assert result is None
+
+    async def test_set_cached_redis_unavailable(self, mocker):
+        """Test set_cached when Redis is unavailable (returns None)."""
+        mocker.patch("src.app.utils.cache.get_redis", return_value=None)
+        
+        result = await set_cached("test:key", "value")
+        assert result is False
+
+    async def test_set_cached_redis_exception(self, mocker):
+        """Test set_cached when Redis raises exception."""
+        mock_redis = mocker.AsyncMock()
+        mock_redis.setex.side_effect = Exception("Redis write error")
+        mocker.patch("src.app.utils.cache.get_redis", return_value=mock_redis)
+        
+        result = await set_cached("test:key", "value", ttl_seconds=60)
+        assert result is False
+
+    async def test_delete_cached_redis_unavailable(self, mocker):
+        """Test delete_cached when Redis is unavailable (returns None)."""
+        mocker.patch("src.app.utils.cache.get_redis", return_value=None)
+        
+        result = await delete_cached("test:key")
+        assert result is False
+
+    async def test_delete_cached_redis_exception(self, mocker):
+        """Test delete_cached when Redis raises exception."""
+        mock_redis = mocker.AsyncMock()
+        mock_redis.delete.side_effect = Exception("Redis delete error")
+        mocker.patch("src.app.utils.cache.get_redis", return_value=mock_redis)
+        
+        result = await delete_cached("test:key")
+        assert result is False
+
+    async def test_invalidate_pattern_redis_unavailable(self, mocker):
+        """Test invalidate_pattern when Redis is unavailable (returns None)."""
+        mocker.patch("src.app.utils.cache.get_redis", return_value=None)
+        
+        result = await invalidate_pattern("test:pattern:*")
+        assert result == 0
+
+    async def test_invalidate_pattern_redis_exception(self, mocker):
+        """Test invalidate_pattern when Redis raises exception."""
+        mock_redis = mocker.AsyncMock()
+        mock_redis.keys.side_effect = Exception("Redis keys error")
+        mocker.patch("src.app.utils.cache.get_redis", return_value=mock_redis)
+        
+        result = await invalidate_pattern("test:pattern:*")
+        assert result == 0

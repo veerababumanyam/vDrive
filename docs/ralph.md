@@ -2,8 +2,8 @@
 # 1. Setup & Criteria
 
 **Feature Context**:
-*   **Target Feature**: `001-gallery-service` Microservice for gallery
-*   **Branch**: `git checkout 001-gallery-service`
+*   **Target Feature**: `005-upload-media-processing` Microservice for gallery
+*   **Branch**: `git checkout 005-upload-media-processing`
 *   **Note**: Use appropriate skills and claude agents where necessary.
 *   **Context**: Context7 MCP
 
@@ -26,7 +26,7 @@ The workflow is complete ONLY when:
 
 ### Phase 1: Discovery & Planning
 **Goal**: Define the work and phases.
-*   Read `specs/001-gallery-service/tasks.md`.
+*   Read `specs/005-upload-media-processing/tasks.md.
 *   Identify constraints and unchecked tasks.
 *   **Plan**: Break task into clear phases if complex (e.g., Logic -> UI -> Refinement).
 
@@ -74,7 +74,7 @@ The workflow is complete ONLY when:
     4.  Write missing tests for edge cases.
 
 **[5] PROJECT MANAGER (Verification)**
-*   **Task**: Verify acceptance criteria against `specs/001-gallery-service/spec.md`.
+*   **Task**: Verify acceptance criteria against `specs/005-upload-media-processing/spec.md`.
 *   **Action**: Document implementation gaps and trigger fixes.
 
 **[6] BUSINESS ANALYST (User Flow)**

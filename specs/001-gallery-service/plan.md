@@ -1,316 +1,104 @@
-# Implementation Plan: Gallery Service Microservice
+# Implementation Plan: [FEATURE]
 
-**Branch**: `001-gallery-service` | **Date**: 2026-01-14 | **Spec**: [spec.md](spec.md)
-**Input**: Feature specification from `/specs/001-gallery-service/spec.md`
+**Branch**: `[###-feature-name]` | **Date**: [DATE] | **Spec**: [link]
+**Input**: Feature specification from `/specs/[###-feature-name]/spec.md`
+
+**Note**: This template is filled in by the `/speckit.plan` command. See `.specify/templates/commands/plan.md` for the execution workflow.
 
 ## Summary
 
-The Gallery Service is a high-traffic microservice for public gallery viewing, Magic Link access, real-time proofing via WebSocket, and lead capture. It implements KEDA autoscaling (5-50 replicas), LQIP placeholders for instant page loads, signed URL generation for secure asset access, and batch operations for staff efficiency.
-
-**Primary Requirements**:
-- Public gallery viewing via Magic Links (passwordless access)
-- Real-time WebSocket updates for favorites/selections (500 connections/pod)
-- Performance optimization: P95 <300ms, LQIP <50ms, 50,000 concurrent viewers
-- KEDA autoscaling based on HTTP RPS (>100) and WebSocket connections (>500)
-- Multi-tenant workspace isolation with Row-Level Security
-
-**Technical Approach** (from Phase 0 research):
-- **WebSocket**: Native FastAPI WebSocket + Redis pub/sub for multi-pod broadcasting
-- **LQIP**: Pillow 16x16 WebP generation (~100-200 bytes), base64 data URIs
-- **Caching**: Cloudflare R2 signed URLs (4hr TTL), immutable cache headers, cursor-based pagination
-- **Autoscaling**: KEDA ScaledObject with dual Prometheus triggers (HTTP RPS + WebSocket connections)
+[Extract from feature spec: primary requirement + technical approach from research]
 
 ## Technical Context
 
-**Language/Version**: Python 3.11
-**Primary Dependencies**: FastAPI, SQLAlchemy, asyncpg, Pillow, boto3 (Cloudflare R2), Redis, Kafka, KEDA
-**Storage**: PostgreSQL 16 (pgvector), Redis 7 (cache/pub-sub), Cloudflare R2 (S3-compatible object storage)
-**Testing**: pytest, pytest-asyncio, pytest-cov, httpx (TestClient)
-**Target Platform**: Linux server (Docker Compose for dev, Kubernetes for prod)
-**Project Type**: web (microservice backend)
-**Performance Goals**: P95 <300ms for gallery loads, 50,000 concurrent viewers, 100 RPS per replica, 500 WebSocket connections per pod
-**Constraints**: <300ms P95 latency, <50ms LQIP delivery, <100ms cached thumbnail delivery, 4-hour signed URL TTL for security, 30-second batch operation timeout
-**Scale/Scope**: High-traffic service (10,000+ RPS at peak), KEDA 5-50 replicas, 99.95% uptime SLA
+<!--
+  ACTION REQUIRED: Replace the content in this section with the technical details
+  for the project. The structure here is presented in advisory capacity to guide
+  the iteration process.
+-->
+
+**Language/Version**: [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION]  
+**Primary Dependencies**: [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]  
+**Storage**: [if applicable, e.g., PostgreSQL, CoreData, files or N/A]  
+**Testing**: [e.g., pytest, XCTest, cargo test or NEEDS CLARIFICATION]  
+**Target Platform**: [e.g., Linux server, iOS 15+, WASM or NEEDS CLARIFICATION]
+**Project Type**: [single/web/mobile - determines source structure]  
+**Performance Goals**: [domain-specific, e.g., 1000 req/s, 10k lines/sec, 60 fps or NEEDS CLARIFICATION]  
+**Constraints**: [domain-specific, e.g., <200ms p95, <100MB memory, offline-capable or NEEDS CLARIFICATION]  
+**Scale/Scope**: [domain-specific, e.g., 10k users, 1M LOC, 50 screens or NEEDS CLARIFICATION]
 
 ## Constitution Check
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-✅ **Single Responsibility**: Gallery Service focuses on public gallery viewing and Magic Link access. Authentication, asset upload, and face detection are handled by separate services (Backend API, Face Service).
-
-✅ **Microservice Boundaries**: Clear separation of concerns - Gallery Service does not manage asset storage (R2), user authentication (Backend API), or AI processing (Face Service).
-
-✅ **Technology Stack Consistency**: Uses Python 3.11 + FastAPI (same as Backend API and other microservices), PostgreSQL 16 (shared schema), Redis 7 (shared cache).
-
-✅ **KEDA Autoscaling Standard**: Follows established KEDA patterns from KEDA_AUTOSCALING.md - ScaledObject with Prometheus triggers, 5-50 replicas, 15s polling, 60s cooldown.
-
-✅ **Monitoring Integration**: Exposes Prometheus metrics at `/metrics`, structured JSON logs to Loki via Promtail, distributed tracing with Tempo/Jaeger.
-
-**No Violations** - Implementation can proceed without complexity justification.
+[Gates determined based on constitution file]
 
 ## Project Structure
 
 ### Documentation (this feature)
 
 ```text
-specs/001-gallery-service/
-├── spec.md              # Feature specification (completed)
-├── plan.md              # This file (completed)
-├── research.md          # Phase 0 research (completed)
-├── data-model.md        # Phase 1 data model (completed)
-├── quickstart.md        # Phase 1 setup guide (completed)
-├── contracts/           # Phase 1 API contracts (completed)
-│   └── gallery-api.yaml # OpenAPI 3.1 specification
-└── tasks.md             # Phase 2 tasks (to be generated by /speckit.tasks)
+specs/[###-feature]/
+├── plan.md              # This file (/speckit.plan command output)
+├── research.md          # Phase 0 output (/speckit.plan command)
+├── data-model.md        # Phase 1 output (/speckit.plan command)
+├── quickstart.md        # Phase 1 output (/speckit.plan command)
+├── contracts/           # Phase 1 output (/speckit.plan command)
+└── tasks.md             # Phase 2 output (/speckit.tasks command - NOT created by /speckit.plan)
 ```
 
 ### Source Code (repository root)
-
-**Project Type**: Web application (microservice backend)
+<!--
+  ACTION REQUIRED: Replace the placeholder tree below with the concrete layout
+  for this feature. Delete unused options and expand the chosen structure with
+  real paths (e.g., apps/admin, packages/something). The delivered plan must
+  not include Option labels.
+-->
 
 ```text
-services/gallery-service/
-├── Dockerfile                    # Docker build (Python 3.11-slim base)
-├── requirements.txt              # Python dependencies
-├── pyproject.toml                # Poetry/pip configuration
-├── README.md                     # Service documentation
-├── alembic.ini                   # Database migration config
-├── alembic/
-│   ├── env.py
-│   └── versions/
-│       └── 001_create_galleries_schema.py
+# [REMOVE IF UNUSED] Option 1: Single project (DEFAULT)
+src/
+├── models/
+├── services/
+├── cli/
+└── lib/
+
+tests/
+├── contract/
+├── integration/
+└── unit/
+
+# [REMOVE IF UNUSED] Option 2: Web application (when "frontend" + "backend" detected)
+backend/
 ├── src/
-│   └── app/
-│       ├── main.py               # FastAPI app + lifespan management
-│       ├── core/                 # Configuration and infrastructure
-│       │   ├── config.py         # Pydantic settings from environment
-│       │   ├── database.py       # PostgreSQL connection pool
-│       │   ├── redis.py          # Redis connection and pub/sub
-│       │   ├── kafka.py          # Kafka producer/consumer
-│       │   ├── auth.py           # JWT + Magic Link authentication
-│       │   ├── metrics.py        # Prometheus metrics definitions
-│       │   └── logging.py        # Structured JSON logging
-│       ├── models/               # SQLAlchemy ORM models
-│       │   ├── gallery.py
-│       │   ├── sub_gallery.py
-│       │   ├── share_link.py
-│       │   ├── gallery_asset.py
-│       │   ├── visitor.py
-│       │   └── gallery_visitor.py
-│       ├── schemas/              # Pydantic request/response models
-│       │   ├── gallery.py
-│       │   ├── share_link.py
-│       │   └── visitor.py
-│       ├── api/v1/               # API endpoints (FastAPI routers)
-│       │   ├── router.py         # Main router aggregation
-│       │   ├── public_access.py  # Magic Link verification
-│       │   ├── gallery_viewing.py # Photo retrieval
-│       │   ├── websocket.py      # WebSocket proofing
-│       │   ├── batch_operations.py # Batch updates
-│       │   ├── email_registration.py # Visitor capture
-│       │   ├── downloads.py      # Download management
-│       │   ├── qr_codes.py       # QR code generation
-│       │   └── health.py         # Health checks + /metrics
-│       ├── services/             # Business logic layer
-│       │   ├── gallery_service.py
-│       │   ├── share_link_service.py
-│       │   ├── visitor_service.py
-│       │   ├── lqip_service.py   # Pillow LQIP generation
-│       │   ├── signed_url_service.py # R2 signed URLs (boto3)
-│       │   ├── qr_code_service.py
-│       │   └── websocket_manager.py # WebSocket connection pool
-│       ├── middleware/           # Request/response middleware
-│       │   ├── auth_middleware.py
-│       │   ├── rate_limit_middleware.py
-│       │   ├── metrics_middleware.py
-│       │   ├── error_middleware.py
-│       │   └── cors_middleware.py
-│       └── utils/                # Helper functions
-│           ├── security.py       # Argon2id hashing
-│           ├── validation.py     # Email/PIN validation
-│           ├── pagination.py     # Cursor-based pagination
-│           └── cache.py          # Redis caching helpers
+│   ├── models/
+│   ├── services/
+│   └── api/
 └── tests/
-    ├── conftest.py               # Pytest fixtures
-    ├── unit/                     # Unit tests (mocked dependencies)
-    ├── integration/              # Integration tests (real DB/Redis)
-    └── contract/                 # API contract compliance tests
+
+frontend/
+├── src/
+│   ├── components/
+│   ├── pages/
+│   └── services/
+└── tests/
+
+# [REMOVE IF UNUSED] Option 3: Mobile + API (when "iOS/Android" detected)
+api/
+└── [same as backend above]
+
+ios/ or android/
+└── [platform-specific structure: feature modules, UI flows, platform tests]
 ```
 
-**Structure Decision**: Follows existing microservice pattern established by onboarding-service. Uses FastAPI with `src/app/` structure, separating models (SQLAlchemy), schemas (Pydantic), API routes, services (business logic), and middleware. Alembic for database migrations. Port 8004 assigned (no conflicts).
+**Structure Decision**: [Document the selected structure and reference the real
+directories captured above]
 
-## Phase 0: Research (Completed)
+## Complexity Tracking
 
-**Research Document**: [research.md](research.md)
+> **Fill ONLY if Constitution Check has violations that must be justified**
 
-**Key Technical Decisions**:
-
-1. **WebSocket Implementation**
-   - **Decision**: Native FastAPI WebSocket + Redis pub/sub (Broadcaster library)
-   - **Rationale**: ASGI-native, multi-pod support, 500 connections/pod capacity, graceful shutdown compatible
-   - **Alternatives Rejected**: python-socketio (protocol overhead), websockets library (manual ASGI integration), picows (overkill)
-
-2. **LQIP Generation and Caching**
-   - **Decision**: Pillow 16x16 WebP (~100-200 bytes), Cloudflare R2 signed URLs (4hr TTL), immutable cache headers
-   - **Rationale**: WebP block encoding efficiency, optimal security/performance balance, cursor-based pagination for O(1) scaling
-   - **Alternatives Rejected**: Thumbor (too complex), Sharp (Node.js dependency), 20x20 LQIP (wastes bytes), 2hr TTL (too short)
-
-3. **KEDA Autoscaling Configuration**
-   - **Decision**: KEDA ScaledObject with dual Prometheus triggers (HTTP RPS >100, WebSocket >500 connections)
-   - **Rationale**: Event-driven scaling, custom metrics support, production-proven (CNCF graduated)
-   - **Alternatives Rejected**: Standard HPA CPU/Memory (doesn't track connections), Redis scaler (wrong metrics)
-
-## Phase 1: Data Model and API Contracts (Completed)
-
-**Data Model Document**: [data-model.md](data-model.md)
-
-**Key Entities** (7 total):
-1. **Gallery**: Core container with workspace isolation, denormalized stats (photo_count, video_count, favorites_count), status (draft/published/archived)
-2. **Sub-Gallery**: Organization unit for tab navigation or continuous scroll sections
-3. **Share Link (Magic Link)**: Capability-based access with fine-grained permissions, QR code configuration, time-boxing
-4. **Gallery Asset**: Junction entity with per-gallery metadata (visibility, privacy, tags)
-5. **Visitor**: Lead capture with GDPR/CCPA compliance (email, name, phone, metadata)
-6. **Gallery Visitor**: Access log for analytics (IP, User-Agent, referrer, timestamps)
-7. **WebSocket Connection**: In-memory state for real-time proofing (not persisted)
-
-**Database Design**:
-- Multi-tenancy: Row-Level Security (RLS) on all tables with `workspace_id` filtering
-- Performance: Denormalized stats updated via database triggers, strategic indexes (composite, partial)
-- Security: Argon2id password hashing, rate limiting via application layer
-- Caching: Redis 5-10 minute TTLs for gallery metadata, paginated photos, stats
-
-**API Contracts Document**: [contracts/gallery-api.yaml](contracts/gallery-api.yaml)
-
-**Key Endpoints** (OpenAPI 3.1 specification):
-- **Public Gallery Access**: `/public/verify-link` (Magic Link verification), `/public/gallery/{id}/photos` (paginated viewing)
-- **Real-Time Proofing**: `/ws/gallery/{id}` (WebSocket connection for favorites/selections/comments)
-- **Batch Operations**: `/staff/gallery/{id}/batch/visibility|sub-gallery|privacy|tags` (bulk updates up to 500 photos)
-- **Email Registration**: `/public/register-visitor` (lead capture with RFC 5322 validation)
-- **Download Management**: `/public/photo/{id}/download` (policy enforcement, signed URL generation)
-- **QR Code Generation**: `/staff/share-link/{id}/qr-code` (customizable size, color, logo, error correction)
-- **Health & Metrics**: `/health`, `/ready`, `/metrics` (Kubernetes probes, Prometheus scraping)
-
-## Phase 1: Quickstart Guide (Completed)
-
-**Quickstart Document**: [quickstart.md](quickstart.md)
-
-**Setup Instructions**:
-- Docker Compose configuration for port 8004
-- Environment variables: Database, Redis, Kafka, JWT, Cloudflare R2, rate limiting, WebSocket, monitoring
-- Dockerfile: Multi-stage build with Python 3.11-slim, non-root user, health checks
-- Testing examples: Magic Link verification, gallery viewing, WebSocket proofing, batch operations, email registration, QR codes
-- Monitoring: Prometheus metrics, Grafana dashboards, Loki log queries
-- Troubleshooting: Common issues (DB connection, Redis, WebSocket, performance)
-
-## Phase 2: Task Generation (Next Step)
-
-**Command**: `/speckit.tasks`
-
-**Expected Tasks** (to be generated):
-1. **Service Bootstrap**: Create service structure, Dockerfile, docker-compose.yml entry, environment variables
-2. **Database Migrations**: Alembic migration for galleries schema (7 tables + indexes + triggers + RLS policies)
-3. **Core Models**: SQLAlchemy models for Gallery, SubGallery, ShareLink, GalleryAsset, Visitor, GalleryVisitor
-4. **Pydantic Schemas**: Request/response validation models
-5. **Authentication Middleware**: JWT for staff, Magic Link token for public endpoints
-6. **Magic Link Verification**: `/public/verify-link` endpoint with access count increment, expiration checks
-7. **Gallery Photo Viewing**: `/public/gallery/{id}/photos` with cursor-based pagination, LQIP, signed URLs
-8. **LQIP Generation Service**: Pillow 16x16 WebP generation, base64 encoding
-9. **Signed URL Service**: boto3 Cloudflare R2 presigned URLs (4hr thumbnails, 1hr downloads)
-10. **WebSocket Connection Manager**: FastAPI WebSocket + Redis pub/sub via Broadcaster
-11. **Real-Time Proofing Endpoint**: `/ws/gallery/{id}` with connection tracking, event broadcasting
-12. **Batch Operations**: Visibility, sub-gallery reassignment, privacy, tags (atomic transactions, rollback)
-13. **Email Registration**: Visitor capture with RFC 5322 validation, optional disposable email blocking
-14. **Download Policy Enforcement**: `/public/photo/{id}/download` with policy checks, watermarking
-15. **QR Code Generation**: qrcode[pil] library with customizable parameters
-16. **Rate Limiting Middleware**: Per-IP (200 req/min), per-Magic-Link (100 req/min), progressive delays
-17. **Prometheus Metrics**: http_requests_total, http_request_duration_seconds, websocket_active_connections
-18. **Health Checks**: `/health` (liveness), `/ready` (readiness with dependency checks)
-19. **KEDA Configuration**: ScaledObject YAML with Prometheus triggers
-20. **Integration Tests**: Magic Link verification, gallery viewing, WebSocket proofing, batch operations
-21. **Load Testing**: locust or k6 scripts for 50,000 concurrent viewers
-22. **Documentation**: Update ARCHITECTURE_QUICK_REFERENCE.md with Gallery Service entry
-
-## Critical Files
-
-| File | Purpose | Status |
-|------|---------|--------|
-| `spec.md` | Feature specification | ✅ Completed |
-| `plan.md` | Implementation plan (this file) | ✅ Completed |
-| `research.md` | Phase 0 technical decisions | ✅ Completed |
-| `data-model.md` | Database schema and entities | ✅ Completed |
-| `quickstart.md` | Setup and testing guide | ✅ Completed |
-| `contracts/gallery-api.yaml` | OpenAPI 3.1 specification | ✅ Completed |
-| `tasks.md` | Phase 2 implementation tasks | ⏳ Pending `/speckit.tasks` |
-| `services/gallery-service/` | Service implementation | ⏳ Pending implementation |
-| `infrastructure/kubernetes/gallery-service/` | KEDA ScaledObject YAML | ⏳ Pending implementation |
-
-## Verification Plan
-
-### Phase 0 Verification (✅ Completed)
-- [x] Research document created with 3 technical decisions
-- [x] Each decision has rationale and alternatives considered
-- [x] Code snippets provided for WebSocket, LQIP, KEDA
-
-### Phase 1 Verification (✅ Completed)
-- [x] Data model document with 7 entities, relationships, indexes, RLS policies
-- [x] OpenAPI 3.1 specification with all endpoints from functional requirements
-- [x] Quickstart guide with Docker Compose setup, environment variables, testing examples
-
-### Phase 2 Verification (⏳ Pending)
-- [ ] Task list generated from `/speckit.tasks` command
-- [ ] Tasks map to functional requirements (FR-001 to FR-060)
-- [ ] Tasks ordered by dependency (database → models → API → tests)
-
-### Implementation Verification (⏳ Pending)
-- [ ] Service starts on port 8004, health checks pass
-- [ ] Magic Link verification works with password-protected galleries
-- [ ] Gallery photo viewing returns LQIP + signed URLs, pagination works
-- [ ] WebSocket connections broadcast favorites/selections across pods
-- [ ] Batch operations update 500 photos in <30 seconds
-- [ ] KEDA scales from 5 to 50 replicas under load (0 to 10,000 RPS)
-- [ ] Prometheus metrics exposed, Grafana dashboards show data
-- [ ] P95 latency <300ms, cache hit rate >80%
-
-## Dependencies and Assumptions
-
-### External Dependencies
-1. **Backend API** (port 8000): JWT token validation, user authentication
-2. **Face Service** (port 8003): Consumes `face.detected` events (optional integration)
-3. **PostgreSQL 16**: Shared database with existing schema (workspaces, users, assets)
-4. **Redis 7**: Shared cache and pub/sub infrastructure
-5. **Kafka**: Event streaming for `gallery.published`, `face.detected` events
-6. **Traefik v3**: API Gateway routing to `/api/gallery/*`
-7. **Cloudflare R2**: S3-compatible object storage for thumbnails and originals
-8. **Prometheus**: Metrics scraping for KEDA autoscaling
-9. **Grafana**: Dashboards and alerting
-10. **Loki**: Log aggregation via Promtail
-11. **KEDA 2.12+**: Kubernetes event-driven autoscaling (production only)
-
-### Assumptions
-1. PostgreSQL schema includes `workspaces`, `users`, `assets` tables (from Backend API)
-2. Assets have `lqip` field populated during upload (base64 WebP data URI)
-3. Cloudflare R2 buckets exist: `vdrive-thumbnails`, `vdrive-originals`
-4. Traefik is configured for `/api/gallery/*` routing to port 8004
-5. Prometheus scrapes `/metrics` endpoint every 15 seconds
-6. Redis is configured for pub/sub and cache eviction (LRU policy)
-7. JWT secret is shared across Backend API and Gallery Service
-8. Kubernetes cluster has KEDA operator installed (production only)
-9. Monitoring stack is running (Prometheus, Grafana, Loki, Promtail)
-10. Secret management is configured for R2 credentials, JWT secret
-
-## Next Steps
-
-1. **Run `/speckit.tasks` command**: Generate task list from specification and plan
-2. **Create Service Structure**: Bootstrap `services/gallery-service/` directory with Dockerfile, requirements.txt
-3. **Database Migrations**: Write Alembic migration for galleries schema
-4. **Implement Core Endpoints**: Magic Link verification, gallery viewing, WebSocket proofing
-5. **KEDA Configuration**: Create ScaledObject YAML for Kubernetes
-6. **Integration Testing**: Verify Magic Link flow, WebSocket broadcasting, batch operations
-7. **Load Testing**: Simulate 50,000 concurrent viewers, measure P95 latency and KEDA scaling
-8. **Documentation**: Update ARCHITECTURE_QUICK_REFERENCE.md, add Grafana dashboards
-
----
-
-**Plan Status**: ✅ Phase 0 and Phase 1 Complete. Ready for `/speckit.tasks` to generate implementation task list.
-
-**Estimated Implementation Timeline**: The task breakdown and implementation sequence will be determined after task generation. Complexity is within acceptable bounds (no constitution violations, follows established patterns).
+| Violation | Why Needed | Simpler Alternative Rejected Because |
+|-----------|------------|-------------------------------------|
+| [e.g., 4th project] | [current need] | [why 3 projects insufficient] |
+| [e.g., Repository pattern] | [specific problem] | [why direct DB access insufficient] |

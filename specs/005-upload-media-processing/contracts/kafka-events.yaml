@@ -1,0 +1,497 @@
+# Kafka Event Contracts: Storage & Media Processing
+# AsyncAPI 2.6.0 specification for event-driven communication
+
+asyncapi: 2.6.0
+info:
+  title: vDrive Upload & Processing Events
+  version: 1.0.0
+  description: |
+    Kafka events for upload service and processing pipeline.
+    All events follow the BaseEvent schema with workspace isolation.
+
+servers:
+  development:
+    url: localhost:9092
+    protocol: kafka
+    description: Local development Kafka
+  production:
+    url: kafka:9092
+    protocol: kafka
+    description: Production Kafka cluster
+
+defaultContentType: application/json
+
+channels:
+  upload.initiated:
+    description: Published when a new upload session is created
+    publish:
+      operationId: publishUploadInitiated
+      message:
+        $ref: '#/components/messages/UploadInitiatedEvent'
+    bindings:
+      kafka:
+        partitions: 6
+        replicas: 1
+        topicConfiguration:
+          retention.ms: 604800000  # 7 days
+
+  upload.completed:
+    description: Published when file upload completes and is assembled
+    publish:
+      operationId: publishUploadCompleted
+      message:
+        $ref: '#/components/messages/UploadCompletedEvent'
+    bindings:
+      kafka:
+        partitions: 6
+        replicas: 1
+        topicConfiguration:
+          retention.ms: 604800000  # 7 days
+
+  asset.processing:
+    description: Consumed by processing workers to generate derivatives
+    subscribe:
+      operationId: consumeAssetProcessing
+      message:
+        $ref: '#/components/messages/AssetProcessingEvent'
+    bindings:
+      kafka:
+        partitions: 12
+        replicas: 1
+        topicConfiguration:
+          retention.ms: 259200000  # 3 days
+
+  asset.processed:
+    description: Published when all processing tasks complete
+    publish:
+      operationId: publishAssetProcessed
+      message:
+        $ref: '#/components/messages/AssetProcessedEvent'
+    bindings:
+      kafka:
+        partitions: 12
+        replicas: 1
+        topicConfiguration:
+          retention.ms: 604800000  # 7 days
+
+  face.detected:
+    description: Published when faces are detected in an asset
+    publish:
+      operationId: publishFaceDetected
+      message:
+        $ref: '#/components/messages/FaceDetectedEvent'
+    bindings:
+      kafka:
+        partitions: 6
+        replicas: 1
+        topicConfiguration:
+          retention.ms: 604800000  # 7 days
+
+  upload.failed:
+    description: Published when upload or processing fails permanently
+    publish:
+      operationId: publishUploadFailed
+      message:
+        $ref: '#/components/messages/UploadFailedEvent'
+    bindings:
+      kafka:
+        partitions: 3
+        replicas: 1
+        topicConfiguration:
+          retention.ms: 2592000000  # 30 days
+
+components:
+  messages:
+    UploadInitiatedEvent:
+      name: UploadInitiatedEvent
+      title: Upload Initiated
+      summary: New upload session created
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/UploadInitiatedPayload'
+      headers:
+        $ref: '#/components/schemas/EventHeaders'
+      examples:
+        - name: jpegUpload
+          payload:
+            event_id: "550e8400-e29b-41d4-a716-446655440000"
+            event_type: "upload.initiated"
+            timestamp: "2026-01-14T10:30:00Z"
+            source: "upload-service"
+            version: "1.0"
+            upload_id: "660e8400-e29b-41d4-a716-446655440001"
+            workspace_id: "770e8400-e29b-41d4-a716-446655440002"
+            user_id: "880e8400-e29b-41d4-a716-446655440003"
+            filename: "wedding_photo_001.jpg"
+            mime_type: "image/jpeg"
+            expected_size: 25000000
+            gallery_id: "990e8400-e29b-41d4-a716-446655440004"
+
+    UploadCompletedEvent:
+      name: UploadCompletedEvent
+      title: Upload Completed
+      summary: File upload completed and assembled
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/UploadCompletedPayload'
+      headers:
+        $ref: '#/components/schemas/EventHeaders'
+      examples:
+        - name: completedUpload
+          payload:
+            event_id: "550e8400-e29b-41d4-a716-446655440010"
+            event_type: "upload.completed"
+            timestamp: "2026-01-14T10:35:00Z"
+            source: "upload-service"
+            version: "1.0"
+            upload_id: "660e8400-e29b-41d4-a716-446655440001"
+            workspace_id: "770e8400-e29b-41d4-a716-446655440002"
+            asset_id: "aa0e8400-e29b-41d4-a716-446655440005"
+            filename: "wedding_photo_001.jpg"
+            mime_type: "image/jpeg"
+            file_size: 25000000
+            storage_path: "workspaces/770e8400.../assets/aa0e8400.../original.jpg"
+            checksum: "a1b2c3d4e5f6..."
+            is_encrypted: true
+            encryption_key_id: "ws-770e8400-v1"
+
+    AssetProcessingEvent:
+      name: AssetProcessingEvent
+      title: Asset Processing Request
+      summary: Request to process asset (thumbnails, metadata, etc.)
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/AssetProcessingPayload'
+      headers:
+        $ref: '#/components/schemas/EventHeaders'
+
+    AssetProcessedEvent:
+      name: AssetProcessedEvent
+      title: Asset Processed
+      summary: All processing tasks completed for asset
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/AssetProcessedPayload'
+      headers:
+        $ref: '#/components/schemas/EventHeaders'
+
+    FaceDetectedEvent:
+      name: FaceDetectedEvent
+      title: Face Detected
+      summary: Faces detected in asset
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/FaceDetectedPayload'
+      headers:
+        $ref: '#/components/schemas/EventHeaders'
+
+    UploadFailedEvent:
+      name: UploadFailedEvent
+      title: Upload Failed
+      summary: Upload or processing failed permanently
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/UploadFailedPayload'
+      headers:
+        $ref: '#/components/schemas/EventHeaders'
+
+  schemas:
+    EventHeaders:
+      type: object
+      properties:
+        kafka_key:
+          type: string
+          description: Partition key (workspace_id for ordering)
+        kafka_timestamp:
+          type: integer
+          format: int64
+          description: Kafka message timestamp
+
+    BaseEvent:
+      type: object
+      required:
+        - event_id
+        - event_type
+        - timestamp
+        - source
+        - version
+      properties:
+        event_id:
+          type: string
+          format: uuid
+          description: Unique event identifier
+        event_type:
+          type: string
+          description: Event type identifier
+        timestamp:
+          type: string
+          format: date-time
+          description: ISO 8601 UTC timestamp
+        source:
+          type: string
+          description: Service that produced the event
+        version:
+          type: string
+          description: Event schema version
+          default: "1.0"
+
+    UploadInitiatedPayload:
+      allOf:
+        - $ref: '#/components/schemas/BaseEvent'
+        - type: object
+          required:
+            - upload_id
+            - workspace_id
+            - user_id
+            - filename
+            - mime_type
+            - expected_size
+          properties:
+            upload_id:
+              type: string
+              format: uuid
+            workspace_id:
+              type: string
+              format: uuid
+            user_id:
+              type: string
+              format: uuid
+            filename:
+              type: string
+              maxLength: 255
+            mime_type:
+              type: string
+            expected_size:
+              type: integer
+              format: int64
+              minimum: 1
+              maximum: 10737418240
+            gallery_id:
+              type: string
+              format: uuid
+              description: Optional target gallery
+            client_checksum:
+              type: string
+              description: Client-provided SHA-256
+
+    UploadCompletedPayload:
+      allOf:
+        - $ref: '#/components/schemas/BaseEvent'
+        - type: object
+          required:
+            - upload_id
+            - workspace_id
+            - asset_id
+            - filename
+            - mime_type
+            - file_size
+            - storage_path
+            - checksum
+            - is_encrypted
+          properties:
+            upload_id:
+              type: string
+              format: uuid
+            workspace_id:
+              type: string
+              format: uuid
+            asset_id:
+              type: string
+              format: uuid
+            filename:
+              type: string
+            mime_type:
+              type: string
+            file_size:
+              type: integer
+              format: int64
+            storage_path:
+              type: string
+              description: R2 object key
+            checksum:
+              type: string
+              description: SHA-256 hash (hex)
+            is_encrypted:
+              type: boolean
+            encryption_key_id:
+              type: string
+              description: Reference to encryption key version
+            gallery_id:
+              type: string
+              format: uuid
+
+    AssetProcessingPayload:
+      allOf:
+        - $ref: '#/components/schemas/BaseEvent'
+        - type: object
+          required:
+            - asset_id
+            - workspace_id
+            - processing_tasks
+          properties:
+            asset_id:
+              type: string
+              format: uuid
+            workspace_id:
+              type: string
+              format: uuid
+            storage_path:
+              type: string
+            mime_type:
+              type: string
+            file_size:
+              type: integer
+              format: int64
+            processing_tasks:
+              type: array
+              items:
+                type: string
+                enum:
+                  - thumbnail_generation
+                  - exif_extraction
+                  - face_detection
+                  - video_thumbnail
+              description: Tasks to execute
+            priority:
+              type: integer
+              minimum: 1
+              maximum: 10
+              default: 5
+
+    AssetProcessedPayload:
+      allOf:
+        - $ref: '#/components/schemas/BaseEvent'
+        - type: object
+          required:
+            - asset_id
+            - workspace_id
+            - status
+          properties:
+            asset_id:
+              type: string
+              format: uuid
+            workspace_id:
+              type: string
+              format: uuid
+            status:
+              type: string
+              enum: [completed, partial, failed]
+            derivatives:
+              type: object
+              properties:
+                thumbnail_key:
+                  type: string
+                preview_key:
+                  type: string
+                lqip_base64:
+                  type: string
+            metadata:
+              type: object
+              properties:
+                width:
+                  type: integer
+                height:
+                  type: integer
+                duration_seconds:
+                  type: number
+                camera_model:
+                  type: string
+                captured_at:
+                  type: string
+                  format: date-time
+            faces_count:
+              type: integer
+            errors:
+              type: array
+              items:
+                type: object
+                properties:
+                  task:
+                    type: string
+                  error:
+                    type: string
+            processing_duration_ms:
+              type: integer
+              description: Total processing time
+
+    FaceDetectedPayload:
+      allOf:
+        - $ref: '#/components/schemas/BaseEvent'
+        - type: object
+          required:
+            - asset_id
+            - workspace_id
+            - faces
+          properties:
+            asset_id:
+              type: string
+              format: uuid
+            workspace_id:
+              type: string
+              format: uuid
+            faces_count:
+              type: integer
+            faces:
+              type: array
+              items:
+                type: object
+                properties:
+                  face_id:
+                    type: string
+                    format: uuid
+                  bounding_box:
+                    type: object
+                    properties:
+                      x:
+                        type: number
+                      y:
+                        type: number
+                      width:
+                        type: number
+                      height:
+                        type: number
+                  confidence:
+                    type: number
+                    minimum: 0
+                    maximum: 1
+                  cluster_id:
+                    type: string
+                    format: uuid
+                    description: Assigned person cluster
+
+    UploadFailedPayload:
+      allOf:
+        - $ref: '#/components/schemas/BaseEvent'
+        - type: object
+          required:
+            - upload_id
+            - workspace_id
+            - error_code
+            - error_message
+          properties:
+            upload_id:
+              type: string
+              format: uuid
+            workspace_id:
+              type: string
+              format: uuid
+            asset_id:
+              type: string
+              format: uuid
+              description: Present if asset was created before failure
+            error_code:
+              type: string
+              enum:
+                - CHECKSUM_MISMATCH
+                - ENCRYPTION_FAILED
+                - STORAGE_FAILED
+                - PROCESSING_FAILED
+                - TIMEOUT
+                - QUOTA_EXCEEDED
+            error_message:
+              type: string
+            failed_task:
+              type: string
+              description: Which task failed
+            retry_count:
+              type: integer

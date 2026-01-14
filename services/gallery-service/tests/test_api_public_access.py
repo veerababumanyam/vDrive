@@ -524,3 +524,58 @@ class TestGetGalleryPhotosAdvanced:
         assert response.status_code == 200
         data = response.json()
         assert len(data["data"]) == 3
+
+
+@pytest.mark.asyncio
+class TestGetGalleryPhotosErrorPaths:
+    """Test error paths in get gallery photos endpoint."""
+
+    async def test_get_photos_sub_gallery_filter(self, client: AsyncClient, test_db_session):
+        """Test getting photos filtered by sub-gallery."""
+        from src.app.models.sub_gallery import SubGallery
+
+        # Create gallery
+        gallery = Gallery(
+            workspace_id="00000000-0000-0000-0000-000000000123",
+            title="Test Gallery",
+            status="published",
+        )
+        test_db_session.add(gallery)
+        await test_db_session.commit()
+
+        # Create sub-gallery
+        sub_gallery = SubGallery(
+            gallery_id=gallery.id,
+            name="Ceremony",
+            sort_order=0,
+            visible=True,
+        )
+        test_db_session.add(sub_gallery)
+        await test_db_session.commit()
+
+        # Add assets (some in sub-gallery, some not)
+        asset1 = GalleryAsset(
+            gallery_id=gallery.id,
+            asset_id="00000000-0000-0000-0000-000000000001",
+            sub_gallery_id=sub_gallery.id,
+            is_private=False,
+        )
+        asset2 = GalleryAsset(
+            gallery_id=gallery.id,
+            asset_id="00000000-0000-0000-0000-000000000002",
+            sub_gallery_id=None,
+            is_private=False,
+        )
+        test_db_session.add_all([asset1, asset2])
+        await test_db_session.commit()
+
+        # Request photos for specific sub-gallery
+        response = await client.get(
+            f"/api/v1/public/gallery/{gallery.id}/photos?sub_gallery_id={sub_gallery.id}"
+        )
+
+        assert response.status_code == 200
+        data = response.json()
+        # Should only return asset1 from the sub-gallery
+        assert len(data["data"]) == 1
+        assert data["data"][0]["asset_id"] == "00000000-0000-0000-0000-000000000001"

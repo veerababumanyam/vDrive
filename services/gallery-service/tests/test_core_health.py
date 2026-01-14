@@ -56,3 +56,37 @@ class TestHealthChecks:
 
         # Overall status should be ready if DB and Redis are up
         assert result["status"] == "ready"
+
+    async def test_check_database_failure(self, mocker):
+        """Test database health check when database is down."""
+        # Mock async_session_factory to raise an exception
+        from src.app.core.health import async_session_factory
+
+        mock_session_factory = mocker.patch(
+            "src.app.core.health.async_session_factory"
+        )
+        mock_session_factory.side_effect = Exception("Database connection failed")
+
+        # Database check should return False when connection fails
+        result = await check_database()
+        assert result is False
+
+    async def test_check_redis_none(self, mocker):
+        """Test Redis health check when Redis is unavailable (returns None)."""
+        # Mock get_redis to return None
+        mocker.patch("src.app.core.health.get_redis", return_value=None)
+
+        # Redis check should return False when get_redis returns None
+        result = await check_redis()
+        assert result is False
+
+    async def test_check_redis_failure(self, mocker):
+        """Test Redis health check when Redis ping fails."""
+        # Mock get_redis to return a mock redis that fails on ping
+        mock_redis = mocker.AsyncMock()
+        mock_redis.ping.side_effect = Exception("Redis ping failed")
+        mocker.patch("src.app.core.health.get_redis", return_value=mock_redis)
+
+        # Redis check should return False when ping fails
+        result = await check_redis()
+        assert result is False

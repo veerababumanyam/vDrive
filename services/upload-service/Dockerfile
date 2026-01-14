@@ -1,7 +1,8 @@
 # ===========================================
-# vDrive Onboarding Service Dockerfile
+# vDrive Upload Service Dockerfile
 # ===========================================
-# User registration and email verification on port 8006
+# TUS resumable upload service on port 8008
+# Dependencies: PostgreSQL, Redis, Kafka, R2
 
 FROM public.ecr.aws/docker/library/python:3.11-slim
 
@@ -20,24 +21,21 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
 COPY src/ ./src/
-
-# Copy Alembic migrations
-COPY alembic.ini .
 COPY alembic/ ./alembic/
-
-# Copy scripts (including entrypoint and seed scripts)
-COPY scripts/ ./scripts/
+COPY alembic.ini .
+COPY tests/ ./tests/
+COPY pytest.ini .
 
 # Create non-root user for security
 RUN useradd -m -u 1000 appuser && chown -R appuser:appuser /app
 USER appuser
 
 # Expose port
-EXPOSE 8006
+EXPOSE 8008
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=20s --retries=3 \
-    CMD curl -f http://localhost:8006/health || exit 1
+    CMD curl -f http://localhost:8008/health || exit 1
 
-# Run entrypoint (migrations + seeding + app)
-ENTRYPOINT ["/bin/bash", "scripts/docker-entrypoint.sh"]
+# Run application (migrations run separately in CI/CD)
+CMD ["uvicorn", "src.app.main:app", "--host", "0.0.0.0", "--port", "8008"]

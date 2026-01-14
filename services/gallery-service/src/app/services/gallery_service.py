@@ -38,6 +38,9 @@ class GalleryService:
             query = query.options(joinedload(Gallery.sub_galleries))
 
         result = await db.execute(query)
+        # Use unique() when eager loading collections to deduplicate rows
+        if include_sub_galleries:
+            result = result.unique()
         gallery = result.scalar_one_or_none()
 
         if gallery:
@@ -83,16 +86,19 @@ class GalleryService:
         if cursor:
             try:
                 cursor_data = decode_cursor(cursor)
-                created_at = cursor_data["created_at"]
-                cursor_id = cursor_data["id"]
+                if cursor_data:
+                    from datetime import datetime
 
-                query = query.where(
-                    (GalleryAsset.created_at < created_at)
-                    | (
-                        (GalleryAsset.created_at == created_at)
-                        & (GalleryAsset.id < cursor_id)
+                    created_at_str, cursor_id = cursor_data  # Unpack tuple
+                    created_at = datetime.fromisoformat(created_at_str)
+
+                    query = query.where(
+                        (GalleryAsset.created_at < created_at)
+                        | (
+                            (GalleryAsset.created_at == created_at)
+                            & (GalleryAsset.id < cursor_id)
+                        )
                     )
-                )
             except Exception as e:
                 logger.warning("Invalid pagination cursor", cursor=cursor, error=str(e))
                 # Continue without cursor if invalid

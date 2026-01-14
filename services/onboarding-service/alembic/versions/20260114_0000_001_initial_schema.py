@@ -106,13 +106,16 @@ def upgrade() -> None:
     op.create_table(
         "workspace_members",
         sa.Column("id", postgresql.UUID(as_uuid=True), nullable=False),
-        sa.Column("workspace_id", postgresql.UUID(as_uuid=True), nullable=False),
         sa.Column("user_id", postgresql.UUID(as_uuid=True), nullable=False),
-        sa.Column("role", sa.String(20), nullable=False, server_default="viewer"),
-        sa.Column("invited_by_id", postgresql.UUID(as_uuid=True), nullable=True),
-        sa.Column("invited_at", sa.DateTime(timezone=True), nullable=True),
-        sa.Column("joined_at", sa.DateTime(timezone=True), nullable=True),
-        sa.Column("is_active", sa.Boolean(), nullable=False, server_default="true"),
+        sa.Column("workspace_id", postgresql.UUID(as_uuid=True), nullable=False),
+        sa.Column(
+            "role",
+            postgresql.ENUM('owner', 'admin', 'editor', 'viewer', name='workspace_role', create_type=True),
+            nullable=False,
+            server_default="viewer",
+        ),
+        sa.Column("permissions", postgresql.JSON(), nullable=False, server_default="{}"),
+        sa.Column("invited_by", sa.String(36), nullable=True),
         sa.Column(
             "created_at",
             sa.DateTime(timezone=True),
@@ -128,8 +131,7 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("id"),
         sa.ForeignKeyConstraint(["workspace_id"], ["workspaces.id"], ondelete="CASCADE"),
         sa.ForeignKeyConstraint(["user_id"], ["users.id"], ondelete="CASCADE"),
-        sa.ForeignKeyConstraint(["invited_by_id"], ["users.id"], ondelete="SET NULL"),
-        sa.UniqueConstraint("workspace_id", "user_id", name="uq_workspace_member"),
+        sa.UniqueConstraint("user_id", "workspace_id", name="uq_workspace_member_user_workspace"),
     )
     op.create_index("ix_workspace_members_workspace_id", "workspace_members", ["workspace_id"])
     op.create_index("ix_workspace_members_user_id", "workspace_members", ["user_id"])
@@ -166,19 +168,35 @@ def upgrade() -> None:
     op.create_index("ix_verification_tokens_user_id", "verification_tokens", ["user_id"])
 
     # Create onboarding_states table
+    # Note: enum type is created automatically by SQLAlchemy when first used
     op.create_table(
         "onboarding_states",
         sa.Column("id", postgresql.UUID(as_uuid=True), nullable=False),
         sa.Column("user_id", postgresql.UUID(as_uuid=True), nullable=False),
-        sa.Column("workspace_id", postgresql.UUID(as_uuid=True), nullable=True),
-        sa.Column("current_step", sa.String(50), nullable=False, server_default="registration"),
-        sa.Column("completed_steps", postgresql.ARRAY(sa.String(50)), nullable=False, server_default="{}"),
-        sa.Column("form_data", postgresql.JSONB(), nullable=True),
-        sa.Column("activation_checklist", postgresql.JSONB(), nullable=True),
-        sa.Column("is_completed", sa.Boolean(), nullable=False, server_default="false"),
-        sa.Column("completed_at", sa.DateTime(timezone=True), nullable=True),
+        sa.Column(
+            "current_step",
+            postgresql.ENUM(
+                'registration', 'email_verification', 'workspace_identity',
+                'workspace_preferences', 'workspace_branding', 'completed',
+                name='onboarding_step',
+                create_type=True,
+            ),
+            nullable=False,
+            server_default="registration",
+        ),
+        sa.Column("completed_steps", postgresql.JSON(), nullable=False, server_default="[]"),
+        sa.Column("form_data", postgresql.JSON(), nullable=False, server_default="{}"),
+        sa.Column("activation_checklist", postgresql.JSON(), nullable=False, server_default="{}"),
+        sa.Column("checklist_dismissed", sa.Boolean(), nullable=False, server_default="false"),
         sa.Column(
             "started_at",
+            sa.DateTime(timezone=True),
+            nullable=False,
+            server_default=sa.text("CURRENT_TIMESTAMP"),
+        ),
+        sa.Column("completed_at", sa.DateTime(timezone=True), nullable=True),
+        sa.Column(
+            "created_at",
             sa.DateTime(timezone=True),
             nullable=False,
             server_default=sa.text("CURRENT_TIMESTAMP"),
@@ -191,7 +209,6 @@ def upgrade() -> None:
         ),
         sa.PrimaryKeyConstraint("id"),
         sa.ForeignKeyConstraint(["user_id"], ["users.id"], ondelete="CASCADE"),
-        sa.ForeignKeyConstraint(["workspace_id"], ["workspaces.id"], ondelete="SET NULL"),
     )
     op.create_index("ix_onboarding_states_user_id", "onboarding_states", ["user_id"], unique=True)
 
@@ -201,6 +218,10 @@ def downgrade() -> None:
     op.drop_index("ix_onboarding_states_user_id", table_name="onboarding_states")
     op.drop_table("onboarding_states")
 
+    # Drop the onboarding_step enum type
+    onboarding_step_enum = postgresql.ENUM(name='onboarding_step')
+    onboarding_step_enum.drop(op.get_bind(), checkfirst=True)
+
     op.drop_index("ix_verification_tokens_user_id", table_name="verification_tokens")
     op.drop_index("ix_verification_tokens_token_hash", table_name="verification_tokens")
     op.drop_table("verification_tokens")
@@ -208,6 +229,10 @@ def downgrade() -> None:
     op.drop_index("ix_workspace_members_user_id", table_name="workspace_members")
     op.drop_index("ix_workspace_members_workspace_id", table_name="workspace_members")
     op.drop_table("workspace_members")
+
+    # Drop the workspace_role enum type
+    workspace_role_enum = postgresql.ENUM(name='workspace_role')
+    workspace_role_enum.drop(op.get_bind(), checkfirst=True)
 
     op.drop_index("ix_workspaces_owner_id", table_name="workspaces")
     op.drop_index("ix_workspaces_slug", table_name="workspaces")

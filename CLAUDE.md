@@ -519,9 +519,9 @@ curl http://localhost:3000  # Frontend
 ```
 
 ## Recent Changes
+- 005-upload-media-processing: Added Python 3.11 + FastAPI, tuspyserver (TUS protocol), cryptography (AES-256-GCM), Pillow, rawpy, ffmpeg-python, ExifRead, google-cloud-vision, Kafka consumers
 - 001-gallery-service: Added Python 3.11 + FastAPI, SQLAlchemy, asyncpg, Pillow, boto3 (Cloudflare R2), Redis, Kafka, KEDA
-- 001-gallery-service: Added [if applicable, e.g., PostgreSQL, CoreData, files or N/A]
 
 ## Active Technologies
-- Python 3.11 + FastAPI, SQLAlchemy, asyncpg, Pillow, boto3 (Cloudflare R2), Redis, Kafka, KEDA (001-gallery-service)
-- PostgreSQL 16 (pgvector), Redis 7 (cache/pub-sub), Cloudflare R2 (S3-compatible object storage) (001-gallery-service)
+- Python 3.11 + FastAPI, tuspyserver, cryptography, Pillow, rawpy, ffmpeg-python, ExifRead, google-cloud-vision (005-upload-media-processing)
+- PostgreSQL 16 (pgvector), Redis 7, Cloudflare R2, Kafka (005-upload-media-processing)

@@ -705,6 +705,119 @@ services:
           memory: 1G
           cpus: '1.0'
 
+  # ===========================================
+  # Upload Service
+  # Port 8008 - TUS Resumable Upload Protocol
+  # ===========================================
+  upload-service:
+    build:
+      context: ../../services/upload-service
+      dockerfile: Dockerfile
+    image: ghcr.io/vdrive/upload-service:${VERSION:-latest}
+    container_name: vDrive-upload
+    restart: unless-stopped
+    ports:
+      - "${UPLOAD_SERVICE_PORT:-8008}:8008"
+    environment:
+      SERVICE_NAME: upload-service
+      SERVICE_VERSION: "1.0.0"
+      APP_ENV: ${APP_ENV:-development}
+      PORT: "8008"
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-vDrive}:${POSTGRES_PASSWORD:-vDrive_dev_password}@postgres:5432/${POSTGRES_DB:-vDrive}
+      REDIS_URL: redis://redis:6379/0
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      R2_ACCESS_KEY_ID: ${R2_ACCESS_KEY_ID}
+      R2_SECRET_ACCESS_KEY: ${R2_SECRET_ACCESS_KEY}
+      R2_BUCKET_NAME: ${R2_BUCKET_NAME:-vdrive}
+      R2_ENDPOINT: ${R2_ENDPOINT}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_ALGORITHM: ${JWT_ALGORITHM:-EdDSA}
+      ENCRYPTION_MASTER_KEY: ${ENCRYPTION_MASTER_KEY}
+      TUS_MAX_SIZE: ${TUS_MAX_SIZE:-10737418240}
+      TUS_UPLOAD_URL_TTL_HOURS: ${TUS_UPLOAD_URL_TTL_HOURS:-24}
+      MAX_CONCURRENT_UPLOADS_PER_WORKSPACE: ${MAX_CONCURRENT_UPLOADS_PER_WORKSPACE:-10}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8008/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    networks:
+      - vDrive-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.upload.rule=PathPrefix(`/api/v1/files`) || PathPrefix(`/api/v1/uploads`)"
+      - "traefik.http.routers.upload.priority=150"
+      - "traefik.http.services.upload.loadbalancer.server.port=8008"
+      - "traefik.http.services.upload.loadbalancer.healthcheck.path=/health"
+      - "prometheus.io/scrape=true"
+      - "prometheus.io/port=8008"
+      - "prometheus.io/path=/metrics"
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '1.0'
+
+  # ===========================================
+  # Processing Service
+  # Port 8010 - Media Processing Kafka Consumers
+  # ===========================================
+  processing-service:
+    build:
+      context: ../../services/processing-service
+      dockerfile: Dockerfile
+    image: ghcr.io/vdrive/processing-service:${VERSION:-latest}
+    container_name: vDrive-processing
+    restart: unless-stopped
+    ports:
+      - "${PROCESSING_SERVICE_PORT:-8010}:8010"
+    environment:
+      SERVICE_NAME: processing-service
+      SERVICE_VERSION: "1.0.0"
+      APP_ENV: ${APP_ENV:-development}
+      PORT: "8010"
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-vDrive}:${POSTGRES_PASSWORD:-vDrive_dev_password}@postgres:5432/${POSTGRES_DB:-vDrive}
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      KAFKA_CONSUMER_GROUP_ID: processing-service-group
+      R2_ACCESS_KEY_ID: ${R2_ACCESS_KEY_ID}
+      R2_SECRET_ACCESS_KEY: ${R2_SECRET_ACCESS_KEY}
+      R2_BUCKET_NAME: ${R2_BUCKET_NAME:-vdrive}
+      R2_ENDPOINT: ${R2_ENDPOINT}
+      ENCRYPTION_MASTER_KEY: ${ENCRYPTION_MASTER_KEY}
+      GOOGLE_CLOUD_VISION_CREDENTIALS: ${GOOGLE_CLOUD_VISION_CREDENTIALS}
+      GOOGLE_CLOUD_VISION_PROJECT_ID: ${GOOGLE_CLOUD_VISION_PROJECT_ID}
+      FACE_DETECTION_RATE_LIMIT_PER_MINUTE: ${FACE_DETECTION_RATE_LIMIT_PER_MINUTE:-60}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8010/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    networks:
+      - vDrive-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    labels:
+      - "prometheus.io/scrape=true"
+      - "prometheus.io/port=8010"
+      - "prometheus.io/path=/metrics"
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '2.0'
+
 networks:
   vDrive-network:
     driver: bridge
