@@ -81,6 +81,87 @@ PLATFORM_ADMIN_USERS = [
         "last_name": "Admin",
         "role": "platform_admin",
     },
+    {
+        "id": "22222222-2222-2222-2222-222222222003",
+        "email": "supportadmin@test.vdrive.in",
+        "first_name": "Support",
+        "last_name": "Admin",
+        "role": "support_admin",
+    },
+    {
+        "id": "22222222-2222-2222-2222-222222222004",
+        "email": "billingadmin@test.vdrive.in",
+        "first_name": "Billing",
+        "last_name": "Admin",
+        "role": "billing_admin",
+    },
+    {
+        "id": "22222222-2222-2222-2222-222222222005",
+        "email": "contentmod@test.vdrive.in",
+        "first_name": "Content",
+        "last_name": "Moderator",
+        "role": "content_moderator",
+    },
+    {
+        "id": "22222222-2222-2222-2222-222222222006",
+        "email": "securityadmin@test.vdrive.in",
+        "first_name": "Security",
+        "last_name": "Admin",
+        "role": "security_admin",
+    },
+    {
+        "id": "22222222-2222-2222-2222-222222222007",
+        "email": "observabilityadmin@test.vdrive.in",
+        "first_name": "Observability",
+        "last_name": "Admin",
+        "role": "observability_admin",
+    },
+    {
+        "id": "22222222-2222-2222-2222-222222222008",
+        "email": "auditor@test.vdrive.in",
+        "first_name": "Auditor",
+        "last_name": "User",
+        "role": "auditor",
+    },
+    {
+        "id": "22222222-2222-2222-2222-222222222009",
+        "email": "productadmin@test.vdrive.in",
+        "first_name": "Product",
+        "last_name": "Admin",
+        "role": "product_admin",
+    },
+]
+
+# Workspace role test users (belong to test-roles-workspace)
+WORKSPACE_ROLE_USERS = [
+    {
+        "id": "33333333-3333-3333-3333-333333333001",
+        "email": "workspaceowner@test.vdrive.in",
+        "first_name": "Workspace",
+        "last_name": "Owner",
+        "role": "owner",
+    },
+    {
+        "id": "33333333-3333-3333-3333-333333333002",
+        "email": "workspaceadmin@test.vdrive.in",
+        "first_name": "Workspace",
+        "last_name": "Admin",
+        "role": "admin",
+    },
+    {
+        "id": "33333333-3333-3333-3333-333333333003",
+        "email": "staffuser@test.vdrive.in",
+        "first_name": "Staff",
+        "last_name": "User",
+        "role": "editor",
+    },
+    {
+        "id": "33333333-3333-3333-3333-333333333004",
+        "email": "clientviewer@test.vdrive.in",
+        "first_name": "Client",
+        "last_name": "Viewer",
+        "role": "viewer",
+    },
 ]
 
 
@@ -126,7 +207,7 @@ async def seed_test_users():
     async with async_session() as session:
         try:
             # 1. Create Tier Test Users
-            print("\n[1/2] Creating Subscription Tier Users...")
+            print("\n[1/3] Creating Subscription Tier Users...")
             for user_data in TIER_TEST_USERS:
                 # Check if user exists
                 result = await session.execute(
@@ -153,8 +234,33 @@ async def seed_test_users():
                 print(f"  Created user: {user_data['email']}")
 
             # 2. Create Platform Admin Users
-            print("\n[2/2] Creating Platform Admin Users...")
+            print("\n[2/3] Creating Platform Admin Users...")
             for user_data in PLATFORM_ADMIN_USERS:
+                result = await session.execute(
+                    select(User).where(User.email == user_data["email"])
+                )
+                existing = result.scalar_one_or_none()
+
+                if existing:
+                    print(f"  User exists: {user_data['email']}")
+                    continue
+
+                user = User(
+                    id=user_data["id"],
+                    email=user_data["email"],
+                    password_hash=password_hash,
+                    first_name=user_data["first_name"],
+                    last_name=user_data["last_name"],
+                    email_verified=True,
+                    email_verified_at=now,
+                    is_active=True,
+                )
+                session.add(user)
+                print(f"  Created user: {user_data['email']}")
+
+            # 3. Create Workspace Role Users
+            print("\n[3/3] Creating Workspace Role Users...")
+            for user_data in WORKSPACE_ROLE_USERS:
                 result = await session.execute(
                     select(User).where(User.email == user_data["email"])
                 )
@@ -190,6 +296,7 @@ async def seed_test_users():
             print("\nLogin examples:")
             print("  - free@test.vdrive.in")
             print("  - superadmin@test.vdrive.in")
+            print("  - workspaceowner@test.vdrive.in")
             print()
 
         except Exception as e:

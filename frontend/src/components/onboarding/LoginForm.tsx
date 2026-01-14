@@ -134,8 +134,8 @@ export function LoginForm({ onSuccess, className }: LoginFormProps) {
     <AppCard variant="glass" padding="lg" className={cn('w-full max-w-md', className)}>
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-2xl font-bold text-white mb-2">Welcome Back</h1>
-        <p className="text-white/60">Sign in to continue to vDrive</p>
+        <h1 className="text-2xl font-bold text-neutral-900 dark:text-white mb-2">Welcome Back</h1>
+        <p className="text-neutral-500 dark:text-white/60">Sign in to continue to vDrive</p>
       </div>
 
       {/* OAuth Options */}
@@ -144,12 +144,12 @@ export function LoginForm({ onSuccess, className }: LoginFormProps) {
       </div>
 
       {/* Divider */}
-      <div className="relative my-6">
+      <div className="relative my-8">
         <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-white/10" />
+          <div className="w-full border-t border-neutral-200 dark:border-white/10" />
         </div>
         <div className="relative flex justify-center text-sm">
-          <span className="px-4 bg-neutral-900/80 text-white/50">
+          <span className="px-4 bg-white dark:bg-neutral-900/80 text-neutral-500 dark:text-white/50">
             or continue with email
           </span>
         </div>
@@ -183,7 +183,7 @@ export function LoginForm({ onSuccess, className }: LoginFormProps) {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="p-1 hover:text-white transition-colors"
+                className="p-1 hover:text-neutral-900 dark:hover:text-white transition-colors"
                 aria-label={showPassword ? 'Hide password' : 'Show password'}
               >
                 {showPassword ? (
@@ -202,7 +202,7 @@ export function LoginForm({ onSuccess, className }: LoginFormProps) {
           <div className="flex justify-end">
             <a
               href="/forgot-password"
-              className="text-sm text-primary-400 hover:text-primary-300 transition-colors"
+              className="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 transition-colors"
             >
               Forgot password?
             </a>
@@ -212,7 +212,7 @@ export function LoginForm({ onSuccess, className }: LoginFormProps) {
         {/* General Error */}
         {errors.general && (
           <div
-            className="p-3 rounded-lg bg-error-500/20 border border-error-500/30 text-error-400 text-sm"
+            className="p-3 rounded-lg bg-error-500/10 dark:bg-error-500/20 border border-error-500/30 text-error-600 dark:text-error-400 text-sm"
             role="alert"
           >
             {errors.general}
@@ -234,10 +234,10 @@ export function LoginForm({ onSuccess, className }: LoginFormProps) {
 
       {/* Register Link */}
       <div className="mt-6 text-center">
-        <span className="text-white/60">Don't have an account? </span>
+        <span className="text-neutral-500 dark:text-white/60">Don't have an account? </span>
         <a
           href="/register"
-          className="text-primary-400 hover:text-primary-300 font-medium transition-colors"
+          className="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium transition-colors"
         >
           Create account
         </a>

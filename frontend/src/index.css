@@ -9,10 +9,11 @@
 :root {
   /* Color tokens (RGB for opacity support) */
   --color-primary: 14 165 233;
-  --color-accent: 217 70 239;
-  --color-bg: 10 10 10;
-  --color-text: 250 250 250;
-  --color-border: 38 38 38;
+  --color-accent: 59 130 246;
+  /* Warm dark mode colors */
+  --color-bg: 15 13 12;           /* warm-950 */
+  --color-text: 247 246 245;      /* warm-50 */
+  --color-border: 42 37 35;       /* warm-800 */
 
   /* Glass effect tokens */
   --glass-bg: rgba(255, 255, 255, 0.1);
@@ -37,18 +38,22 @@
 @layer base {
   html {
     scroll-behavior: smooth;
+  }
+
+  html.dark {
     color-scheme: dark;
   }
 
   body {
-    @apply bg-neutral-950 text-neutral-50 font-sans antialiased;
+    @apply bg-neutral-50 text-neutral-900 dark:bg-warm-950 dark:text-warm-50 font-sans antialiased;
+    @apply transition-colors duration-300;
     min-height: 100vh;
     margin: 0;
   }
 
   /* Focus styles - WCAG compliant */
   *:focus-visible {
-    @apply outline-none ring-2 ring-primary-500 ring-offset-2 ring-offset-neutral-950;
+    @apply outline-none ring-2 ring-primary-500 ring-offset-2 ring-offset-white dark:ring-offset-warm-950;
   }
 
   /* Heading hierarchy */
@@ -71,12 +76,14 @@
 @layer components {
   /* Glass effect - core Futuristic Glass aesthetic */
   .glass {
-    @apply bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    @apply bg-white/95 backdrop-blur-xl border border-neutral-200 rounded-2xl;
+    @apply dark:bg-white/[0.12] dark:border-white/25;
+    @apply shadow-xl shadow-neutral-200/50 dark:shadow-[0_8px_32px_rgba(0,0,0,0.25)];
+    @apply transition-colors duration-300;
   }
 
   .glass-dark {
-    @apply bg-neutral-900/70 backdrop-blur-xl border border-neutral-700/50 rounded-2xl;
+    @apply bg-warm-900/70 backdrop-blur-xl border border-warm-700/50 rounded-2xl;
   }
 
   .glass-border-glow {
@@ -88,7 +95,7 @@
 
   /* Gradient text */
   .gradient-text {
-    @apply bg-gradient-to-r from-primary-400 to-accent-500 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-primary-500 to-accent-500 dark:from-primary-400 dark:to-accent-500 bg-clip-text text-transparent;
   }
 
   /* Button variants */
@@ -105,7 +112,7 @@
     @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2;
     @apply disabled:opacity-50 disabled:cursor-not-allowed;
     @apply bg-primary-500 text-white hover:bg-primary-600;
-    @apply focus-visible:ring-primary-500 focus-visible:ring-offset-neutral-950;
+    @apply focus-visible:ring-primary-500 focus-visible:ring-offset-warm-950;
   }
 
   .btn-accent {
@@ -114,8 +121,8 @@
     @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2;
     @apply disabled:opacity-50 disabled:cursor-not-allowed;
     @apply bg-accent-500 text-white hover:bg-accent-600;
-    @apply focus-visible:ring-accent-500 focus-visible:ring-offset-neutral-950;
-    @apply shadow-glow-accent hover:shadow-[0_0_50px_rgba(217,70,239,0.5)];
+    @apply focus-visible:ring-accent-500 focus-visible:ring-offset-warm-950;
+    @apply shadow-lg shadow-accent-500/30 hover:shadow-accent-500/50;
   }
 
   .btn-outline {
@@ -123,9 +130,11 @@
     @apply transition-all duration-200 ease-out;
     @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2;
     @apply disabled:opacity-50 disabled:cursor-not-allowed;
-    @apply bg-transparent border border-white/20 text-white;
-    @apply hover:bg-white/10 hover:border-white/30;
-    @apply focus-visible:ring-white/50;
+    @apply bg-transparent border border-neutral-300 text-neutral-900;
+    @apply hover:bg-neutral-100 hover:border-neutral-400;
+    @apply dark:border-white/20 dark:text-white;
+    @apply dark:hover:bg-white/10 dark:hover:border-white/30;
+    @apply focus-visible:ring-neutral-400 dark:focus-visible:ring-white/50;
   }
 
   .btn-ghost {
@@ -133,7 +142,8 @@
     @apply transition-all duration-200 ease-out;
     @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2;
     @apply disabled:opacity-50 disabled:cursor-not-allowed;
-    @apply bg-transparent text-white/70 hover:text-white hover:bg-white/10;
+    @apply bg-transparent text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100;
+    @apply dark:text-white/70 dark:hover:text-white dark:hover:bg-white/10;
   }
 
   .btn-lg {
@@ -146,8 +156,9 @@
 
   /* Input styles */
   .input {
-    @apply w-full px-4 py-3 rounded-xl border bg-white/5;
-    @apply border-white/20 text-white placeholder-white/40;
+    @apply w-full px-4 py-3 rounded-xl border;
+    @apply bg-white border-neutral-300 text-neutral-900 placeholder-neutral-400;
+    @apply dark:bg-white/[0.08] dark:border-white/25 dark:text-white dark:placeholder-white/50;
     @apply focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20;
     @apply transition-all duration-200;
   }
@@ -158,14 +169,18 @@
 
   /* Card styles */
   .card {
-    @apply bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    @apply bg-white border border-neutral-200 rounded-2xl p-6;
+    @apply dark:bg-white/[0.12] dark:border-white/25;
+    @apply shadow-lg shadow-neutral-200/50 dark:shadow-[0_8px_32px_rgba(0,0,0,0.25)];
+    @apply backdrop-blur-xl transition-colors duration-300;
   }
 
   .card-hover {
-    @apply bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6;
-    @apply hover:shadow-float hover:-translate-y-1 transition-all duration-300;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    @apply bg-white border border-neutral-200 rounded-2xl p-6;
+    @apply dark:bg-white/[0.12] dark:border-white/25;
+    @apply shadow-lg shadow-neutral-200/50 dark:shadow-[0_8px_32px_rgba(0,0,0,0.25)];
+    @apply hover:shadow-xl hover:-translate-y-1 transition-all duration-300;
+    @apply backdrop-blur-xl;
   }
 
   /* Container utilities */
@@ -197,12 +212,14 @@
 
   .badge-primary {
     @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium;
-    @apply bg-primary-500/20 text-primary-400 border border-primary-500/30;
+    @apply bg-primary-100 text-primary-700 border border-primary-200;
+    @apply dark:bg-primary-500/20 dark:text-primary-400 dark:border-primary-500/30;
   }
 
   .badge-accent {
     @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium;
-    @apply bg-accent-500/20 text-accent-400 border border-accent-500/30;
+    @apply bg-accent-100 text-accent-700 border border-accent-200;
+    @apply dark:bg-accent-500/20 dark:text-accent-400 dark:border-accent-500/30;
   }
 }
 
@@ -278,7 +295,7 @@
   height: 35%;
   bottom: 20%;
   right: 15%;
-  background: rgba(217, 70, 239, 0.2);
+  background: rgba(59, 130, 246, 0.2);
   animation-delay: 5s;
 }
 
@@ -310,4 +327,164 @@
     transparent
   );
   animation: shimmer 2s infinite;
+}
+
+/* ============================================
+   Entrance Animations - Premium Page Transitions
+   ============================================ */
+
+/* Fade in from below - primary entrance */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Fade in from above */
+@keyframes fade-in-down {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Fade in with scale */
+@keyframes fade-in-scale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Slide in from left */
+@keyframes slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Slide in from right */
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Animation utility classes */
+.animate-fade-in-up {
+  animation: fade-in-up 0.6s ease-out forwards;
+  opacity: 0;
+}
+
+.animate-fade-in-down {
+  animation: fade-in-down 0.6s ease-out forwards;
+  opacity: 0;
+}
+
+.animate-fade-in-scale {
+  animation: fade-in-scale 0.5s ease-out forwards;
+  opacity: 0;
+}
+
+.animate-slide-in-left {
+  animation: slide-in-left 0.6s ease-out forwards;
+  opacity: 0;
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.6s ease-out forwards;
+  opacity: 0;
+}
+
+/* Stagger delay utilities (for child elements) */
+.stagger-1 { animation-delay: 50ms; }
+.stagger-2 { animation-delay: 100ms; }
+.stagger-3 { animation-delay: 150ms; }
+.stagger-4 { animation-delay: 200ms; }
+.stagger-5 { animation-delay: 250ms; }
+.stagger-6 { animation-delay: 300ms; }
+.stagger-7 { animation-delay: 350ms; }
+.stagger-8 { animation-delay: 400ms; }
+
+/* ============================================
+   Auth Background - Theme-Aware
+   Light: Soft gradient mesh (editorial)
+   Dark: Dramatic aurora (cinematic)
+   ============================================ */
+.auth-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -10;
+  overflow: hidden;
+}
+
+/* Light mode - soft gradient mesh */
+.auth-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 20% 20%, rgba(14, 165, 233, 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(59, 130, 246, 0.05) 0%, transparent 50%),
+    linear-gradient(to bottom right, #fafafa, #f5f5f5);
+  transition: opacity 0.3s ease;
+}
+
+/* Dark mode - override with solid dark + aurora orbs */
+:root.dark .auth-bg::before {
+  background: #0f0d0c;
+}
+
+:root.dark .auth-bg::after {
+  content: '';
+  position: absolute;
+  width: 45%;
+  height: 45%;
+  top: 5%;
+  left: 15%;
+  background: rgba(14, 165, 233, 0.25);
+  border-radius: 50%;
+  filter: blur(120px);
+  animation: aurora 20s ease-in-out infinite;
+}
+
+/* Second aurora orb for dark mode */
+.auth-bg .aurora-orb {
+  display: none;
+}
+
+:root.dark .auth-bg .aurora-orb {
+  display: block;
+  position: absolute;
+  width: 40%;
+  height: 40%;
+  bottom: 10%;
+  right: 10%;
+  background: rgba(59, 130, 246, 0.2);
+  border-radius: 50%;
+  filter: blur(120px);
+  animation: aurora 20s ease-in-out infinite 7s;
 }

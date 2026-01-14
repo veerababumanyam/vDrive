@@ -16,20 +16,36 @@ export interface AppCardProps extends HTMLAttributes<HTMLDivElement> {
 
 const variants = {
   default: cn(
-    'bg-white/5 border border-white/10 rounded-2xl',
-    'backdrop-blur-sm'
+    // Light mode
+    'bg-neutral-50 border border-neutral-200 rounded-2xl',
+    'shadow-sm',
+    // Dark mode
+    'dark:bg-white/5 dark:border-white/10',
+    'dark:backdrop-blur-sm dark:shadow-none'
   ),
   elevated: cn(
-    'bg-white/10 border border-white/20 rounded-2xl',
-    'backdrop-blur-xl',
-    'shadow-glass'
+    // Light mode
+    'bg-white border border-neutral-200 rounded-2xl',
+    'shadow-lg shadow-neutral-200/60',
+    // Dark mode
+    'dark:bg-white/10 dark:border-white/20',
+    'dark:backdrop-blur-xl dark:shadow-glass'
   ),
   glass: cn(
-    'bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl',
-    'shadow-[0_8px_32px_rgba(0,0,0,0.12)]'
+    // Light mode - clean white card with soft shadow
+    'bg-white/95 border border-neutral-200/80 rounded-2xl',
+    'shadow-xl shadow-neutral-300/40',
+    // Dark mode - Apple iOS glass effect
+    'dark:bg-white/[0.12] dark:border-white/25',
+    'dark:shadow-[0_8px_40px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)]',
+    // Common
+    'backdrop-blur-xl transition-colors duration-300'
   ),
   outline: cn(
-    'bg-transparent border border-white/20 rounded-2xl'
+    // Light mode
+    'bg-transparent border border-neutral-300 rounded-2xl',
+    // Dark mode
+    'dark:border-white/20'
   ),
 };
 
@@ -43,7 +59,10 @@ const paddings = {
 const hoverStyles = cn(
   'transition-all duration-300 ease-out',
   'hover:shadow-float hover:-translate-y-1',
-  'hover:border-white/30'
+  // Light mode
+  'hover:border-neutral-300 hover:shadow-xl',
+  // Dark mode
+  'dark:hover:border-white/30'
 );
 
 /**
@@ -86,7 +105,7 @@ export const AppCard = forwardRef<HTMLDivElement, AppCardProps>(
         {header && (
           <div
             className={cn(
-              'border-b border-white/10',
+              'border-b border-neutral-200 dark:border-white/10',
               padding !== 'none' && paddings[padding]
             )}
           >
@@ -103,7 +122,7 @@ export const AppCard = forwardRef<HTMLDivElement, AppCardProps>(
         {footer && (
           <div
             className={cn(
-              'border-t border-white/10',
+              'border-t border-neutral-200 dark:border-white/10',
               padding !== 'none' && paddings[padding]
             )}
           >
@@ -129,14 +148,20 @@ export const GlassCard = forwardRef<
       ref={ref}
       className={cn(
         'relative p-[1px] rounded-2xl',
-        'bg-gradient-to-br from-white/30 via-white/10 to-transparent',
+        // Light mode - subtle gradient border
+        'bg-gradient-to-br from-neutral-300/50 via-neutral-200/30 to-transparent',
+        // Dark mode - brighter gradient border
+        'dark:from-white/30 dark:via-white/10 dark:to-transparent',
         className
       )}
       {...props}
     >
       <div
         className={cn(
-          'bg-neutral-900/80 backdrop-blur-xl rounded-2xl',
+          // Light mode
+          'bg-white/95 backdrop-blur-xl rounded-2xl',
+          // Dark mode
+          'dark:bg-neutral-900/80',
           props.padding !== 'none' && paddings[props.padding || 'md']
         )}
       >
@@ -157,9 +182,14 @@ export const FloatingPanel = forwardRef<HTMLDivElement, AppCardProps>(
       <div
         ref={ref}
         className={cn(
-          'bg-white/10 backdrop-blur-xl border border-white/20',
-          'rounded-2xl shadow-2xl shadow-black/20',
-          'animate-fade-up',
+          // Light mode
+          'bg-white/95 backdrop-blur-xl border border-neutral-200',
+          'shadow-2xl shadow-neutral-300/30',
+          // Dark mode
+          'dark:bg-white/10 dark:border-white/20',
+          'dark:shadow-black/20',
+          // Common
+          'rounded-2xl animate-fade-up',
           paddings[props.padding || 'md'],
           className
         )}

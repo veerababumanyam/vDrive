@@ -25,7 +25,7 @@ const variants = {
   accent: cn(
     'bg-accent-500 text-white hover:bg-accent-600',
     'focus-visible:ring-accent-500 focus-visible:ring-offset-neutral-950',
-    'shadow-glow-accent hover:shadow-[0_0_50px_rgba(217,70,239,0.5)]'
+    'shadow-lg shadow-accent-500/30 hover:shadow-accent-500/50'
   ),
   outline: cn(
     'bg-transparent border border-white/20 text-white',

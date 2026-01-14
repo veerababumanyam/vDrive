@@ -115,20 +115,24 @@ export function RegisterPage() {
   // Show loading while processing OAuth
   if (isProcessingOAuth) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-neutral-950">
-        <div className="aurora-bg" />
+      <div className="min-h-screen flex items-center justify-center bg-neutral-50 dark:bg-warm-950 transition-colors duration-300">
+        <div className="auth-bg">
+          <div className="aurora-orb" />
+        </div>
         <div className="text-center">
           <div className="w-12 h-12 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-white/70">Completing sign in...</p>
+          <p className="text-neutral-600 dark:text-white/70">Completing sign in...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex bg-neutral-950">
-      {/* Aurora Background */}
-      <div className="aurora-bg" />
+    <div className="min-h-screen flex bg-neutral-50 dark:bg-warm-950 transition-colors duration-300">
+      {/* Theme-Aware Background */}
+      <div className="auth-bg">
+        <div className="aurora-orb" />
+      </div>
 
       {/* Theme Toggle (fixed position) */}
       <div className="fixed top-6 right-6 z-50">
@@ -144,47 +148,48 @@ export function RegisterPage() {
             backgroundImage: 'url(/images/register-bg.jpg)',
           }}
         >
-          <div className="absolute inset-0 bg-gradient-to-r from-neutral-950 via-neutral-950/80 to-transparent" />
+          {/* Light mode: softer gradient, Dark mode: dramatic gradient */}
+          <div className="absolute inset-0 bg-gradient-to-r from-white via-white/90 to-white/70 dark:from-neutral-950 dark:via-neutral-950/80 dark:to-transparent" />
         </div>
 
         {/* Content */}
         <div className="relative z-10 flex flex-col justify-center px-12 xl:px-20 max-w-2xl">
-          {/* Logo */}
-          <a href="/" className="inline-flex items-center gap-2 mb-12">
+          {/* Logo - with entrance animation */}
+          <a href="/" className="inline-flex items-center gap-2 mb-12 animate-fade-in-scale">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center">
               <CameraIcon className="w-6 h-6 text-white" />
             </div>
-            <span className="text-2xl font-bold text-white">vDrive</span>
+            <span className="text-2xl font-bold text-neutral-900 dark:text-white">vDrive</span>
           </a>
 
-          {/* Headline */}
-          <h1 className="text-4xl xl:text-5xl font-bold text-white mb-6 leading-tight">
+          {/* Headline - with staggered entrance */}
+          <h1 className="text-4xl xl:text-5xl font-bold text-neutral-900 dark:text-white mb-6 leading-tight animate-fade-in-up stagger-1">
             Your photography
             <br />
             <span className="gradient-text">deserves better</span>
           </h1>
 
-          <p className="text-lg text-white/70 mb-12 max-w-lg">
+          <p className="text-lg text-neutral-600 dark:text-white/70 mb-12 max-w-lg animate-fade-in-up stagger-2">
             Join thousands of photographers who use vDrive to manage, showcase,
             and deliver their work with stunning galleries.
           </p>
 
-          {/* Features */}
+          {/* Features - with staggered entrance */}
           <div className="space-y-6">
             {features.map((feature, index) => (
               <div
                 key={index}
                 className={cn(
-                  'flex items-start gap-4 animate-fade-up',
-                  `animation-delay-${(index + 1) * 100}`
+                  'flex items-start gap-4 animate-fade-in-up'
                 )}
+                style={{ animationDelay: `${200 + index * 100}ms` }}
               >
-                <div className="w-10 h-10 rounded-lg bg-white/10 backdrop-blur-sm flex items-center justify-center shrink-0">
-                  <feature.icon className="w-5 h-5 text-primary-400" />
+                <div className="w-10 h-10 rounded-lg bg-neutral-100 dark:bg-white/10 backdrop-blur-sm flex items-center justify-center shrink-0">
+                  <feature.icon className="w-5 h-5 text-primary-600 dark:text-primary-400" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-white">{feature.title}</h3>
-                  <p className="text-sm text-white/60">{feature.description}</p>
+                  <h3 className="font-semibold text-neutral-900 dark:text-white">{feature.title}</h3>
+                  <p className="text-sm text-neutral-500 dark:text-white/60">{feature.description}</p>
                 </div>
               </div>
             ))}
@@ -192,21 +197,21 @@ export function RegisterPage() {
         </div>
       </div>
 
-      {/* Right Side - Registration Form */}
+      {/* Right Side - Registration Form with slide-in animation */}
       <div className="w-full lg:w-1/2 xl:w-[45%] flex items-center justify-center p-6 sm:p-8 lg:p-12">
-        <div className="w-full max-w-md">
+        <div className="w-full max-w-md animate-slide-in-right lg:animate-fade-in-scale" style={{ animationDelay: '150ms' }}>
           {/* Mobile Logo */}
           <div className="lg:hidden flex items-center justify-center gap-2 mb-8">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center">
               <CameraIcon className="w-6 h-6 text-white" />
             </div>
-            <span className="text-2xl font-bold text-white">vDrive</span>
+            <span className="text-2xl font-bold text-neutral-900 dark:text-white">vDrive</span>
           </div>
 
           {/* OAuth Error */}
           {oauthError && (
             <div
-              className="mb-6 p-4 rounded-xl bg-error-500/20 border border-error-500/30 text-error-400"
+              className="mb-6 p-4 rounded-xl bg-error-500/10 dark:bg-error-500/20 border border-error-500/30 text-error-600 dark:text-error-400"
               role="alert"
             >
               <p className="font-medium">Sign in failed</p>

@@ -63,14 +63,14 @@ const uniqueId = `feature-${name.toLowerCase().replace(/\s+/g, '-')}`;
     <h3 class="text-xl font-semibold text-neutral-900 dark:text-white">
       {name}
     </h3>
-    <p class="mt-2 text-neutral-600 dark:text-neutral-400">
+    <p class="mt-2 text-neutral-600 dark:text-warm-400">
       {tagline}
     </p>
 
     <!-- Benefits List -->
     <ul class="mt-4 space-y-2">
       {benefits.slice(0, 3).map((benefit) => (
-        <li class="flex items-start gap-2 text-sm text-neutral-600 dark:text-neutral-400">
+        <li class="flex items-start gap-2 text-sm text-neutral-600 dark:text-warm-400">
           <svg
             class="mt-0.5 h-4 w-4 flex-shrink-0 text-primary-500"
             fill="none"
@@ -119,9 +119,9 @@ const uniqueId = `feature-${name.toLowerCase().replace(/\s+/g, '-')}`;
       class="mt-4 hidden overflow-hidden"
       data-expand-content
     >
-      <div class="border-t border-neutral-200 pt-4 dark:border-neutral-700">
+      <div class="border-t border-neutral-200 pt-4 dark:border-warm-700">
         <!-- Full Description -->
-        <p class="text-sm text-neutral-600 dark:text-neutral-400">
+        <p class="text-sm text-neutral-600 dark:text-warm-400">
           {description}
         </p>
 
@@ -133,7 +133,7 @@ const uniqueId = `feature-${name.toLowerCase().replace(/\s+/g, '-')}`;
             </h4>
             <ul class="mt-2 space-y-1">
               {useCases.map((useCase) => (
-                <li class="flex items-start gap-2 text-sm text-neutral-600 dark:text-neutral-400">
+                <li class="flex items-start gap-2 text-sm text-neutral-600 dark:text-warm-400">
                   <span class="text-primary-500">→</span>
                   <span>{useCase}</span>
                 </li>
@@ -150,7 +150,7 @@ const uniqueId = `feature-${name.toLowerCase().replace(/\s+/g, '-')}`;
             </h4>
             <ul class="mt-2 space-y-1">
               {benefits.slice(3).map((benefit) => (
-                <li class="flex items-start gap-2 text-sm text-neutral-600 dark:text-neutral-400">
+                <li class="flex items-start gap-2 text-sm text-neutral-600 dark:text-warm-400">
                   <svg
                     class="mt-0.5 h-4 w-4 flex-shrink-0 text-primary-500"
                     fill="none"

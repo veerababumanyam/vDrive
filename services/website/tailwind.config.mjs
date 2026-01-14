@@ -35,7 +35,7 @@ export default {
           900: '#701a75',
           950: '#4a044e',
         },
-        // Neutral/Gray
+        // Neutral/Gray (kept for light mode)
         neutral: {
           50: '#fafafa',
           100: '#f5f5f5',
@@ -48,6 +48,20 @@ export default {
           800: '#262626',
           900: '#171717',
           950: '#0a0a0a',
+        },
+        // Warm neutrals for dark mode (espresso/taupe undertones)
+        warm: {
+          50: '#f7f6f5',
+          100: '#eceae9',
+          200: '#d9d5d3',
+          300: '#b5afac',
+          400: '#8a8380',
+          500: '#6b6562',
+          600: '#524d4a',
+          700: '#3d3835',
+          800: '#2a2523',
+          900: '#1a1614',
+          950: '#0f0d0c',
         },
         // Success/Error/Warning
         success: {

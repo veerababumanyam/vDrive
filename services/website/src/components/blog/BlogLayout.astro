@@ -101,7 +101,7 @@ const formattedUpdatedDate = updatedDate?.toLocaleDateString('en-US', {
 
         {/* Description */}
         <p
-          class="mt-6 text-lg text-neutral-600 dark:text-neutral-400"
+          class="mt-6 text-lg text-neutral-600 dark:text-warm-400"
           itemprop="description"
         >
           {description}
@@ -127,12 +127,12 @@ const formattedUpdatedDate = updatedDate?.toLocaleDateString('en-US', {
             </span>
           </div>
 
-          <span class="text-neutral-300 dark:text-neutral-700" aria-hidden="true">|</span>
+          <span class="text-neutral-300 dark:text-warm-700" aria-hidden="true">|</span>
 
           {/* Date */}
           <time
             datetime={pubDate.toISOString()}
-            class="text-neutral-500 dark:text-neutral-400"
+            class="text-neutral-500 dark:text-warm-400"
             itemprop="datePublished"
           >
             {formattedPubDate}
@@ -140,8 +140,8 @@ const formattedUpdatedDate = updatedDate?.toLocaleDateString('en-US', {
 
           {readingTime && (
             <>
-              <span class="text-neutral-300 dark:text-neutral-700" aria-hidden="true">|</span>
-              <span class="text-neutral-500 dark:text-neutral-400">
+              <span class="text-neutral-300 dark:text-warm-700" aria-hidden="true">|</span>
+              <span class="text-neutral-500 dark:text-warm-400">
                 {readingTime}
               </span>
             </>
@@ -149,7 +149,7 @@ const formattedUpdatedDate = updatedDate?.toLocaleDateString('en-US', {
         </div>
 
         {updatedDate && (
-          <p class="mt-2 text-sm text-neutral-500 dark:text-neutral-400">
+          <p class="mt-2 text-sm text-neutral-500 dark:text-warm-400">
             Updated on{' '}
             <time datetime={updatedDate.toISOString()} itemprop="dateModified">
               {formattedUpdatedDate}
@@ -179,7 +179,7 @@ const formattedUpdatedDate = updatedDate?.toLocaleDateString('en-US', {
       </div>
 
       {/* Footer */}
-      <footer class="mt-16 border-t border-neutral-200 pt-8 dark:border-neutral-800">
+      <footer class="mt-16 border-t border-neutral-200 pt-8 dark:border-warm-800">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <a
             href="/blog"
@@ -193,12 +193,12 @@ const formattedUpdatedDate = updatedDate?.toLocaleDateString('en-US', {
 
           {/* Share Buttons */}
           <div class="flex items-center gap-3">
-            <span class="text-sm text-neutral-500 dark:text-neutral-400">Share:</span>
+            <span class="text-sm text-neutral-500 dark:text-warm-400">Share:</span>
             <a
               href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(`https://www.vdrive.io/blog/${slug}`)}`}
               target="_blank"
               rel="noopener noreferrer"
-              class="text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors"
+              class="text-neutral-400 hover:text-neutral-600 dark:hover:text-warm-300 transition-colors"
               aria-label="Share on Twitter"
             >
               <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
@@ -209,7 +209,7 @@ const formattedUpdatedDate = updatedDate?.toLocaleDateString('en-US', {
               href={`https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(`https://www.vdrive.io/blog/${slug}`)}&title=${encodeURIComponent(title)}`}
               target="_blank"
               rel="noopener noreferrer"
-              class="text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors"
+              class="text-neutral-400 hover:text-neutral-600 dark:hover:text-warm-300 transition-colors"
               aria-label="Share on LinkedIn"
             >
               <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">

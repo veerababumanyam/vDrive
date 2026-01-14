@@ -1,5 +1,5 @@
 # vDrive Website Service Dockerfile
-# Multi-stage build for Astro with Node.js adapter
+# Multi-stage build for Astro static site
 
 # ===========================================
 # Stage 1: Dependencies
@@ -33,28 +33,40 @@ ENV APP_URL=$APP_URL
 RUN npm run build
 
 # ===========================================
-# Stage 3: Runner (Production)
+# Stage 3: Runner (Production) - Nginx for static files
 # ===========================================
-FROM node:20-alpine AS runner
+FROM nginx:alpine AS runner
 
-WORKDIR /app
+# Copy built static files
+COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Set production environment
-ENV NODE_ENV=production
-ENV HOST=0.0.0.0
-ENV PORT=8020
-
-# Create non-root user
-RUN addgroup --system --gid 1001 nodejs && \
-  adduser --system --uid 1001 astro
-
-# Copy built application
-COPY --from=builder --chown=astro:nodejs /app/dist ./dist
-COPY --from=builder --chown=astro:nodejs /app/node_modules ./node_modules
-COPY --from=builder --chown=astro:nodejs /app/package.json ./package.json
-
-# Switch to non-root user
-USER astro
+# Copy custom nginx config for SPA routing
+RUN echo 'server { \
+    listen 8020; \
+    server_name localhost; \
+    root /usr/share/nginx/html; \
+    index index.html; \
+    \
+    # Gzip compression \
+    gzip on; \
+    gzip_types text/plain text/css application/json application/javascript text/xml application/xml; \
+    \
+    # Security headers \
+    add_header X-Frame-Options "SAMEORIGIN" always; \
+    add_header X-Content-Type-Options "nosniff" always; \
+    add_header X-XSS-Protection "1; mode=block" always; \
+    \
+    # Static file caching \
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2)$ { \
+        expires 1y; \
+        add_header Cache-Control "public, immutable"; \
+    } \
+    \
+    # Try files or 404 \
+    location / { \
+        try_files $uri $uri/ $uri.html /index.html; \
+    } \
+}' > /etc/nginx/conf.d/default.conf
 
 # Expose port
 EXPOSE 8020
@@ -63,5 +75,5 @@ EXPOSE 8020
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD wget --no-verbose --tries=1 --spider http://localhost:8020/ || exit 1
 
-# Start the server
-CMD ["node", "./dist/server/entry.mjs"]
+# Start nginx
+CMD ["nginx", "-g", "daemon off;"]

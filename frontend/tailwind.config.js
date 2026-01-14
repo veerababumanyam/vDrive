@@ -22,21 +22,21 @@ export default {
           900: '#0c4a6e',
           950: '#082f49',
         },
-        // Accent - Fuchsia/Magenta
+        // Accent - Apple Blue (clean, professional)
         accent: {
-          50: '#fdf4ff',
-          100: '#fae8ff',
-          200: '#f5d0fe',
-          300: '#f0abfc',
-          400: '#e879f9',
-          500: '#d946ef',
-          600: '#c026d3',
-          700: '#a21caf',
-          800: '#86198f',
-          900: '#701a75',
-          950: '#4a044e',
+          50: '#eff6ff',
+          100: '#dbeafe',
+          200: '#bfdbfe',
+          300: '#93c5fd',
+          400: '#60a5fa',
+          500: '#3b82f6',
+          600: '#2563eb',
+          700: '#1d4ed8',
+          800: '#1e40af',
+          900: '#1e3a8a',
+          950: '#172554',
         },
-        // Neutral - Slate Gray
+        // Neutral - Slate Gray (kept for light mode)
         neutral: {
           50: '#fafafa',
           100: '#f5f5f5',
@@ -49,6 +49,20 @@ export default {
           800: '#262626',
           900: '#171717',
           950: '#0a0a0a',
+        },
+        // Warm - Custom warm neutrals for dark mode (espresso/taupe undertones)
+        warm: {
+          50: '#f7f6f5',
+          100: '#eceae9',
+          200: '#d9d5d3',
+          300: '#b5afac',
+          400: '#8a8380',
+          500: '#6b6562',
+          600: '#524d4a',
+          700: '#3d3835',
+          800: '#2a2523',
+          900: '#1a1614',
+          950: '#0f0d0c',
         },
         // Status Colors
         success: {
@@ -68,7 +82,7 @@ export default {
         },
         // Surface colors for glass effects
         surface: {
-          dark: 'rgba(10, 10, 10, 0.8)',
+          dark: 'rgba(15, 13, 12, 0.8)',  // warm-950 with opacity
           glass: 'rgba(255, 255, 255, 0.1)',
           'glass-border': 'rgba(255, 255, 255, 0.2)',
         },
@@ -133,10 +147,11 @@ export default {
       boxShadow: {
         'glow': '0 0 20px rgba(14, 165, 233, 0.3)',
         'glow-lg': '0 0 40px rgba(14, 165, 233, 0.4)',
-        'glow-accent': '0 0 40px rgba(217, 70, 239, 0.4)',
+        'glow-accent': '0 0 40px rgba(59, 130, 246, 0.4)',
         'glass': '0 8px 32px rgba(0, 0, 0, 0.12)',
         'glass-lg': '0 25px 80px rgba(0, 0, 0, 0.35)',
         'float': '0 20px 60px -10px rgba(0, 0, 0, 0.3)',
+        'inner-glow': 'inset 0 1px 0 rgba(255, 255, 255, 0.1)',
       },
       backdropBlur: {
         xs: '2px',

@@ -37,14 +37,25 @@ Before coding, commit to a **BOLD** aesthetic direction:
 
 Glassmorphism creates depth through translucent layers. Use it intentionally for premium feel.
 
-### Core Glass Styles
+### Core Glass Styles (Apple iOS-Inspired)
 
 ```typescript
-// Standard frosted glass
+// Standard frosted glass - Apple iOS style
 const GlassCard = ({ children, className }) => (
   <div className={cn(
-    "bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl",
-    "shadow-[0_8px_32px_rgba(0,0,0,0.12)]",
+    "bg-white/[0.12] backdrop-blur-xl border border-white/25 rounded-2xl",
+    "shadow-[0_8px_40px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)]",
+    className
+  )}>
+    {children}
+  </div>
+);
+
+// Glass input field - high visibility
+const GlassInput = ({ children, className }) => (
+  <div className={cn(
+    "bg-white/[0.08] backdrop-blur-xl border border-white/25 rounded-xl",
+    "shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]",
     className
   )}>
     {children}
@@ -53,11 +64,22 @@ const GlassCard = ({ children, className }) => (
 
 // Dark mode glass (for light backgrounds)
 const GlassDark = ({ children }) => (
-  <div className="bg-slate-900/70 backdrop-blur-xl border border-slate-700/50 rounded-2xl">
+  <div className="bg-warm-900/70 backdrop-blur-xl border border-warm-700/50 rounded-2xl">
     {children}
   </div>
 );
 ```
+
+### Glass Opacity Guidelines
+
+| Element | Background | Border | Blur |
+|---------|------------|--------|------|
+| Cards | `white/[0.12]` | `white/25` | `blur-xl` |
+| Inputs | `white/[0.08]` | `white/25` | `blur-xl` |
+| Modals | `white/[0.15]` | `white/30` | `blur-2xl` |
+| Tooltips | `white/[0.10]` | `white/20` | `blur-lg` |
+
+**CRITICAL**: Never use `white/5` or `blur-sm` - too subtle, looks muddy.
 
 ### Multi-Layer Glass (Advanced Depth)
 
@@ -119,7 +141,7 @@ const grainOverlay = `
 // Gradient border glow
 const GlassBorderGlow = () => (
   <div className="relative p-[1px] rounded-2xl bg-gradient-to-br from-white/30 via-white/10 to-transparent">
-    <div className="bg-slate-900/80 backdrop-blur-xl rounded-2xl p-6">
+    <div className="bg-warm-900/80 backdrop-blur-xl rounded-2xl p-6">
       {/* Content */}
     </div>
   </div>
@@ -156,6 +178,103 @@ const ResponsiveGlass = () => (
 ---
 
 ## Advanced Animation System
+
+### CSS-Only Entrance Animations (No Dependencies)
+
+For lightweight page entrance animations without Framer Motion, use these CSS-only utilities:
+
+```css
+/* Keyframe definitions (in index.css) */
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in-down {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in-scale {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes slide-in-left {
+  from { opacity: 0; transform: translateX(-30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slide-in-right {
+  from { opacity: 0; transform: translateX(30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* Utility classes */
+.animate-fade-in-up { animation: fade-in-up 0.6s ease-out forwards; opacity: 0; }
+.animate-fade-in-down { animation: fade-in-down 0.6s ease-out forwards; opacity: 0; }
+.animate-fade-in-scale { animation: fade-in-scale 0.5s ease-out forwards; opacity: 0; }
+.animate-slide-in-left { animation: slide-in-left 0.6s ease-out forwards; opacity: 0; }
+.animate-slide-in-right { animation: slide-in-right 0.6s ease-out forwards; opacity: 0; }
+
+/* Stagger utilities */
+.stagger-1 { animation-delay: 50ms; }
+.stagger-2 { animation-delay: 100ms; }
+.stagger-3 { animation-delay: 150ms; }
+.stagger-4 { animation-delay: 200ms; }
+.stagger-5 { animation-delay: 250ms; }
+.stagger-6 { animation-delay: 300ms; }
+.stagger-7 { animation-delay: 350ms; }
+.stagger-8 { animation-delay: 400ms; }
+```
+
+#### Usage Patterns
+
+```tsx
+// Page header - fade down from top
+<header className="animate-fade-in-down">...</header>
+
+// Welcome section - staggered fade up
+<div className="animate-fade-in-up stagger-1">Badge</div>
+<h1 className="animate-fade-in-up stagger-2">Title</h1>
+<p className="animate-fade-in-up stagger-3">Description</p>
+
+// Cards with inline delay (for dynamic lists)
+{items.map((item, index) => (
+  <div
+    key={item.id}
+    className="animate-fade-in-up"
+    style={{ animationDelay: `${200 + index * 100}ms` }}
+  >
+    {item.content}
+  </div>
+))}
+
+// Sidebar - slide in from side
+<aside className="animate-slide-in-right" style={{ animationDelay: '300ms' }}>
+  ...
+</aside>
+
+// Hero section - scale in for impact
+<div className="animate-fade-in-scale" style={{ animationDelay: '150ms' }}>
+  <LoginForm />
+</div>
+```
+
+#### Best Practices
+
+| Element | Animation | Delay |
+|---------|-----------|-------|
+| Header/Nav | `fade-in-down` | 0ms |
+| Hero badge | `fade-in-up` | 50-100ms |
+| Hero title | `fade-in-up` | 100-150ms |
+| Hero subtitle | `fade-in-up` | 150-200ms |
+| Cards (list) | `fade-in-up` | 200ms + (index * 100ms) |
+| Sidebar | `slide-in-right` | 300ms |
+| Modal/Form | `fade-in-scale` | 150ms |
+| CTA section | `fade-in-scale` | 500-650ms |
+
+---
 
 ### Framer Motion Integration
 
@@ -304,7 +423,7 @@ const ExpandableCard = ({ isExpanded, children }) => (
 // Shimmer skeleton
 const SkeletonShimmer = ({ className }) => (
   <div className={cn(
-    "relative overflow-hidden bg-slate-200 dark:bg-slate-800 rounded-lg",
+    "relative overflow-hidden bg-slate-200 dark:bg-warm-800 rounded-lg",
     className
   )}>
     <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/20 to-transparent" />
@@ -318,7 +437,7 @@ const SkeletonShimmer = ({ className }) => (
 // Pulse skeleton alternative
 const SkeletonPulse = ({ className }) => (
   <div className={cn(
-    "animate-pulse bg-slate-200 dark:bg-slate-800 rounded-lg",
+    "animate-pulse bg-slate-200 dark:bg-warm-800 rounded-lg",
     className
   )} />
 );
@@ -539,7 +658,7 @@ const FloatingLabelInput = ({ label, type = "text", error, ...props }) => {
         className={cn(
           "peer w-full px-4 pt-6 pb-2 rounded-xl border bg-transparent",
           "transition-all duration-200 outline-none",
-          "border-slate-200 dark:border-slate-700",
+          "border-slate-200 dark:border-warm-700",
           "focus:border-accent-500 focus:ring-2 focus:ring-accent-500/20",
           error && "border-rose-500 focus:border-rose-500 focus:ring-rose-500/20"
         )}
@@ -554,7 +673,7 @@ const FloatingLabelInput = ({ label, type = "text", error, ...props }) => {
       <label
         className={cn(
           "absolute left-4 transition-all duration-200 pointer-events-none",
-          "text-slate-500 dark:text-slate-400",
+          "text-slate-500 dark:text-warm-400",
           "peer-placeholder-shown:top-4 peer-placeholder-shown:text-base",
           "peer-focus:top-2 peer-focus:text-xs peer-focus:text-accent-500",
           (hasValue || isFocused) && "top-2 text-xs"
@@ -1042,7 +1161,7 @@ className="shadow-[0_0_40px_rgba(6,182,212,0.4)]"
 
 ```typescript
 const PremiumPhotoCard = ({ photo, onSelect }) => (
-  <div className="group relative overflow-hidden rounded-2xl bg-neutral-900">
+  <div className="group relative overflow-hidden rounded-2xl bg-warm-900">
     <img
       src={photo.thumbnailUrl}
       alt={photo.title}
@@ -1187,7 +1306,7 @@ const ResponsiveGlassCard = ({ children }) => {
     <div className={cn(
       "rounded-2xl border",
       isLowPower
-        ? "bg-slate-900/90 border-slate-700" // Simple fallback
+        ? "bg-warm-900/90 border-warm-700" // Simple fallback
         : "bg-white/10 backdrop-blur-xl border-white/20" // Full effect
     )}>
       {children}
@@ -1208,7 +1327,7 @@ const LazyGlass = ({ children }) => {
       ref={ref}
       className={cn(
         "rounded-2xl border border-white/20 transition-all duration-500",
-        isVisible ? "bg-white/10 backdrop-blur-xl" : "bg-slate-900/50"
+        isVisible ? "bg-white/10 backdrop-blur-xl" : "bg-warm-900/50"
       )}
     >
       {children}
@@ -1316,38 +1435,38 @@ export const useTheme = () => {
   --glass-border: rgba(0, 0, 0, 0.1);
 }
 
-/* Dark theme */
+/* Dark theme - Warm Neutrals */
 [data-theme="dark"] {
-  /* Backgrounds */
-  --color-background: #030712;
-  --color-surface: #0F172A;
-  --color-surface-hover: #1E293B;
-  --color-surface-elevated: #1E293B;
+  /* Backgrounds - warm espresso/taupe undertones */
+  --color-background: #0f0d0c;        /* warm-950 - rich warm black */
+  --color-surface: #1a1614;           /* warm-900 - deep espresso */
+  --color-surface-hover: #2a2523;     /* warm-800 - warm cocoa */
+  --color-surface-elevated: #2a2523;  /* warm-800 */
 
-  /* Text - WCAG AA compliant contrast */
-  --color-text-primary: #F8FAFC;      /* 15.3:1 on dark bg */
-  --color-text-secondary: #CBD5E1;    /* 9.1:1 on dark bg */
-  --color-text-tertiary: #94A3B8;     /* 5.5:1 on dark bg */
+  /* Text - WCAG AA compliant contrast on warm backgrounds */
+  --color-text-primary: #f7f6f5;      /* warm-50 - 16.5:1 on warm-950 */
+  --color-text-secondary: #b5afac;    /* warm-300 - 8.2:1 on warm-950 */
+  --color-text-tertiary: #8a8380;     /* warm-400 - 5.2:1 on warm-950 */
   --color-text-on-accent: #FFFFFF;
 
-  /* Borders */
-  --color-border: #1E293B;
-  --color-border-strong: #334155;
+  /* Borders - warm tones */
+  --color-border: #2a2523;            /* warm-800 */
+  --color-border-strong: #3d3835;     /* warm-700 */
   --color-border-focus: #3B82F6;
 
-  /* Interactive */
-  --color-primary: #3B82F6;
-  --color-primary-hover: #2563EB;
-  --color-accent: #06B6D4;
-  --color-accent-hover: #0891B2;
+  /* Interactive - Apple Blue accent */
+  --color-primary: #0ea5e9;           /* sky-500 */
+  --color-primary-hover: #0284c7;     /* sky-600 */
+  --color-accent: #3b82f6;            /* blue-500 - Apple style */
+  --color-accent-hover: #2563eb;      /* blue-600 */
 
   /* Status */
   --color-success: #10B981;
   --color-warning: #F59E0B;
   --color-error: #EF4444;
 
-  /* Glass effects */
-  --glass-bg: rgba(15, 23, 42, 0.8);
+  /* Glass effects - warm tint */
+  --glass-bg: rgba(26, 22, 20, 0.8);  /* warm-900 with opacity */
   --glass-border: rgba(255, 255, 255, 0.1);
 }
 ```
@@ -1444,8 +1563,8 @@ const accessibleColors = {
     accentOnWhite: { fg: '#0891B2', ratio: 4.5 },     // AA
   },
   dark: {
-    textOnDark: { fg: '#F8FAFC', ratio: 15.3 },       // AAA
-    secondaryOnDark: { fg: '#CBD5E1', ratio: 9.1 },   // AAA
+    textOnDark: { fg: '#f7f6f5', ratio: 16.5 },       // AAA (warm-50 on warm-950)
+    secondaryOnDark: { fg: '#b5afac', ratio: 8.2 },   // AAA (warm-300 on warm-950)
     primaryOnDark: { fg: '#3B82F6', ratio: 5.2 },     // AA
     accentOnDark: { fg: '#06B6D4', ratio: 6.8 },      // AA
   },
@@ -1458,7 +1577,7 @@ const accessibleColors = {
 // Visible focus indicators - NEVER remove
 const focusStyles = {
   default: "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
-  onDark: "focus-visible:ring-white focus-visible:ring-offset-slate-900",
+  onDark: "focus-visible:ring-white focus-visible:ring-offset-warm-950",
   inset: "focus-visible:ring-inset focus-visible:ring-white/50",
 };
 
@@ -1690,15 +1809,15 @@ const MotionSafe = ({ children }) => {
 | Problem | Fix |
 |---------|-----|
 | Generic fonts (Inter, Roboto, Arial) | Use serif for headlines, vary fonts |
-| Purple gradient on white | Use brand colors: blue-cyan or gold |
-| Centered everything | Embrace asymmetry |
-| Stock illustrations | Use photography or abstract gradients |
+| Hot pink/fuchsia buttons | Use clean Apple-style blue (`accent-500: #3b82f6`) |
+| Low contrast glassmorphism | Use `bg-white/[0.08]` minimum, `backdrop-blur-xl` |
 | Boring shadows (`shadow-md`) | Use dramatic shadows or glows |
-| Rainbow gradients | Stick to 2-3 brand colors |
+| Rainbow/neon gradients | Stick to blue-cyan brand colors |
 | Same aesthetic every time | Vary between directions |
 | Backdrop-blur everywhere | Use strategically, consider performance |
 | Animations without purpose | Every animation should communicate |
 | Ignoring reduced-motion | Always provide fallbacks |
+| Weak borders (`white/20`) | Use `white/25` minimum for visibility |
 
 ---
 

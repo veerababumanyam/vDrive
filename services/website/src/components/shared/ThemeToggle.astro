@@ -16,7 +16,7 @@ const { class: className = '' } = Astro.props;
   <button
     id="theme-toggle-btn"
     type="button"
-    class="flex items-center gap-1.5 rounded-lg p-2 text-neutral-500 hover:bg-neutral-100 dark:text-neutral-400 dark:hover:bg-neutral-800 transition-colors"
+    class="flex items-center gap-1.5 rounded-lg p-2 text-neutral-500 hover:bg-neutral-100 dark:text-warm-400 dark:hover:bg-warm-800 transition-colors"
     aria-label="Toggle theme"
     aria-haspopup="menu"
     aria-expanded="false"
@@ -71,14 +71,14 @@ const { class: className = '' } = Astro.props;
   <!-- Dropdown menu -->
   <div
     id="theme-menu"
-    class="absolute right-0 top-full mt-2 hidden w-36 origin-top-right rounded-lg border border-neutral-200 bg-white py-1 shadow-lg dark:border-neutral-700 dark:bg-neutral-800"
+    class="absolute right-0 top-full mt-2 hidden w-36 origin-top-right rounded-lg border border-neutral-200 bg-white py-1 shadow-lg dark:border-warm-700 dark:bg-warm-800"
     role="menu"
     aria-orientation="vertical"
     aria-labelledby="theme-toggle-btn"
   >
     <button
       type="button"
-      class="theme-option flex w-full items-center gap-2 px-3 py-2 text-sm text-neutral-700 hover:bg-neutral-100 dark:text-neutral-200 dark:hover:bg-neutral-700"
+      class="theme-option flex w-full items-center gap-2 px-3 py-2 text-sm text-neutral-700 hover:bg-neutral-100 dark:text-warm-200 dark:hover:bg-warm-700"
       data-theme="light"
       role="menuitem"
     >
@@ -96,7 +96,7 @@ const { class: className = '' } = Astro.props;
     </button>
     <button
       type="button"
-      class="theme-option flex w-full items-center gap-2 px-3 py-2 text-sm text-neutral-700 hover:bg-neutral-100 dark:text-neutral-200 dark:hover:bg-neutral-700"
+      class="theme-option flex w-full items-center gap-2 px-3 py-2 text-sm text-neutral-700 hover:bg-neutral-100 dark:text-warm-200 dark:hover:bg-warm-700"
       data-theme="dark"
       role="menuitem"
     >
@@ -114,7 +114,7 @@ const { class: className = '' } = Astro.props;
     </button>
     <button
       type="button"
-      class="theme-option flex w-full items-center gap-2 px-3 py-2 text-sm text-neutral-700 hover:bg-neutral-100 dark:text-neutral-200 dark:hover:bg-neutral-700"
+      class="theme-option flex w-full items-center gap-2 px-3 py-2 text-sm text-neutral-700 hover:bg-neutral-100 dark:text-warm-200 dark:hover:bg-warm-700"
       data-theme="system"
       role="menuitem"
     >

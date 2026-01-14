@@ -110,7 +110,7 @@ const featureCategories = [
         <h1 class="mt-4 text-4xl font-bold tracking-tight text-neutral-900 dark:text-white sm:text-5xl">
           Everything you need to run your photography business
         </h1>
-        <p class="mt-6 text-lg text-neutral-600 dark:text-neutral-400">
+        <p class="mt-6 text-lg text-neutral-600 dark:text-warm-400">
           From intelligent photo management to stunning client galleries, vDrive has all the tools
           professional photographers need to save time and impress clients.
         </p>
@@ -125,13 +125,13 @@ const featureCategories = [
 
   <!-- Feature Categories -->
   {featureCategories.map((category, index) => (
-    <section class={`section ${index % 2 === 0 ? 'bg-white dark:bg-neutral-950' : 'bg-neutral-50 dark:bg-neutral-900'}`}>
+    <section class={`section ${index % 2 === 0 ? 'bg-white dark:bg-warm-950' : 'bg-neutral-50 dark:bg-warm-900'}`}>
       <div class="container-lg">
         <div class="mx-auto max-w-2xl text-center">
           <h2 class="text-3xl font-bold tracking-tight text-neutral-900 dark:text-white">
             {category.title}
           </h2>
-          <p class="mt-4 text-lg text-neutral-600 dark:text-neutral-400">
+          <p class="mt-4 text-lg text-neutral-600 dark:text-warm-400">
             {category.description}
           </p>
         </div>
@@ -150,7 +150,7 @@ const featureCategories = [
                 <h3 class="text-lg font-semibold text-neutral-900 dark:text-white">
                   {feature.name}
                 </h3>
-                <p class="mt-2 text-neutral-600 dark:text-neutral-400">
+                <p class="mt-2 text-neutral-600 dark:text-warm-400">
                   {feature.description}
                 </p>
               </div>

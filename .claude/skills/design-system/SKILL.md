@@ -22,9 +22,9 @@ description: Design system guidelines for vDrive. Use when styling components, u
 --color-primary: #2563EB;
 --color-primary-hover: #1D4ED8;
 
-/* Accent - Cyan */
---color-accent: #06B6D4;
---color-accent-hover: #0891B2;
+/* Accent - Apple Blue (clean, professional) */
+--color-accent: #3B82F6;
+--color-accent-hover: #2563EB;
 
 /* Gold - Premium */
 --color-gold: #D4AF37;
@@ -33,6 +33,7 @@ description: Design system guidelines for vDrive. Use when styling components, u
 
 ## Semantic Tokens
 
+### Light Mode
 ```css
 /* Backgrounds */
 --color-background: #F8FAFC;
@@ -53,6 +54,47 @@ description: Design system guidelines for vDrive. Use when styling components, u
 --color-warning: #B45309;
 --color-error: #B91C1C;
 ```
+
+### Dark Mode (Warm Neutrals)
+```css
+/* Backgrounds - Warm espresso/taupe undertones */
+--color-background: #0f0d0c;      /* warm-950 - rich warm black */
+--color-surface: #1a1614;         /* warm-900 - deep espresso */
+--color-surface-hover: #2a2523;   /* warm-800 - warm cocoa */
+
+/* Text */
+--color-text-primary: #f7f6f5;    /* warm-50 - off-white */
+--color-text-secondary: #b5afac;  /* warm-300 - soft warm */
+--color-text-tertiary: #8a8380;   /* warm-400 - light warm */
+
+/* Borders */
+--color-border: #2a2523;          /* warm-800 */
+--color-border-strong: #3d3835;   /* warm-700 */
+--color-border-focus: #3B82F6;
+```
+
+## Warm Palette (Tailwind)
+
+Custom warm neutral scale for dark mode with espresso/brown undertones:
+
+| Token | Hex | Usage |
+|-------|-----|-------|
+| `warm-950` | `#0f0d0c` | Primary dark background |
+| `warm-900` | `#1a1614` | Secondary surface |
+| `warm-800` | `#2a2523` | Cards, borders |
+| `warm-700` | `#3d3835` | Hover states |
+| `warm-600` | `#524d4a` | Active states |
+| `warm-500` | `#6b6562` | Muted text |
+| `warm-400` | `#8a8380` | Secondary text |
+| `warm-300` | `#b5afac` | Tertiary text |
+| `warm-200` | `#d9d5d3` | Subtle borders (light) |
+| `warm-100` | `#eceae9` | Light surfaces |
+| `warm-50` | `#f7f6f5` | Light background |
+
+**Why warm neutrals:**
+- Subtle brown/taupe undertones feel inviting, not cold
+- Better for viewing photos (pure grays can color-cast)
+- Premium, distinctive feel for photography platform
 
 ## Component Library
 
@@ -167,26 +209,46 @@ const { theme, toggleTheme, isDark } = useTheme();
   --color-surface: #FFFFFF;
 }
 
-/* Dark theme */
+/* Dark theme - Warm neutrals */
 [data-theme="dark"] {
-  --color-background: #020617;
-  --color-surface: #0F172A;
+  --color-background: #0f0d0c;  /* warm-950 */
+  --color-surface: #1a1614;     /* warm-900 */
 }
+```
+
+**Tailwind dark mode classes:**
+```html
+<!-- Use warm-* classes for dark mode backgrounds -->
+<div class="bg-white dark:bg-warm-950">...</div>
+<div class="bg-gray-100 dark:bg-warm-900">...</div>
+<div class="border-gray-200 dark:border-warm-800">...</div>
 ```
 
 ## Glassmorphism
 
 ```css
+/* Light mode glass */
 .glass {
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
+/* Dark mode glass - warm tint */
 .glass-dark {
-  background: rgba(15, 23, 42, 0.8);
+  background: rgba(26, 22, 20, 0.8);  /* warm-900 with opacity */
   backdrop-filter: blur(12px);
+  border: 1px solid rgba(61, 56, 53, 0.5);  /* warm-700 with opacity */
 }
+```
+
+**Tailwind glass utilities:**
+```html
+<!-- Standard glass on dark backgrounds -->
+<div class="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl">
+
+<!-- Warm glass for dark mode -->
+<div class="bg-warm-900/70 backdrop-blur-xl border border-warm-700/50 rounded-2xl">
 ```
 
 ## Typography

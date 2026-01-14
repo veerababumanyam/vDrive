@@ -80,10 +80,16 @@ export const AppInput = forwardRef<HTMLInputElement, AppInputProps>(
           {leftIcon && (
             <div
               className={cn(
-                'absolute left-4 top-1/2 -translate-y-1/2 text-white/50',
+                'absolute left-4 top-1/2 -translate-y-1/2',
+                // Light mode
+                'text-neutral-400',
+                // Dark mode
+                'dark:text-white/60',
                 iconSizes[size],
-                isFocused && 'text-primary-400',
-                hasError && 'text-error-400'
+                // Focus state
+                isFocused && 'text-primary-500 dark:text-primary-400',
+                // Error state
+                hasError && 'text-error-500 dark:text-error-400'
               )}
               aria-hidden="true"
             >
@@ -98,14 +104,18 @@ export const AppInput = forwardRef<HTMLInputElement, AppInputProps>(
             type={type}
             className={cn(
               // Base styles
-              'w-full rounded-xl border bg-white/5 backdrop-blur-sm',
-              'text-white placeholder-white/40',
-              'transition-all duration-200',
+              'w-full rounded-xl border transition-all duration-200',
+              // Light mode
+              'bg-white text-neutral-900 placeholder-neutral-400',
+              'border-neutral-300',
+              // Dark mode - Apple iOS glass effect
+              'dark:bg-white/[0.08] dark:backdrop-blur-xl',
+              'dark:text-white dark:placeholder-white/50',
+              'dark:border-white/25',
+              'dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]',
               // Focus styles
               'focus:outline-none focus:ring-2',
-              // Default border
-              'border-white/20',
-              // Focus state
+              // Focus state (theme-aware)
               !hasError && 'focus:border-primary-500 focus:ring-primary-500/20',
               // Error state
               hasError && 'border-error-500 focus:border-error-500 focus:ring-error-500/20',
@@ -143,14 +153,19 @@ export const AppInput = forwardRef<HTMLInputElement, AppInputProps>(
               htmlFor={inputId}
               className={cn(
                 'absolute left-4 transition-all duration-200 pointer-events-none',
-                'text-white/60',
+                // Light mode
+                'text-neutral-500',
+                // Dark mode
+                'dark:text-white/70',
                 leftIcon && 'left-12',
                 // Floating state
                 (isFocused || hasValue)
                   ? 'top-2 text-xs'
                   : 'top-1/2 -translate-y-1/2 text-base',
-                isFocused && 'text-primary-400',
-                hasError && isFocused && 'text-error-400'
+                // Focus state (theme-aware)
+                isFocused && 'text-primary-600 dark:text-primary-400',
+                // Error state
+                hasError && isFocused && 'text-error-500 dark:text-error-400'
               )}
             >
               {label}
@@ -161,7 +176,11 @@ export const AppInput = forwardRef<HTMLInputElement, AppInputProps>(
           {rightIcon && (
             <div
               className={cn(
-                'absolute right-4 top-1/2 -translate-y-1/2 text-white/50',
+                'absolute right-4 top-1/2 -translate-y-1/2',
+                // Light mode
+                'text-neutral-400',
+                // Dark mode
+                'dark:text-white/60',
                 iconSizes[size]
               )}
               aria-hidden="true"
@@ -187,7 +206,7 @@ export const AppInput = forwardRef<HTMLInputElement, AppInputProps>(
         {helperText && !hasError && (
           <p
             id={`${inputId}-helper`}
-            className="mt-2 text-sm text-white/50"
+            className="mt-2 text-sm text-neutral-500 dark:text-white/50"
           >
             {helperText}
           </p>

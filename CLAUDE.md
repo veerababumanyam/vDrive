@@ -218,7 +218,8 @@ Example: "Use the Frontend Design agent to build a gallery component"
 | Main entry | `backend/src/app/main.py` |
 | API routes | `backend/src/app/api/v1/` |
 | Shared types | `packages/shared-types/src/` |
-| Docker config | `infrastructure/docker/docker-compose.dev.yml` |
+| Docker (dev) | `infrastructure/docker/docker-compose.yml` |
+| Kubernetes (prod) | `infrastructure/kubernetes/` |
 
 ## Environment Variables
 
@@ -236,7 +237,7 @@ R2_SECRET_ACCESS_KEY=<cloudflare-r2-secret>
 - **Frontend**: React 19, TypeScript, Vite, TailwindCSS, React Query
 - **Backend**: Python 3.11, FastAPI, SQLAlchemy, Pydantic, Alembic, FastMCP
 - **Database**: PostgreSQL 16 (pgvector), Redis 7
-- **Infrastructure**: Traefik v3, KEDA, Docker, Kubernetes
+- **Infrastructure**: Docker Compose (dev), Kubernetes (prod), Traefik v3, KEDA
 - **AI/MCP**: FastMCP for Model Context Protocol integration
 
 ## FastMCP Integration (FastAPI)
@@ -399,9 +400,94 @@ print(result)
 
 | Service | Port | Domain |
 |---------|------|--------|
-| Website | 8011 | www.vdrive.io |
+| Website | 8020 | www.vdrive.io |
 | Frontend | 3000/80 | app.vdrive.io |
 | Backend | 8000 | app.vdrive.io/api |
 | Gallery | 8004 | - |
 | Billing | 8005 | - |
 | Upload | 8008 | - |
+
+## Docker Development (IMPORTANT)
+
+**All vDrive services run in Docker containers for development.** Always use Docker commands for local development and testing.
+
+- **Development**: Docker Compose (current)
+- **Production**: Kubernetes (after development complete)
+
+### Docker Compose Files
+```
+infrastructure/docker/docker-compose.yml      # Main development stack
+infrastructure/docker/docker-compose.dev.yml  # Dev-specific overrides (keep this)
+```
+
+### All Docker Services
+
+| Category | Services |
+|----------|----------|
+| **Core Application** | `frontend`, `backend`, `website` |
+| **Microservices** | `onboarding-service` |
+| **Data Stores** | `postgres`, `redis`, `kafka`, `zookeeper` |
+| **Routing** | `traefik` |
+| **Monitoring** | `prometheus`, `grafana`, `loki`, `promtail`, `alertmanager` |
+| **Exporters** | `postgres-exporter`, `redis-exporter`, `kafka-exporter` |
+| **Tools** | `kafka-ui`, `kafka-init`, `flower` |
+
+### Common Docker Commands
+
+```bash
+# Start all services
+cd infrastructure/docker && docker compose up -d
+
+# Start specific service
+docker compose up -d website
+
+# Rebuild and start a service (after code changes)
+docker compose up -d --build website
+
+# View logs
+docker compose logs -f website
+docker compose logs -f backend
+
+# Stop all services
+docker compose down
+
+# Restart a service
+docker compose restart website
+
+# Check service status
+docker compose ps
+
+# Enter a container shell
+docker compose exec backend bash
+docker compose exec website sh
+```
+
+### Rebuilding After Code Changes
+
+When you modify code in any service, you MUST rebuild the Docker container:
+
+```bash
+# Rebuild single service
+cd infrastructure/docker && docker compose up -d --build <service-name>
+
+# Rebuild multiple services
+docker compose up -d --build frontend backend
+
+# Full rebuild (clean)
+docker compose down && docker compose build --no-cache && docker compose up -d
+```
+
+### Service Health Checks
+
+```bash
+# Check if services are healthy
+docker compose ps
+
+# Check specific service logs for errors
+docker compose logs --tail=50 <service-name>
+
+# Test service endpoints
+curl http://localhost:8020  # Website
+curl http://localhost:8000/health  # Backend
+curl http://localhost:3000  # Frontend
+```

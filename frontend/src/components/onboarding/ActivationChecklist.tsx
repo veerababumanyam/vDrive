@@ -8,7 +8,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { onboardingApi } from '../../services/onboarding-api';
 import { AppCard } from '../ui/AppCard';
 import { AppButton } from '../ui/AppButton';
@@ -166,7 +166,6 @@ export function ActivationChecklist({
   onItemClick,
   className,
 }: ActivationChecklistProps) {
-  const queryClient = useQueryClient();
   const [isDismissed, setIsDismissed] = useState(() => {
     return localStorage.getItem(DISMISSED_KEY) === 'true';
   });
@@ -180,14 +179,6 @@ export function ActivationChecklist({
     queryKey: ['activationChecklist'],
     queryFn: onboardingApi.getActivationChecklist,
     staleTime: 60000,
-  });
-
-  // Complete item mutation
-  const completeMutation = useMutation({
-    mutationFn: (itemId: string) => onboardingApi.completeChecklistItem(itemId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['activationChecklist'] });
-    },
   });
 
   // Check for completion celebration (T127)
@@ -249,17 +240,17 @@ export function ActivationChecklist({
   if (isLoading) {
     return (
       <AppCard variant="glass" padding="md" className={cn('animate-pulse', className)}>
-        <div className="h-6 bg-white/10 rounded w-1/2 mb-4" />
+        <div className="h-6 bg-neutral-200 dark:bg-white/10 rounded w-1/2 mb-4" />
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-12 bg-white/5 rounded-lg" />
+            <div key={i} className="h-12 bg-neutral-100 dark:bg-white/5 rounded-lg" />
           ))}
         </div>
       </AppCard>
     );
   }
 
-  if (!data) return null;
+  if (!data || !data.items) return null;
 
   const { items, completed_items, total_items, progress_percentage } = data;
 
@@ -275,13 +266,13 @@ export function ActivationChecklist({
           <div className="relative">
             {/* Confetti-like animation */}
             <div className="absolute -top-8 left-1/2 -translate-x-1/2">
-              <PartyPopperIcon className="w-16 h-16 text-accent-400 animate-float" />
+              <PartyPopperIcon className="w-16 h-16 text-accent-500 dark:text-accent-400 animate-float" />
             </div>
 
-            <h2 className="text-2xl font-bold text-white mt-8 mb-2">
+            <h2 className="text-2xl font-bold text-neutral-900 dark:text-white mt-8 mb-2">
               Congratulations!
             </h2>
-            <p className="text-white/60 mb-6">
+            <p className="text-neutral-600 dark:text-white/60 mb-6">
               You've completed all the getting started tasks. Your workspace is
               ready for amazing things!
             </p>
@@ -315,14 +306,14 @@ export function ActivationChecklist({
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <SparklesIcon className="w-5 h-5 text-accent-400" />
-          <h3 className="font-semibold text-white">Getting Started</h3>
+          <SparklesIcon className="w-5 h-5 text-accent-500 dark:text-accent-400" />
+          <h3 className="font-semibold text-neutral-900 dark:text-white">Getting Started</h3>
         </div>
 
         {!compact && (
           <button
             onClick={handleDismiss}
-            className="p-1 text-white/40 hover:text-white/70 transition-colors"
+            className="p-1 text-neutral-400 hover:text-neutral-600 dark:text-white/40 dark:hover:text-white/70 transition-colors"
             aria-label="Dismiss checklist"
           >
             <XIcon className="w-4 h-4" />
@@ -333,12 +324,12 @@ export function ActivationChecklist({
       {/* Progress bar */}
       <div className="mb-4">
         <div className="flex items-center justify-between text-sm mb-1.5">
-          <span className="text-white/60">Progress</span>
-          <span className="text-white font-medium">
+          <span className="text-neutral-500 dark:text-white/60">Progress</span>
+          <span className="text-neutral-900 dark:text-white font-medium">
             {completed_items}/{total_items}
           </span>
         </div>
-        <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+        <div className="h-2 bg-neutral-200 dark:bg-white/10 rounded-full overflow-hidden">
           <div
             className="h-full bg-gradient-to-r from-primary-500 to-accent-500 rounded-full transition-all duration-500 ease-out"
             style={{ width: `${progress_percentage}%` }}
@@ -357,15 +348,15 @@ export function ActivationChecklist({
               'w-full flex items-center gap-3 p-3 rounded-lg text-left',
               'transition-all duration-200',
               item.completed
-                ? 'bg-success-500/10 cursor-default'
-                : 'bg-white/5 hover:bg-white/10 cursor-pointer'
+                ? 'bg-success-100 dark:bg-success-500/10 cursor-default'
+                : 'bg-neutral-100 hover:bg-neutral-200 dark:bg-white/5 dark:hover:bg-white/10 cursor-pointer'
             )}
           >
             {/* Check icon */}
             <div
               className={cn(
                 'shrink-0 w-5 h-5 rounded-full transition-colors',
-                item.completed ? 'text-success-400' : 'text-white/30'
+                item.completed ? 'text-success-500 dark:text-success-400' : 'text-neutral-400 dark:text-white/30'
               )}
             >
               {item.completed ? (
@@ -380,13 +371,13 @@ export function ActivationChecklist({
               <p
                 className={cn(
                   'font-medium text-sm',
-                  item.completed ? 'text-white/50 line-through' : 'text-white'
+                  item.completed ? 'text-neutral-400 dark:text-white/50 line-through' : 'text-neutral-900 dark:text-white'
                 )}
               >
                 {item.title}
               </p>
               {!compact && (
-                <p className="text-xs text-white/40 mt-0.5 line-clamp-1">
+                <p className="text-xs text-neutral-500 dark:text-white/40 mt-0.5 line-clamp-1">
                   {item.description}
                 </p>
               )}
@@ -394,7 +385,7 @@ export function ActivationChecklist({
 
             {/* Arrow for actionable items */}
             {!item.completed && item.action_url && (
-              <ChevronRightIcon className="w-4 h-4 text-white/30" />
+              <ChevronRightIcon className="w-4 h-4 text-neutral-400 dark:text-white/30" />
             )}
           </button>
         ))}

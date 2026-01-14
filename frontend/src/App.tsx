@@ -14,6 +14,8 @@ import { VerifyEmailPage } from './pages/VerifyEmail';
 import { WorkspaceSetupPage } from './pages/WorkspaceSetup';
 import { DashboardPage } from './pages/Dashboard';
 
+import { PlaceholderPage } from './components/ui/PlaceholderPage';
+
 // Create React Query client
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -40,6 +42,10 @@ function App() {
 
             {/* Protected Routes */}
             <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/galleries/*" element={<PlaceholderPage />} />
+            <Route path="/upload" element={<PlaceholderPage />} />
+            <Route path="/clients/*" element={<PlaceholderPage />} />
+            <Route path="/settings" element={<PlaceholderPage />} />
 
             {/* Auth Routes */}
             <Route path="/login" element={<LoginPage />} />

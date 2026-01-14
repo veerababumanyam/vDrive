@@ -41,11 +41,11 @@ const searchIndex = docs
       type="search"
       id="docs-search-input"
       placeholder="Search docs..."
-      class="w-full rounded-lg border border-neutral-200 bg-white py-2 pl-10 pr-4 text-sm text-neutral-900 placeholder-neutral-500 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100 dark:placeholder-neutral-400 dark:focus:border-primary-400 dark:focus:ring-primary-400"
+      class="w-full rounded-lg border border-neutral-200 bg-white py-2 pl-10 pr-4 text-sm text-neutral-900 placeholder-neutral-500 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 dark:border-warm-700 dark:bg-warm-800 dark:text-warm-100 dark:placeholder-neutral-400 dark:focus:border-primary-400 dark:focus:ring-primary-400"
       autocomplete="off"
     />
     <kbd
-      class="pointer-events-none absolute right-3 top-1/2 hidden -translate-y-1/2 rounded border border-neutral-200 bg-neutral-100 px-1.5 py-0.5 text-xs text-neutral-500 dark:border-neutral-700 dark:bg-neutral-800 sm:inline-block"
+      class="pointer-events-none absolute right-3 top-1/2 hidden -translate-y-1/2 rounded border border-neutral-200 bg-neutral-100 px-1.5 py-0.5 text-xs text-neutral-500 dark:border-warm-700 dark:bg-warm-800 sm:inline-block"
       aria-hidden="true"
     >
       /
@@ -55,11 +55,11 @@ const searchIndex = docs
   <!-- Search Results -->
   <div
     id="docs-search-results"
-    class="absolute left-0 right-0 top-full z-50 mt-2 hidden max-h-64 overflow-y-auto rounded-lg border border-neutral-200 bg-white shadow-lg dark:border-neutral-700 dark:bg-neutral-800"
+    class="absolute left-0 right-0 top-full z-50 mt-2 hidden max-h-64 overflow-y-auto rounded-lg border border-neutral-200 bg-white shadow-lg dark:border-warm-700 dark:bg-warm-800"
     role="listbox"
     aria-label="Search results"
   >
-    <div class="p-2 text-sm text-neutral-500 dark:text-neutral-400" id="docs-no-results">
+    <div class="p-2 text-sm text-neutral-500 dark:text-warm-400" id="docs-no-results">
       No results found
     </div>
   </div>
@@ -77,7 +77,7 @@ const searchIndex = docs
     function createResultItem(doc) {
       const link = document.createElement('a');
       link.href = `/docs/${doc.slug}`;
-      link.className = 'block px-3 py-2 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-700 focus:bg-neutral-100 dark:focus:bg-neutral-700 focus:outline-none';
+      link.className = 'block px-3 py-2 text-sm hover:bg-neutral-100 dark:hover:bg-warm-700 focus:bg-neutral-100 dark:focus:bg-neutral-700 focus:outline-none';
       link.setAttribute('role', 'option');
 
       const title = document.createElement('div');
@@ -85,7 +85,7 @@ const searchIndex = docs
       title.textContent = doc.title;
 
       const section = document.createElement('div');
-      section.className = 'text-xs text-neutral-500 dark:text-neutral-400';
+      section.className = 'text-xs text-neutral-500 dark:text-warm-400';
       section.textContent = doc.section;
 
       link.appendChild(title);

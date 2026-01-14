@@ -42,7 +42,7 @@ const contactReasons = [
           <h1 class="mt-4 text-4xl font-bold tracking-tight text-neutral-900 dark:text-white sm:text-5xl">
             Let's talk about your needs
           </h1>
-          <p class="mt-6 text-lg text-neutral-600 dark:text-neutral-400">
+          <p class="mt-6 text-lg text-neutral-600 dark:text-warm-400">
             Have questions about vDrive? Want to discuss enterprise solutions?
             We'd love to hear from you.
           </p>
@@ -50,11 +50,11 @@ const contactReasons = [
 
         <div class="mt-16 grid gap-12 lg:grid-cols-2">
           <!-- Contact Form -->
-          <div class="rounded-2xl border border-neutral-200 bg-white p-8 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
+          <div class="rounded-2xl border border-neutral-200 bg-white p-8 shadow-sm dark:border-warm-800 dark:bg-warm-900">
             <h2 class="text-xl font-semibold text-neutral-900 dark:text-white">
               Send us a message
             </h2>
-            <p class="mt-2 text-sm text-neutral-600 dark:text-neutral-400">
+            <p class="mt-2 text-sm text-neutral-600 dark:text-warm-400">
               Fill out the form and we'll get back to you within 24 hours.
             </p>
 
@@ -66,7 +66,7 @@ const contactReasons = [
             >
               <div class="grid gap-6 sm:grid-cols-2">
                 <div>
-                  <label for="firstName" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                  <label for="firstName" class="block text-sm font-medium text-neutral-700 dark:text-warm-300">
                     First name <span class="text-red-500">*</span>
                   </label>
                   <input
@@ -75,12 +75,12 @@ const contactReasons = [
                     name="firstName"
                     required
                     autocomplete="given-name"
-                    class="mt-1 block w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-neutral-900 placeholder-neutral-400 transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white dark:placeholder-neutral-500"
+                    class="mt-1 block w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-neutral-900 placeholder-neutral-400 transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 dark:border-warm-700 dark:bg-warm-800 dark:text-white dark:placeholder-neutral-500"
                     placeholder="John"
                   />
                 </div>
                 <div>
-                  <label for="lastName" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                  <label for="lastName" class="block text-sm font-medium text-neutral-700 dark:text-warm-300">
                     Last name <span class="text-red-500">*</span>
                   </label>
                   <input
@@ -89,14 +89,14 @@ const contactReasons = [
                     name="lastName"
                     required
                     autocomplete="family-name"
-                    class="mt-1 block w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-neutral-900 placeholder-neutral-400 transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white dark:placeholder-neutral-500"
+                    class="mt-1 block w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-neutral-900 placeholder-neutral-400 transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 dark:border-warm-700 dark:bg-warm-800 dark:text-white dark:placeholder-neutral-500"
                     placeholder="Doe"
                   />
                 </div>
               </div>
 
               <div>
-                <label for="email" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                <label for="email" class="block text-sm font-medium text-neutral-700 dark:text-warm-300">
                   Email <span class="text-red-500">*</span>
                 </label>
                 <input
@@ -105,13 +105,13 @@ const contactReasons = [
                   name="email"
                   required
                   autocomplete="email"
-                  class="mt-1 block w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-neutral-900 placeholder-neutral-400 transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white dark:placeholder-neutral-500"
+                  class="mt-1 block w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-neutral-900 placeholder-neutral-400 transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 dark:border-warm-700 dark:bg-warm-800 dark:text-white dark:placeholder-neutral-500"
                   placeholder="john@example.com"
                 />
               </div>
 
               <div>
-                <label for="company" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                <label for="company" class="block text-sm font-medium text-neutral-700 dark:text-warm-300">
                   Company
                 </label>
                 <input
@@ -119,20 +119,20 @@ const contactReasons = [
                   id="company"
                   name="company"
                   autocomplete="organization"
-                  class="mt-1 block w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-neutral-900 placeholder-neutral-400 transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white dark:placeholder-neutral-500"
+                  class="mt-1 block w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-neutral-900 placeholder-neutral-400 transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 dark:border-warm-700 dark:bg-warm-800 dark:text-white dark:placeholder-neutral-500"
                   placeholder="Your company name"
                 />
               </div>
 
               <div>
-                <label for="reason" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                <label for="reason" class="block text-sm font-medium text-neutral-700 dark:text-warm-300">
                   Reason for contact <span class="text-red-500">*</span>
                 </label>
                 <select
                   id="reason"
                   name="reason"
                   required
-                  class="mt-1 block w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-neutral-900 transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
+                  class="mt-1 block w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-neutral-900 transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 dark:border-warm-700 dark:bg-warm-800 dark:text-white"
                 >
                   {contactReasons.map((option) => (
                     <option
@@ -146,7 +146,7 @@ const contactReasons = [
               </div>
 
               <div>
-                <label for="message" class="block text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                <label for="message" class="block text-sm font-medium text-neutral-700 dark:text-warm-300">
                   Message <span class="text-red-500">*</span>
                 </label>
                 <textarea
@@ -154,7 +154,7 @@ const contactReasons = [
                   name="message"
                   required
                   rows="4"
-                  class="mt-1 block w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-neutral-900 placeholder-neutral-400 transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white dark:placeholder-neutral-500"
+                  class="mt-1 block w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-neutral-900 placeholder-neutral-400 transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 dark:border-warm-700 dark:bg-warm-800 dark:text-white dark:placeholder-neutral-500"
                   placeholder="Tell us how we can help..."
                 ></textarea>
               </div>
@@ -171,7 +171,7 @@ const contactReasons = [
           <!-- Contact Info -->
           <div class="space-y-8">
             <!-- Quick Links -->
-            <div class="rounded-2xl border border-neutral-200 bg-white p-8 dark:border-neutral-800 dark:bg-neutral-900">
+            <div class="rounded-2xl border border-neutral-200 bg-white p-8 dark:border-warm-800 dark:bg-warm-900">
               <h2 class="text-xl font-semibold text-neutral-900 dark:text-white">
                 Quick links
               </h2>
@@ -185,7 +185,7 @@ const contactReasons = [
                     </div>
                     <div>
                       <span class="font-medium text-neutral-900 group-hover:text-primary-500 dark:text-white">Documentation</span>
-                      <p class="text-sm text-neutral-600 dark:text-neutral-400">Get started with our comprehensive guides</p>
+                      <p class="text-sm text-neutral-600 dark:text-warm-400">Get started with our comprehensive guides</p>
                     </div>
                   </a>
                 </li>
@@ -198,7 +198,7 @@ const contactReasons = [
                     </div>
                     <div>
                       <span class="font-medium text-neutral-900 group-hover:text-primary-500 dark:text-white">Pricing</span>
-                      <p class="text-sm text-neutral-600 dark:text-neutral-400">View our plans and pricing options</p>
+                      <p class="text-sm text-neutral-600 dark:text-warm-400">View our plans and pricing options</p>
                     </div>
                   </a>
                 </li>
@@ -211,7 +211,7 @@ const contactReasons = [
                     </div>
                     <div>
                       <span class="font-medium text-neutral-900 group-hover:text-primary-500 dark:text-white">Blog</span>
-                      <p class="text-sm text-neutral-600 dark:text-neutral-400">Tips and insights for photographers</p>
+                      <p class="text-sm text-neutral-600 dark:text-warm-400">Tips and insights for photographers</p>
                     </div>
                   </a>
                 </li>
@@ -219,18 +219,18 @@ const contactReasons = [
             </div>
 
             <!-- Office Info -->
-            <div class="rounded-2xl border border-neutral-200 bg-white p-8 dark:border-neutral-800 dark:bg-neutral-900">
+            <div class="rounded-2xl border border-neutral-200 bg-white p-8 dark:border-warm-800 dark:bg-warm-900">
               <h2 class="text-xl font-semibold text-neutral-900 dark:text-white">
                 Contact information
               </h2>
               <ul class="mt-6 space-y-4">
-                <li class="flex items-center gap-3 text-neutral-600 dark:text-neutral-400">
+                <li class="flex items-center gap-3 text-neutral-600 dark:text-warm-400">
                   <svg class="h-5 w-5 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
                   <span>hello@vdrive.io</span>
                 </li>
-                <li class="flex items-center gap-3 text-neutral-600 dark:text-neutral-400">
+                <li class="flex items-center gap-3 text-neutral-600 dark:text-warm-400">
                   <svg class="h-5 w-5 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -239,8 +239,8 @@ const contactReasons = [
                 </li>
               </ul>
 
-              <div class="mt-6 pt-6 border-t border-neutral-200 dark:border-neutral-800">
-                <p class="text-sm text-neutral-600 dark:text-neutral-400">
+              <div class="mt-6 pt-6 border-t border-neutral-200 dark:border-warm-800">
+                <p class="text-sm text-neutral-600 dark:text-warm-400">
                   For urgent support, existing customers can reach us via the in-app help center.
                 </p>
               </div>

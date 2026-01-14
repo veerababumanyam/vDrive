@@ -30,7 +30,7 @@ const schemas = [
         <h1 class="mt-4 text-4xl font-bold tracking-tight text-neutral-900 dark:text-white sm:text-5xl">
           Insights for Photographers
         </h1>
-        <p class="mt-6 text-lg text-neutral-600 dark:text-neutral-400">
+        <p class="mt-6 text-lg text-neutral-600 dark:text-warm-400">
           Tips, tutorials, and news to help you grow your photography business.
         </p>
       </div>
@@ -41,7 +41,7 @@ const schemas = [
           <article class="card-hover group">
             <a href={`/blog/${post.slug}`} class="block">
               {post.data.image ? (
-                <div class="aspect-video w-full overflow-hidden rounded-lg bg-neutral-100 dark:bg-neutral-800">
+                <div class="aspect-video w-full overflow-hidden rounded-lg bg-neutral-100 dark:bg-warm-800">
                   <img
                     src={post.data.image}
                     alt={post.data.title}
@@ -64,10 +64,10 @@ const schemas = [
                 <h2 class="mt-2 text-xl font-semibold text-neutral-900 dark:text-white">
                   {post.data.title}
                 </h2>
-                <p class="mt-2 line-clamp-2 text-neutral-600 dark:text-neutral-400">
+                <p class="mt-2 line-clamp-2 text-neutral-600 dark:text-warm-400">
                   {post.data.description}
                 </p>
-                <div class="mt-4 flex items-center gap-3 text-sm text-neutral-500 dark:text-neutral-400">
+                <div class="mt-4 flex items-center gap-3 text-sm text-neutral-500 dark:text-warm-400">
                   <span>{post.data.author}</span>
                   <span>·</span>
                   <time datetime={post.data.pubDate.toISOString()}>
@@ -86,7 +86,7 @@ const schemas = [
 
       {posts.length === 0 && (
         <div class="mt-16 text-center">
-          <p class="text-neutral-600 dark:text-neutral-400">
+          <p class="text-neutral-600 dark:text-warm-400">
             No posts yet. Check back soon!
           </p>
         </div>

@@ -5,7 +5,7 @@ import { headerNav, headerCTAs } from '@/data/navigation';
 const APP_URL = import.meta.env.APP_URL || 'https://app.vdrive.io';
 ---
 
-<header class="sticky top-0 z-50 w-full border-b border-neutral-200 bg-white/80 backdrop-blur-md dark:border-neutral-800 dark:bg-neutral-950/80 transition-colors duration-200">
+<header class="sticky top-0 z-50 w-full border-b border-neutral-200 bg-white/80 backdrop-blur-md dark:border-warm-800 dark:bg-warm-950/80 transition-colors duration-200">
   <nav class="container-lg" aria-label="Main navigation">
     <div class="flex h-16 items-center justify-between">
       <!-- Logo -->
@@ -37,7 +37,7 @@ const APP_URL = import.meta.env.APP_URL || 'https://app.vdrive.io';
           headerNav.map((item) => (
             <a
               href={item.href}
-              class="text-sm font-medium text-neutral-600 transition-colors hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white"
+              class="text-sm font-medium text-neutral-600 transition-colors hover:text-neutral-900 dark:text-warm-400 dark:hover:text-white"
             >
               {item.label}
             </a>
@@ -53,7 +53,7 @@ const APP_URL = import.meta.env.APP_URL || 'https://app.vdrive.io';
         <!-- Sign In (desktop only) -->
         <a
           href={`${APP_URL}/sign-in`}
-          class="hidden text-sm font-medium text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white sm:block transition-colors"
+          class="hidden text-sm font-medium text-neutral-600 hover:text-neutral-900 dark:text-warm-400 dark:hover:text-white sm:block transition-colors"
         >
           {headerCTAs.signIn.label}
         </a>
@@ -67,7 +67,7 @@ const APP_URL = import.meta.env.APP_URL || 'https://app.vdrive.io';
         <button
           id="mobile-menu-button"
           type="button"
-          class="rounded-lg p-2 text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800 md:hidden transition-colors"
+          class="rounded-lg p-2 text-neutral-500 hover:bg-neutral-100 dark:hover:bg-warm-800 md:hidden transition-colors"
           aria-label="Open menu"
           aria-expanded="false"
           aria-controls="mobile-menu"
@@ -110,7 +110,7 @@ const APP_URL = import.meta.env.APP_URL || 'https://app.vdrive.io';
   <!-- Mobile Menu -->
   <div
     id="mobile-menu"
-    class="hidden border-t border-neutral-200 bg-white px-4 py-4 dark:border-neutral-800 dark:bg-neutral-950 md:hidden transition-colors"
+    class="hidden border-t border-neutral-200 bg-white px-4 py-4 dark:border-warm-800 dark:bg-warm-950 md:hidden transition-colors"
     role="navigation"
     aria-label="Mobile navigation"
   >
@@ -119,16 +119,16 @@ const APP_URL = import.meta.env.APP_URL || 'https://app.vdrive.io';
         headerNav.map((item) => (
           <a
             href={item.href}
-            class="text-base font-medium text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors"
+            class="text-base font-medium text-neutral-600 hover:text-neutral-900 dark:text-warm-400 dark:hover:text-white transition-colors"
           >
             {item.label}
           </a>
         ))
       }
-      <hr class="border-neutral-200 dark:border-neutral-800" />
+      <hr class="border-neutral-200 dark:border-warm-800" />
       <a
         href={`${APP_URL}/sign-in`}
-        class="text-base font-medium text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors"
+        class="text-base font-medium text-neutral-600 hover:text-neutral-900 dark:text-warm-400 dark:hover:text-white transition-colors"
       >
         Sign in
       </a>

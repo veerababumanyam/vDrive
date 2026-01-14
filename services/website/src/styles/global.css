@@ -25,16 +25,17 @@
   }
 
   .dark {
-    --color-bg: 10 10 10;
-    --color-bg-secondary: 23 23 23;
-    --color-bg-tertiary: 38 38 38;
+    /* Warm dark mode colors (espresso/taupe undertones) */
+    --color-bg: 15 13 12;           /* warm-950 */
+    --color-bg-secondary: 26 22 20; /* warm-900 */
+    --color-bg-tertiary: 42 37 35;  /* warm-800 */
 
-    --color-text: 250 250 250;
-    --color-text-secondary: 163 163 163;
-    --color-text-muted: 115 115 115;
+    --color-text: 247 246 245;      /* warm-50 */
+    --color-text-secondary: 181 175 172; /* warm-300 */
+    --color-text-muted: 138 131 128;     /* warm-400 */
 
-    --color-border: 38 38 38;
-    --color-border-secondary: 64 64 64;
+    --color-border: 42 37 35;       /* warm-800 */
+    --color-border-secondary: 61 56 53;  /* warm-700 */
   }
 
   html {
@@ -43,7 +44,7 @@
 
   body {
     @apply bg-white text-neutral-900 antialiased;
-    @apply dark:bg-neutral-950 dark:text-neutral-50;
+    @apply dark:bg-warm-950 dark:text-warm-50;
     font-feature-settings: 'rlig' 1, 'calt' 1;
   }
 
@@ -81,7 +82,7 @@
   /* Focus Styles */
   :focus-visible {
     @apply outline-none ring-2 ring-primary-500 ring-offset-2;
-    @apply dark:ring-offset-neutral-950;
+    @apply dark:ring-offset-warm-950;
   }
 }
 
@@ -126,23 +127,23 @@
   .btn-secondary {
     @apply bg-neutral-100 text-neutral-900;
     @apply hover:bg-neutral-200 active:bg-neutral-300;
-    @apply dark:bg-neutral-800 dark:text-neutral-100;
-    @apply dark:hover:bg-neutral-700;
+    @apply dark:bg-warm-800 dark:text-warm-100;
+    @apply dark:hover:bg-warm-700;
     @apply focus-visible:ring-neutral-400;
   }
 
   .btn-outline {
     @apply border border-neutral-300 bg-transparent text-neutral-700;
     @apply hover:bg-neutral-50 active:bg-neutral-100;
-    @apply dark:border-neutral-700 dark:text-neutral-300;
-    @apply dark:hover:bg-neutral-800;
+    @apply dark:border-warm-700 dark:text-warm-300;
+    @apply dark:hover:bg-warm-800;
     @apply focus-visible:ring-neutral-400;
   }
 
   .btn-ghost {
     @apply bg-transparent text-neutral-600;
     @apply hover:bg-neutral-100 hover:text-neutral-900;
-    @apply dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-neutral-100;
+    @apply dark:text-warm-400 dark:hover:bg-warm-800 dark:hover:text-warm-100;
   }
 
   .btn-lg {
@@ -156,13 +157,13 @@
   /* Cards */
   .card {
     @apply rounded-xl border border-neutral-200 bg-white p-6;
-    @apply dark:border-neutral-800 dark:bg-neutral-900;
+    @apply dark:border-warm-800 dark:bg-warm-900;
   }
 
   .card-hover {
     @apply card transition-all duration-200;
     @apply hover:border-neutral-300 hover:shadow-lg;
-    @apply dark:hover:border-neutral-700;
+    @apply dark:hover:border-warm-700;
   }
 
   /* Badge */
@@ -199,7 +200,7 @@
     @apply prose-code:rounded prose-code:bg-neutral-100 prose-code:px-1 prose-code:py-0.5;
     @apply prose-pre:bg-neutral-900 prose-pre:text-neutral-100;
     @apply dark:prose-invert;
-    @apply dark:prose-code:bg-neutral-800;
+    @apply dark:prose-code:bg-warm-800;
   }
 }
 
@@ -222,7 +223,7 @@
   /* Glass Effect */
   .glass {
     @apply backdrop-blur-md bg-white/70;
-    @apply dark:bg-neutral-950/70;
+    @apply dark:bg-warm-950/70;
   }
 
   /* Animation Delays */
