@@ -1,5 +1,6 @@
 """JWT authentication and Magic Link verification"""
 
+from datetime import datetime, timedelta
 from typing import Optional
 
 from fastapi import Depends, HTTPException, status
@@ -78,6 +79,44 @@ async def get_current_user(
         workspace_id=payload.get("workspace_id"),
         email_verified=payload.get("email_verified", False),
     )
+
+
+def create_gallery_access_token(
+    gallery_id: str,
+    link_id: str,
+    expires_delta: Optional[timedelta] = None,
+) -> str:
+    """
+    Create JWT token for gallery access via magic link.
+
+    Args:
+        gallery_id: Gallery UUID
+        link_id: Share link token
+        expires_delta: Optional expiration time delta (default: 24 hours)
+
+    Returns:
+        JWT token string
+    """
+    if expires_delta is None:
+        expires_delta = timedelta(hours=24)
+
+    expire = datetime.utcnow() + expires_delta
+
+    payload = {
+        "type": "gallery_access",
+        "gallery_id": gallery_id,
+        "link_id": link_id,
+        "exp": expire,
+        "iat": datetime.utcnow(),
+    }
+
+    token = jwt.encode(
+        payload,
+        settings.JWT_SECRET,
+        algorithm=settings.JWT_ALGORITHM,
+    )
+
+    return token
 
 
 def extract_magic_link_token(link_id: str) -> str:
