@@ -142,6 +142,7 @@ Use `/skill <name>` to invoke. Skills load automatically based on context.
 | `project-structure` | Creating files, organizing code, naming conventions |
 | `api-standards` | Building API endpoints, response formats |
 | `security` | Auth, JWT, encryption, RBAC |
+| `auth-service` | Authentication architecture, JWT tokens, sessions, login flow, security patterns |
 | `saas-practices` | Multi-tenancy, billing, subscriptions |
 | `storage` | File uploads, R2/BYOS storage |
 | `infrastructure` | Traefik, KEDA, Docker, Kubernetes |
@@ -516,3 +517,11 @@ curl http://localhost:8020  # Website
 curl http://localhost:8000/health  # Backend
 curl http://localhost:3000  # Frontend
 ```
+
+## Recent Changes
+- 001-gallery-service: Added Python 3.11 + FastAPI, SQLAlchemy, asyncpg, Pillow, boto3 (Cloudflare R2), Redis, Kafka, KEDA
+- 001-gallery-service: Added [if applicable, e.g., PostgreSQL, CoreData, files or N/A]
+
+## Active Technologies
+- Python 3.11 + FastAPI, SQLAlchemy, asyncpg, Pillow, boto3 (Cloudflare R2), Redis, Kafka, KEDA (001-gallery-service)
+- PostgreSQL 16 (pgvector), Redis 7 (cache/pub-sub), Cloudflare R2 (S3-compatible object storage) (001-gallery-service)

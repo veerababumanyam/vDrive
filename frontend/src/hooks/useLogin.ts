@@ -4,6 +4,7 @@
  */
 
 import { useState, useCallback } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 import { login as loginApi } from '../services/onboarding-api';
 import type { ApiError } from '../types/onboarding';
 
@@ -67,6 +68,7 @@ function validatePassword(password: string): string | undefined {
 
 export function useLogin(options: UseLoginOptions = {}): UseLoginReturn {
   const { onSuccess, onError } = options;
+  const { setUser, setAccessToken } = useAuth();
 
   // Form state
   const [formData, setFormData] = useState<LoginFormData>({
@@ -138,6 +140,22 @@ export function useLogin(options: UseLoginOptions = {}): UseLoginReturn {
         email: formData.email.trim().toLowerCase(),
         password: formData.password,
       });
+
+
+      // Map API response to AuthContext User type
+      const user = {
+        id: response.user_id,
+        email: response.email,
+        first_name: response.full_name.split(' ')[0],
+        last_name: response.full_name.split(' ').slice(1).join(' ') || '',
+        email_verified: response.email_verified,
+      };
+
+      // Update global auth state
+      setUser(user);
+      setAccessToken(response.access_token);
+
+
 
       onSuccess?.(response);
       return true;

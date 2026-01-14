@@ -6,6 +6,8 @@
  */
 
 import axios, { AxiosError, type AxiosInstance } from 'axios';
+// SECURITY: Import secure token management (never localStorage)
+import { setTokenInMemory, getTokenFromMemory } from './authService';
 import type {
   RegistrationRequest,
   RegistrationResponse,
@@ -44,10 +46,11 @@ function createApiClient(): AxiosInstance {
     withCredentials: true, // For cookies (refresh token)
   });
 
-  // Request interceptor - add auth token
+  // Request interceptor - add auth token from MEMORY (not localStorage)
   client.interceptors.request.use(
     (config) => {
-      const token = localStorage.getItem('access_token');
+      // SECURITY: Get token from module memory, NOT localStorage
+      const token = getTokenFromMemory();
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
@@ -85,14 +88,15 @@ function createApiClient(): AxiosInstance {
           );
 
           const { access_token } = refreshResponse.data;
-          localStorage.setItem('access_token', access_token);
+          // SECURITY: Store token in memory, NOT localStorage
+          setTokenInMemory(access_token);
 
           // Retry original request
           originalRequest.headers.Authorization = `Bearer ${access_token}`;
           return client(originalRequest);
         } catch {
-          // Refresh failed - clear tokens and redirect to sign-in
-          localStorage.removeItem('access_token');
+          // Refresh failed - clear memory and redirect to sign-in
+          setTokenInMemory(null);
           window.location.href = '/sign-in';
           return Promise.reject(error);
         }
@@ -219,9 +223,9 @@ export async function handleGoogleCallback(
     { params: { code, state } }
   );
 
-  // Store access token
+  // SECURITY: Store access token in memory, NOT localStorage
   if (response.data.access_token) {
-    localStorage.setItem('access_token', response.data.access_token);
+    setTokenInMemory(response.data.access_token);
   }
 
   return response.data;
@@ -337,9 +341,9 @@ export async function completeChecklistItem(
 export async function login(data: LoginRequest): Promise<LoginResponse> {
   const response = await apiClient.post<LoginResponse>('/auth/login', data);
 
-  // Store access token
+  // SECURITY: Store access token in memory, NOT localStorage
   if (response.data.access_token) {
-    localStorage.setItem('access_token', response.data.access_token);
+    setTokenInMemory(response.data.access_token);
   }
 
   return response.data;
@@ -352,7 +356,8 @@ export async function logout(): Promise<void> {
   try {
     await apiClient.post('/auth/logout');
   } finally {
-    localStorage.removeItem('access_token');
+    // SECURITY: Clear token from memory, NOT localStorage
+    setTokenInMemory(null);
   }
 }
 
@@ -362,8 +367,9 @@ export async function logout(): Promise<void> {
 export async function refreshToken(): Promise<RefreshTokenResponse> {
   const response = await apiClient.post<RefreshTokenResponse>('/auth/refresh');
 
+  // SECURITY: Store token in memory, NOT localStorage
   if (response.data.access_token) {
-    localStorage.setItem('access_token', response.data.access_token);
+    setTokenInMemory(response.data.access_token);
   }
 
   return response.data;

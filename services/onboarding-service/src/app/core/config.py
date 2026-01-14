@@ -157,6 +157,14 @@ class Settings(BaseSettings):
     RATE_LIMIT_SLUG_CHECK_MAX: int = Field(default=100, description="Max slug checks per minute")
     RATE_LIMIT_SLUG_CHECK_WINDOW_SECONDS: int = Field(default=60, description="Slug check rate limit window")
 
+    # Auth-specific rate limiting
+    RATE_LIMIT_LOGIN_MAX: int = Field(default=5, description="Max login attempts per IP per window")
+    RATE_LIMIT_LOGIN_WINDOW_SECONDS: int = Field(default=900, description="Login rate limit window (15 min)")
+
+    # Account lockout settings
+    ACCOUNT_LOCKOUT_THRESHOLD: int = Field(default=5, description="Failed login attempts before lockout")
+    ACCOUNT_LOCKOUT_DURATION_SECONDS: int = Field(default=1800, description="Account lockout duration (30 min)")
+
     # ===========================================
     # Trial Configuration
     # ===========================================

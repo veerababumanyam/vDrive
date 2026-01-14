@@ -5,6 +5,7 @@ All models extend the shared Base for consistent table creation.
 """
 
 from src.app.core.database import Base
+from src.app.models.auth_audit_log import AuthAuditLog
 from src.app.models.onboarding_state import OnboardingState
 from src.app.models.user import User
 from src.app.models.verification_token import VerificationToken
@@ -18,4 +19,5 @@ __all__ = [
     "WorkspaceMember",
     "VerificationToken",
     "OnboardingState",
+    "AuthAuditLog",
 ]

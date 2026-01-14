@@ -289,6 +289,8 @@ WHERE extname IN ('uuid-ossp', 'pgcrypto', 'pg_trgm', 'vector');
 - Chunked file handling
 - AES-256 encryption
 - Publish to Kafka
+- Google Cloud Vision face detection
+- get all metadata from the file and update vectordb  adn other dbs as required with the information.
 
 **Events Produced:**
 - `upload.initiated`
