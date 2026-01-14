@@ -329,3 +329,80 @@ class TestVerifyPinEndpoint:
         )
 
         assert response.status_code == 404
+
+    async def test_verify_pin_not_private(self, client: AsyncClient, test_db_session):
+        """Test verifying PIN for non-private asset (should fail)."""
+        gallery = Gallery(
+            workspace_id="00000000-0000-0000-0000-000000000123",
+            title="Test Gallery",
+            status="published",
+        )
+        test_db_session.add(gallery)
+        await test_db_session.commit()
+
+        # Public asset (no PIN)
+        asset = GalleryAsset(
+            gallery_id=gallery.id,
+            asset_id="00000000-0000-0000-0000-000000000123",
+            is_private=False,
+        )
+        test_db_session.add(asset)
+        await test_db_session.commit()
+
+        # Try to verify PIN for public asset
+        response = await client.post(
+            f"/api/v1/public/photo/{asset.id}/verify-pin?gallery_id={gallery.id}",
+            json={"pin": "1234"},
+        )
+
+        assert response.status_code == 400
+        assert "not PIN-protected" in response.json()["detail"]
+
+
+@pytest.mark.asyncio
+class TestGetGalleryPhotosAdvanced:
+    """Test advanced scenarios for gallery photos endpoint."""
+
+    async def test_get_gallery_photos_filters_private_assets(
+        self, client: AsyncClient, test_db_session
+    ):
+        """Test that private assets are filtered out from gallery photos endpoint."""
+        gallery = Gallery(
+            workspace_id="00000000-0000-0000-0000-000000000123",
+            title="Test Gallery",
+            status="published",
+        )
+        test_db_session.add(gallery)
+        await test_db_session.commit()
+
+        # Add public and private assets
+        public_asset = GalleryAsset(
+            gallery_id=gallery.id,
+            asset_id="00000000-0000-0000-0000-000000000001",
+            is_private=False,
+        )
+        private_asset = GalleryAsset(
+            gallery_id=gallery.id,
+            asset_id="00000000-0000-0000-0000-000000000002",
+            is_private=True,
+            pin_hash=hash_password("1234"),
+        )
+        test_db_session.add(public_asset)
+        test_db_session.add(private_asset)
+        await test_db_session.commit()
+
+        # Get photos
+        response = await client.get(f"/api/v1/public/gallery/{gallery.id}/photos")
+
+        assert response.status_code == 200
+        data = response.json()
+
+        # Only public assets should be returned
+        assert len(data["data"]) == 1
+        returned_asset = data["data"][0]
+        assert returned_asset["asset_id"] == public_asset.asset_id
+        assert returned_asset["is_private"] is False
+
+        # Verify private asset is NOT in response
+        private_ids = [a["asset_id"] for a in data["data"]]
+        assert private_asset.asset_id not in private_ids
