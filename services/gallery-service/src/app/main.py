@@ -8,11 +8,15 @@ and high-performance public gallery viewing on port 8004.
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
-from fastapi import FastAPI
+import time
+import uuid
+
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response
 from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
 
+from src.app.api.v1.router import api_router
 from src.app.core.config import settings
 from src.app.core.database import close_db
 from src.app.core.logging import configure_logging, logger
@@ -61,6 +65,44 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+# Request timing and metrics middleware
+@app.middleware("http")
+async def add_timing_middleware(request: Request, call_next):
+    """Add request timing, request ID, and metrics collection."""
+    from src.app.core.metrics import http_request_duration_seconds, http_requests_total
+
+    start_time = time.time()
+
+    # Generate or extract request ID for tracing
+    request_id = request.headers.get("X-Request-ID", str(uuid.uuid4()))
+
+    response = await call_next(request)
+
+    duration = time.time() - start_time
+
+    # Record Prometheus metrics
+    http_requests_total.labels(
+        method=request.method,
+        endpoint=request.url.path,
+        status_code=response.status_code,
+    ).inc()
+
+    http_request_duration_seconds.labels(
+        method=request.method,
+        endpoint=request.url.path,
+    ).observe(duration)
+
+    # Add tracing and timing headers
+    response.headers["X-Request-ID"] = request_id
+    response.headers["X-Response-Time"] = f"{duration:.3f}s"
+
+    return response
+
+
+# Include API v1 router
+app.include_router(api_router, prefix="/api/v1")
 
 
 @app.get("/health")
