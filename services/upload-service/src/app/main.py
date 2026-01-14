@@ -19,6 +19,7 @@ from prometheus_client import Counter, Histogram, generate_latest, CONTENT_TYPE_
 from .core import settings, close_db
 from .core.redis import init_redis, close_redis
 from .core.logging import configure_logging
+from .services import init_kafka_producer, close_kafka_producer
 
 # Configure logging
 configure_logging()
@@ -49,11 +50,13 @@ async def lifespan(app: FastAPI) -> AsyncGenerator:
         env=settings.APP_ENV,
     )
     await init_redis()
+    await init_kafka_producer()
 
     yield
 
     # Shutdown
     logger.info("Shutting down Upload Service")
+    await close_kafka_producer()
     await close_redis()
     await close_db()
 
