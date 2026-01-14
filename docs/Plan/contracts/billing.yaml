@@ -1,0 +1,907 @@
+openapi: 3.1.0
+info:
+  title: vDrive Billing API
+  description: Subscription, payment, and invoice management
+  version: 1.0.0
+  contact:
+    name: vDrive API Support
+    email: api@vdrive.io
+
+servers:
+  - url: https://app.vdrive.io/api/v1
+    description: Production
+  - url: http://localhost:8005/api/v1
+    description: Billing service (local)
+
+tags:
+  - name: Subscriptions
+    description: Subscription management
+  - name: Plans
+    description: Available subscription plans
+  - name: Invoices
+    description: Invoice and payment history
+  - name: Payment Methods
+    description: Payment method management
+  - name: Webhooks
+    description: Payment provider webhooks
+
+paths:
+  /subscriptions:
+    get:
+      tags:
+        - Subscriptions
+      summary: Get current subscription
+      description: Get the current workspace subscription details
+      operationId: getCurrentSubscription
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Subscription details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /subscriptions/upgrade:
+    post:
+      tags:
+        - Subscriptions
+      summary: Upgrade subscription
+      description: Upgrade to a higher tier plan
+      operationId: upgradeSubscription
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpgradeRequest'
+      responses:
+        '200':
+          description: Subscription upgraded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionResponse'
+        '400':
+          description: Cannot upgrade to lower tier
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          description: Payment required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentRequiredResponse'
+
+  /subscriptions/downgrade:
+    post:
+      tags:
+        - Subscriptions
+      summary: Downgrade subscription
+      description: Downgrade to a lower tier (effective at period end)
+      operationId: downgradeSubscription
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DowngradeRequest'
+      responses:
+        '200':
+          description: Downgrade scheduled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionResponse'
+        '400':
+          description: Cannot downgrade to higher tier
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /subscriptions/cancel:
+    post:
+      tags:
+        - Subscriptions
+      summary: Cancel subscription
+      description: Cancel subscription (effective at period end)
+      operationId: cancelSubscription
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CancelRequest'
+      responses:
+        '200':
+          description: Cancellation scheduled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /subscriptions/reactivate:
+    post:
+      tags:
+        - Subscriptions
+      summary: Reactivate subscription
+      description: Reactivate a cancelled subscription before period end
+      operationId: reactivateSubscription
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Subscription reactivated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionResponse'
+        '400':
+          description: Subscription cannot be reactivated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /subscriptions/usage:
+    get:
+      tags:
+        - Subscriptions
+      summary: Get usage metrics
+      description: Get current usage against plan limits
+      operationId: getUsage
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Usage metrics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsageResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /plans:
+    get:
+      tags:
+        - Plans
+      summary: List available plans
+      description: Get all available subscription plans with pricing
+      operationId: listPlans
+      parameters:
+        - name: currency
+          in: query
+          schema:
+            type: string
+            enum: [USD, EUR, GBP, INR]
+            default: USD
+        - name: billing_cycle
+          in: query
+          schema:
+            type: string
+            enum: [monthly, annual]
+            default: monthly
+      responses:
+        '200':
+          description: Available plans
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlansResponse'
+
+  /plans/{planId}:
+    get:
+      tags:
+        - Plans
+      summary: Get plan details
+      description: Get detailed information about a specific plan
+      operationId: getPlan
+      parameters:
+        - name: planId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Plan details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlanResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /invoices:
+    get:
+      tags:
+        - Invoices
+      summary: List invoices
+      description: Get paginated list of invoices
+      operationId: listInvoices
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [draft, open, paid, void, uncollectible]
+      responses:
+        '200':
+          description: List of invoices
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvoiceListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /invoices/{invoiceId}:
+    get:
+      tags:
+        - Invoices
+      summary: Get invoice
+      description: Get invoice details by ID
+      operationId: getInvoice
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: invoiceId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Invoice details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvoiceResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /invoices/{invoiceId}/pdf:
+    get:
+      tags:
+        - Invoices
+      summary: Download invoice PDF
+      description: Get signed URL to download invoice PDF
+      operationId: getInvoicePdf
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: invoiceId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: PDF download URL
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      url:
+                        type: string
+                        format: uri
+                      expires_at:
+                        type: string
+                        format: date-time
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /payment-methods:
+    get:
+      tags:
+        - Payment Methods
+      summary: List payment methods
+      description: Get all payment methods for the workspace
+      operationId: listPaymentMethods
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of payment methods
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentMethodListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    post:
+      tags:
+        - Payment Methods
+      summary: Add payment method
+      description: Add a new payment method
+      operationId: addPaymentMethod
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddPaymentMethodRequest'
+      responses:
+        '201':
+          description: Payment method added
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentMethodResponse'
+        '400':
+          description: Invalid payment method
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /payment-methods/{paymentMethodId}:
+    delete:
+      tags:
+        - Payment Methods
+      summary: Remove payment method
+      description: Remove a payment method
+      operationId: removePaymentMethod
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: paymentMethodId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Payment method removed
+        '400':
+          description: Cannot remove default payment method
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /payment-methods/{paymentMethodId}/default:
+    post:
+      tags:
+        - Payment Methods
+      summary: Set default payment method
+      description: Set a payment method as the default
+      operationId: setDefaultPaymentMethod
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: paymentMethodId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Default payment method set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentMethodResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /checkout/session:
+    post:
+      tags:
+        - Subscriptions
+      summary: Create checkout session
+      description: Create a Stripe checkout session for subscription
+      operationId: createCheckoutSession
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CheckoutSessionRequest'
+      responses:
+        '200':
+          description: Checkout session created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CheckoutSessionResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /webhooks/stripe:
+    post:
+      tags:
+        - Webhooks
+      summary: Stripe webhook
+      description: Handle Stripe webhook events
+      operationId: stripeWebhook
+      security: []
+      parameters:
+        - name: Stripe-Signature
+          in: header
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Webhook processed
+        '400':
+          description: Invalid signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /webhooks/razorpay:
+    post:
+      tags:
+        - Webhooks
+      summary: Razorpay webhook
+      description: Handle Razorpay webhook events
+      operationId: razorpayWebhook
+      security: []
+      parameters:
+        - name: X-Razorpay-Signature
+          in: header
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Webhook processed
+        '400':
+          description: Invalid signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    PageParam:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+
+    LimitParam:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+
+  responses:
+    Unauthorized:
+      description: Authentication required
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+  schemas:
+    Subscription:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        tier:
+          type: string
+          enum: [free, starter, professional, business, enterprise]
+        billing_cycle:
+          type: string
+          enum: [monthly, annual]
+        price_amount:
+          type: number
+        currency:
+          type: string
+        status:
+          type: string
+          enum: [active, trial, past_due, cancelled, expired]
+        trial_ends_at:
+          type: string
+          format: date-time
+          nullable: true
+        current_period_start:
+          type: string
+          format: date-time
+        current_period_end:
+          type: string
+          format: date-time
+        cancelled_at:
+          type: string
+          format: date-time
+          nullable: true
+        scheduled_change:
+          type: object
+          nullable: true
+          properties:
+            new_tier:
+              type: string
+            effective_date:
+              type: string
+              format: date-time
+
+    SubscriptionResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Subscription'
+
+    UpgradeRequest:
+      type: object
+      required:
+        - plan_id
+      properties:
+        plan_id:
+          type: string
+          description: ID of the plan to upgrade to
+        payment_method_id:
+          type: string
+          format: uuid
+          description: Payment method to use (uses default if not specified)
+        prorate:
+          type: boolean
+          default: true
+          description: Whether to prorate the charge
+
+    DowngradeRequest:
+      type: object
+      required:
+        - plan_id
+      properties:
+        plan_id:
+          type: string
+          description: ID of the plan to downgrade to
+
+    CancelRequest:
+      type: object
+      properties:
+        reason:
+          type: string
+          maxLength: 500
+          description: Optional cancellation reason
+        feedback:
+          type: string
+          maxLength: 2000
+          description: Optional feedback
+
+    Plan:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        tier:
+          type: string
+          enum: [free, starter, professional, business, enterprise]
+        description:
+          type: string
+        price:
+          type: object
+          properties:
+            monthly:
+              type: number
+            annual:
+              type: number
+            currency:
+              type: string
+        limits:
+          type: object
+          properties:
+            storage_gb:
+              type: integer
+            galleries:
+              type: integer
+            assets_per_gallery:
+              type: integer
+            team_members:
+              type: integer
+            api_requests_per_hour:
+              type: integer
+        features:
+          type: array
+          items:
+            type: string
+        highlighted:
+          type: boolean
+          description: Whether to highlight this plan in UI
+
+    PlanResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Plan'
+
+    PlansResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Plan'
+
+    UsageResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            storage:
+              type: object
+              properties:
+                used_bytes:
+                  type: integer
+                limit_bytes:
+                  type: integer
+                percentage:
+                  type: number
+            galleries:
+              type: object
+              properties:
+                used:
+                  type: integer
+                limit:
+                  type: integer
+            assets:
+              type: object
+              properties:
+                used:
+                  type: integer
+                limit:
+                  type: integer
+            api_requests:
+              type: object
+              properties:
+                used_this_hour:
+                  type: integer
+                limit_per_hour:
+                  type: integer
+
+    Invoice:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        invoice_number:
+          type: string
+        amount:
+          type: number
+        tax_amount:
+          type: number
+        total_amount:
+          type: number
+        currency:
+          type: string
+        status:
+          type: string
+          enum: [draft, open, paid, void, uncollectible]
+        due_date:
+          type: string
+          format: date-time
+        paid_at:
+          type: string
+          format: date-time
+          nullable: true
+        pdf_url:
+          type: string
+          format: uri
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+
+    InvoiceResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Invoice'
+
+    InvoiceListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Invoice'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    PaymentMethod:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          type: string
+          enum: [card, bank_account, upi]
+        card_brand:
+          type: string
+          nullable: true
+        card_last4:
+          type: string
+          nullable: true
+        card_exp_month:
+          type: integer
+          nullable: true
+        card_exp_year:
+          type: integer
+          nullable: true
+        is_default:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+
+    PaymentMethodResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/PaymentMethod'
+
+    PaymentMethodListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/PaymentMethod'
+
+    AddPaymentMethodRequest:
+      type: object
+      required:
+        - payment_method_token
+      properties:
+        payment_method_token:
+          type: string
+          description: Stripe PaymentMethod ID or Razorpay token
+        set_as_default:
+          type: boolean
+          default: true
+
+    CheckoutSessionRequest:
+      type: object
+      required:
+        - plan_id
+      properties:
+        plan_id:
+          type: string
+        billing_cycle:
+          type: string
+          enum: [monthly, annual]
+          default: monthly
+        success_url:
+          type: string
+          format: uri
+        cancel_url:
+          type: string
+          format: uri
+
+    CheckoutSessionResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            session_id:
+              type: string
+            url:
+              type: string
+              format: uri
+
+    PaymentRequiredResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          enum: [PAYMENT_REQUIRED]
+        message:
+          type: string
+        client_secret:
+          type: string
+          description: Stripe client secret for payment confirmation
+
+    Pagination:
+      type: object
+      properties:
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        total_pages:
+          type: integer
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+
+security:
+  - bearerAuth: []

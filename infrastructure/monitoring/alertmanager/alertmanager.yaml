@@ -1,0 +1,63 @@
+# ===========================================
+# Alertmanager Configuration
+# ===========================================
+# vDrive Alert Management
+
+global:
+  resolve_timeout: 5m
+
+# Route configuration
+route:
+  group_by: ['alertname', 'cluster', 'service']
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 4h
+  receiver: 'default-receiver'
+  routes:
+    # Critical alerts - immediate notification
+    - match:
+        severity: critical
+      receiver: 'critical-receiver'
+      group_wait: 10s
+      repeat_interval: 1h
+
+    # Warning alerts - grouped notification
+    - match:
+        severity: warning
+      receiver: 'warning-receiver'
+      group_wait: 1m
+      repeat_interval: 4h
+
+# Inhibition rules
+inhibit_rules:
+  # If critical is firing, suppress warning for same alertname
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    equal: ['alertname', 'cluster', 'service']
+
+# Receivers configuration
+receivers:
+  - name: 'default-receiver'
+    # Configure webhook, email, slack, etc. as needed
+    # Example webhook (uncomment and configure):
+    # webhook_configs:
+    #   - url: 'http://notifications-service:8010/api/v1/alerts/webhook'
+    #     send_resolved: true
+
+  - name: 'critical-receiver'
+    # Critical alerts receiver
+    # webhook_configs:
+    #   - url: 'http://notifications-service:8010/api/v1/alerts/critical'
+    #     send_resolved: true
+
+  - name: 'warning-receiver'
+    # Warning alerts receiver
+    # webhook_configs:
+    #   - url: 'http://notifications-service:8010/api/v1/alerts/warning'
+    #     send_resolved: true
+
+# Templates (optional)
+# templates:
+#   - '/etc/alertmanager/templates/*.tmpl'

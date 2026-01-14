@@ -1,0 +1,218 @@
+# ===========================================
+# Traefik IngressRoutes for vDrive Services
+# ===========================================
+# Install Traefik CRDs first: kubectl apply -f https://raw.githubusercontent.com/traefik/traefik/v3.0/docs/content/reference/dynamic-configuration/kubernetes-crd-definition-v1.yml
+
+# Middleware: Rate Limiting (Standard)
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: rate-limit-standard
+  namespace: vDrive
+spec:
+  rateLimit:
+    average: 100
+    burst: 150
+    period: 1m
+---
+# Middleware: Rate Limiting (Gallery - High Traffic)
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: rate-limit-gallery
+  namespace: vDrive
+spec:
+  rateLimit:
+    average: 200
+    burst: 300
+    period: 1m
+---
+# Middleware: Rate Limiting (Auth - Anti Brute Force)
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: rate-limit-auth
+  namespace: vDrive
+spec:
+  rateLimit:
+    average: 5
+    burst: 10
+    period: 15m
+---
+# Middleware: CORS Headers
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: cors-headers
+  namespace: vDrive
+spec:
+  headers:
+    accessControlAllowMethods:
+      - GET
+      - POST
+      - PUT
+      - PATCH
+      - DELETE
+      - OPTIONS
+    accessControlAllowHeaders:
+      - Content-Type
+      - Authorization
+      - X-Requested-With
+      - X-Request-ID
+    accessControlAllowOriginList:
+      - "https://app.vDrive.com"
+      - "http://localhost:5173"
+    accessControlMaxAge: 86400
+    accessControlAllowCredentials: true
+---
+# Middleware: Security Headers
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: security-headers
+  namespace: vDrive
+spec:
+  headers:
+    browserXssFilter: true
+    contentTypeNosniff: true
+    frameDeny: true
+    stsIncludeSubdomains: true
+    stsPreload: true
+    stsSeconds: 31536000
+---
+# IngressRoute: Backend API (Fallback)
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: backend-api
+  namespace: vDrive
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: PathPrefix(`/api`)
+      kind: Rule
+      priority: 100
+      middlewares:
+        - name: rate-limit-standard
+        - name: cors-headers
+        - name: security-headers
+      services:
+        - name: backend
+          port: 8000
+---
+# IngressRoute: Gallery Service
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: gallery-api
+  namespace: vDrive
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: PathPrefix(`/api/v1/galleries`)
+      kind: Rule
+      priority: 140
+      middlewares:
+        - name: rate-limit-gallery
+        - name: cors-headers
+      services:
+        - name: gallery-service
+          port: 8004
+---
+# IngressRoute: Billing Service
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: billing-api
+  namespace: vDrive
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: PathPrefix(`/api/v1/subscription`)
+      kind: Rule
+      priority: 145
+      middlewares:
+        - name: rate-limit-standard
+        - name: cors-headers
+      services:
+        - name: billing-service
+          port: 8005
+---
+# IngressRoute: Stripe Webhooks (No Rate Limit)
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: stripe-webhooks
+  namespace: vDrive
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: PathPrefix(`/webhooks/stripe`)
+      kind: Rule
+      priority: 150
+      services:
+        - name: billing-service
+          port: 8005
+---
+# IngressRoute: Upload Service
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: upload-api
+  namespace: vDrive
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: PathPrefix(`/api/v1/uploads`)
+      kind: Rule
+      priority: 135
+      middlewares:
+        - name: cors-headers
+      services:
+        - name: upload-service
+          port: 8008
+---
+# IngressRoute: Face Service
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: face-api
+  namespace: vDrive
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: PathPrefix(`/api/v1/face`)
+      kind: Rule
+      priority: 130
+      middlewares:
+        - name: rate-limit-standard
+        - name: cors-headers
+      services:
+        - name: face-service
+          port: 8002
+---
+# IngressRoute: Webhooks Service
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: webhooks-api
+  namespace: vDrive
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: PathPrefix(`/api/v1/webhooks`)
+      kind: Rule
+      priority: 142
+      middlewares:
+        - name: rate-limit-standard
+        - name: cors-headers
+      services:
+        - name: webhooks-service
+          port: 8003

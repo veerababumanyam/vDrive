@@ -1,0 +1,942 @@
+openapi: 3.1.0
+info:
+  title: vDrive Clients API
+  description: Client CRM and relationship management
+  version: 1.0.0
+  contact:
+    name: vDrive API Support
+    email: api@vdrive.io
+
+servers:
+  - url: https://app.vdrive.io/api/v1
+    description: Production
+  - url: http://localhost:8000/api/v1
+    description: Local development
+
+tags:
+  - name: Clients
+    description: Client management
+  - name: Activity
+    description: Client activity tracking
+  - name: Projects
+    description: Client project management
+
+paths:
+  /clients:
+    get:
+      tags:
+        - Clients
+      summary: List clients
+      description: Get paginated list of clients
+      operationId: listClients
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/SortParam'
+        - name: search
+          in: query
+          schema:
+            type: string
+          description: Search by name or email
+        - name: tags
+          in: query
+          schema:
+            type: array
+            items:
+              type: string
+          description: Filter by tags
+      responses:
+        '200':
+          description: List of clients
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    post:
+      tags:
+        - Clients
+      summary: Create client
+      description: Create a new client
+      operationId: createClient
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClientCreateRequest'
+      responses:
+        '201':
+          description: Client created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          description: Client with this email already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /clients/{clientId}:
+    get:
+      tags:
+        - Clients
+      summary: Get client
+      description: Get client details by ID
+      operationId: getClient
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ClientIdParam'
+      responses:
+        '200':
+          description: Client details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    patch:
+      tags:
+        - Clients
+      summary: Update client
+      description: Update client details
+      operationId: updateClient
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ClientIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClientUpdateRequest'
+      responses:
+        '200':
+          description: Client updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+    delete:
+      tags:
+        - Clients
+      summary: Delete client
+      description: Soft delete a client
+      operationId: deleteClient
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ClientIdParam'
+      responses:
+        '204':
+          description: Client deleted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /clients/{clientId}/activity:
+    get:
+      tags:
+        - Activity
+      summary: Get client activity
+      description: Get activity history for a client
+      operationId: getClientActivity
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ClientIdParam'
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [gallery_viewed, photo_viewed, photo_selected, photo_downloaded, selection_submitted]
+          description: Filter by activity type
+        - name: from_date
+          in: query
+          schema:
+            type: string
+            format: date
+          description: Start date filter
+        - name: to_date
+          in: query
+          schema:
+            type: string
+            format: date
+          description: End date filter
+      responses:
+        '200':
+          description: Client activity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActivityListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /clients/{clientId}/galleries:
+    get:
+      tags:
+        - Clients
+      summary: Get client galleries
+      description: Get galleries shared with this client
+      operationId: getClientGalleries
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ClientIdParam'
+      responses:
+        '200':
+          description: Client galleries
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientGalleriesResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /clients/{clientId}/bookings:
+    get:
+      tags:
+        - Projects
+      summary: Get client bookings
+      description: Get bookings for this client
+      operationId: getClientBookings
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ClientIdParam'
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [inquiry, quoted, confirmed, completed, cancelled]
+      responses:
+        '200':
+          description: Client bookings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    post:
+      tags:
+        - Projects
+      summary: Create booking
+      description: Create a new booking for this client
+      operationId: createBooking
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ClientIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookingCreateRequest'
+      responses:
+        '201':
+          description: Booking created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /clients/import:
+    post:
+      tags:
+        - Clients
+      summary: Import clients
+      description: Bulk import clients from CSV
+      operationId: importClients
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                update_existing:
+                  type: boolean
+                  default: false
+      responses:
+        '200':
+          description: Import result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportResponse'
+        '400':
+          description: Invalid CSV format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /clients/export:
+    get:
+      tags:
+        - Clients
+      summary: Export clients
+      description: Export clients to CSV
+      operationId: exportClients
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: tags
+          in: query
+          schema:
+            type: array
+            items:
+              type: string
+          description: Filter by tags
+      responses:
+        '200':
+          description: CSV file
+          content:
+            text/csv:
+              schema:
+                type: string
+                format: binary
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /clients/tags:
+    get:
+      tags:
+        - Clients
+      summary: List tags
+      description: Get all client tags in workspace
+      operationId: listClientTags
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of tags
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagsResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /bookings/{bookingId}:
+    get:
+      tags:
+        - Projects
+      summary: Get booking
+      description: Get booking details
+      operationId: getBooking
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: bookingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Booking details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    patch:
+      tags:
+        - Projects
+      summary: Update booking
+      description: Update booking details
+      operationId: updateBooking
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: bookingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookingUpdateRequest'
+      responses:
+        '200':
+          description: Booking updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags:
+        - Projects
+      summary: Delete booking
+      description: Delete a booking
+      operationId: deleteBooking
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: bookingId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Booking deleted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    ClientIdParam:
+      name: clientId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+    PageParam:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+
+    LimitParam:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+
+    SortParam:
+      name: sort
+      in: query
+      schema:
+        type: string
+        default: -created_at
+
+  responses:
+    Unauthorized:
+      description: Authentication required
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    ValidationError:
+      description: Validation error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ValidationErrorResponse'
+
+  schemas:
+    Client:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        first_name:
+          type: string
+        last_name:
+          type: string
+        phone:
+          type: string
+          nullable: true
+        address:
+          $ref: '#/components/schemas/Address'
+        social_profiles:
+          $ref: '#/components/schemas/SocialProfiles'
+        project_type:
+          type: string
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+        tags:
+          type: array
+          items:
+            type: string
+        gallery_count:
+          type: integer
+        total_spent:
+          type: number
+        last_viewed_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    Address:
+      type: object
+      nullable: true
+      properties:
+        street:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        postal_code:
+          type: string
+        country:
+          type: string
+
+    SocialProfiles:
+      type: object
+      nullable: true
+      properties:
+        instagram:
+          type: string
+        facebook:
+          type: string
+        website:
+          type: string
+
+    ClientResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Client'
+
+    ClientListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Client'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    ClientCreateRequest:
+      type: object
+      required:
+        - email
+        - first_name
+        - last_name
+      properties:
+        email:
+          type: string
+          format: email
+        first_name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        last_name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        phone:
+          type: string
+          maxLength: 20
+        address:
+          $ref: '#/components/schemas/Address'
+        social_profiles:
+          $ref: '#/components/schemas/SocialProfiles'
+        project_type:
+          type: string
+          maxLength: 100
+        notes:
+          type: string
+          maxLength: 5000
+        tags:
+          type: array
+          items:
+            type: string
+
+    ClientUpdateRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        first_name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        last_name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        phone:
+          type: string
+          maxLength: 20
+        address:
+          $ref: '#/components/schemas/Address'
+        social_profiles:
+          $ref: '#/components/schemas/SocialProfiles'
+        project_type:
+          type: string
+          maxLength: 100
+        notes:
+          type: string
+          maxLength: 5000
+        tags:
+          type: array
+          items:
+            type: string
+
+    Activity:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        activity_type:
+          type: string
+          enum: [gallery_viewed, photo_viewed, photo_selected, photo_downloaded, selection_submitted, comment_added]
+        gallery_id:
+          type: string
+          format: uuid
+          nullable: true
+        gallery_name:
+          type: string
+          nullable: true
+        asset_id:
+          type: string
+          format: uuid
+          nullable: true
+        metadata:
+          type: object
+        created_at:
+          type: string
+          format: date-time
+
+    ActivityListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Activity'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    ClientGalleriesResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              gallery_id:
+                type: string
+                format: uuid
+              gallery_name:
+                type: string
+              status:
+                type: string
+              access_level:
+                type: string
+              view_count:
+                type: integer
+              last_viewed_at:
+                type: string
+                format: date-time
+                nullable: true
+
+    Booking:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        client_id:
+          type: string
+          format: uuid
+          nullable: true
+        client_name:
+          type: string
+        client_email:
+          type: string
+          format: email
+        client_phone:
+          type: string
+          nullable: true
+        service_type:
+          type: string
+        event_date:
+          type: string
+          format: date-time
+        event_time:
+          type: string
+          nullable: true
+        event_location:
+          type: string
+          nullable: true
+        duration_hours:
+          type: number
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        status:
+          type: string
+          enum: [inquiry, quoted, confirmed, completed, cancelled]
+        quote_amount:
+          type: number
+          nullable: true
+        deposit_amount:
+          type: number
+          nullable: true
+        deposit_paid:
+          type: boolean
+        total_amount:
+          type: number
+          nullable: true
+        currency:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    BookingResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Booking'
+
+    BookingListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Booking'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    BookingCreateRequest:
+      type: object
+      required:
+        - service_type
+        - event_date
+      properties:
+        service_type:
+          type: string
+          maxLength: 100
+        event_date:
+          type: string
+          format: date-time
+        event_time:
+          type: string
+          maxLength: 50
+        event_location:
+          type: string
+          maxLength: 500
+        duration_hours:
+          type: number
+        description:
+          type: string
+          maxLength: 5000
+        quote_amount:
+          type: number
+        deposit_amount:
+          type: number
+
+    BookingUpdateRequest:
+      type: object
+      properties:
+        service_type:
+          type: string
+          maxLength: 100
+        event_date:
+          type: string
+          format: date-time
+        event_time:
+          type: string
+          maxLength: 50
+        event_location:
+          type: string
+          maxLength: 500
+        duration_hours:
+          type: number
+        description:
+          type: string
+          maxLength: 5000
+        status:
+          type: string
+          enum: [inquiry, quoted, confirmed, completed, cancelled]
+        quote_amount:
+          type: number
+        deposit_amount:
+          type: number
+        deposit_paid:
+          type: boolean
+        total_amount:
+          type: number
+
+    ImportResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            imported:
+              type: integer
+            updated:
+              type: integer
+            skipped:
+              type: integer
+            errors:
+              type: array
+              items:
+                type: object
+                properties:
+                  row:
+                    type: integer
+                  error:
+                    type: string
+
+    TagsResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              count:
+                type: integer
+
+    Pagination:
+      type: object
+      properties:
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        total_pages:
+          type: integer
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+
+    ValidationErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          enum: [VALIDATION_ERROR]
+        message:
+          type: string
+        details:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+              message:
+                type: string
+
+security:
+  - bearerAuth: []

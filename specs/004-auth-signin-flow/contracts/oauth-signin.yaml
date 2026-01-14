@@ -1,0 +1,139 @@
+# API Contract: Google OAuth Signin
+# GET /api/v1/onboarding/oauth/google/signin
+# Initiate Google OAuth signin flow (for existing users)
+
+openapi: 3.1.0
+info:
+  title: Google OAuth Signin API
+  version: 1.0.0
+
+paths:
+  /api/v1/onboarding/oauth/google/signin:
+    get:
+      operationId: googleSigninInit
+      summary: Initiate Google OAuth signin
+      description: |
+        Starts the Google OAuth signin flow for EXISTING users.
+
+        Unlike the registration OAuth endpoint, this flow:
+        - Does NOT create new accounts (returns error if user doesn't exist)
+        - Links Google identity to existing verified email account
+        - Returns signin response with tokens on success
+
+        Redirects to Google's consent page. After authorization,
+        Google redirects to the callback endpoint.
+      tags:
+        - authentication
+        - oauth
+      parameters:
+        - name: redirect_uri
+          in: query
+          required: false
+          schema:
+            type: string
+            default: "/dashboard"
+          description: Where to redirect after successful signin
+          example: "/dashboard"
+      responses:
+        '302':
+          description: Redirect to Google OAuth consent page
+          headers:
+            Location:
+              description: Google OAuth authorization URL
+              schema:
+                type: string
+                example: "https://accounts.google.com/o/oauth2/v2/auth?client_id=...&redirect_uri=...&scope=...&state=..."
+            Set-Cookie:
+              description: OAuth state cookie for CSRF protection
+              schema:
+                type: string
+                example: "oauth_state=abc123; HttpOnly; Secure; SameSite=Lax; Max-Age=600"
+
+  /api/v1/onboarding/oauth/google/signin/callback:
+    get:
+      operationId: googleSigninCallback
+      summary: Handle Google OAuth signin callback
+      description: |
+        Processes the Google OAuth callback for signin flow.
+
+        Flow:
+        1. Validates state parameter (CSRF protection)
+        2. Exchanges authorization code for Google tokens
+        3. Fetches user info from Google
+        4. Looks up user by Google ID or verified email
+        5. If found: Issues tokens, sets cookie, redirects to app
+        6. If not found: Redirects to signin with error
+
+        On success, redirects with access token in URL fragment
+        (secure for SPAs - fragment is not sent to server).
+      tags:
+        - authentication
+        - oauth
+      parameters:
+        - name: code
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Authorization code from Google
+        - name: state
+          in: query
+          required: true
+          schema:
+            type: string
+          description: CSRF state token (must match cookie)
+        - name: error
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Error from Google if authorization failed
+      responses:
+        '302':
+          description: Redirect to app
+          headers:
+            Location:
+              description: Redirect URL
+              schema:
+                type: string
+              examples:
+                success:
+                  summary: Successful signin
+                  value: "https://app.vdrive.io/dashboard#access_token=eyJ..."
+                user_not_found:
+                  summary: No account exists
+                  value: "https://app.vdrive.io/signin?error=account_not_found&message=No%20account%20found"
+                oauth_denied:
+                  summary: User denied OAuth
+                  value: "https://app.vdrive.io/signin?error=oauth_denied&message=Authorization%20cancelled"
+                oauth_failed:
+                  summary: OAuth error
+                  value: "https://app.vdrive.io/signin?error=oauth_failed&message=Authentication%20failed"
+            Set-Cookie:
+              description: Refresh token cookie (on success) or cleared cookie (on error)
+              schema:
+                type: string
+
+components:
+  schemas:
+    OAuthError:
+      type: object
+      description: Error passed via query parameter on redirect
+      properties:
+        error:
+          type: string
+          enum:
+            - account_not_found
+            - oauth_denied
+            - oauth_failed
+            - email_not_verified
+            - account_disabled
+          description: Error code
+        message:
+          type: string
+          description: URL-encoded error message
+
+# Google OAuth Scopes Required
+# - openid: Required for OIDC
+# - email: Get user's email address
+# - profile: Get user's name and profile picture

@@ -1,0 +1,253 @@
+# ===========================================
+# Prometheus Alert Rules
+# ===========================================
+# vDrive Alerting Configuration
+
+groups:
+  # ===========================================
+  # Service Health Alerts
+  # ===========================================
+  - name: service_health
+    interval: 30s
+    rules:
+      - alert: ServiceDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Service {{ $labels.job }} is down"
+          description: "{{ $labels.job }} has been down for more than 1 minute."
+
+      - alert: HighErrorRate
+        expr: |
+          sum(rate(http_requests_total{status=~"5.."}[5m])) by (job)
+          /
+          sum(rate(http_requests_total[5m])) by (job) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High error rate on {{ $labels.job }}"
+          description: "{{ $labels.job }} has error rate > 5% for 5 minutes."
+
+      - alert: HighLatency
+        expr: |
+          histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le, job)) > 0.5
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High latency on {{ $labels.job }}"
+          description: "{{ $labels.job }} P95 latency > 500ms for 5 minutes."
+
+  # ===========================================
+  # Traefik Alerts
+  # ===========================================
+  - name: traefik
+    interval: 30s
+    rules:
+      - alert: TraefikHighErrorRate
+        expr: |
+          sum(rate(traefik_service_requests_total{code=~"5.."}[5m])) by (service)
+          /
+          sum(rate(traefik_service_requests_total[5m])) by (service) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High error rate on Traefik service {{ $labels.service }}"
+          description: "Service {{ $labels.service }} has error rate > 5%."
+
+      - alert: TraefikHighLatency
+        expr: |
+          histogram_quantile(0.95, sum(rate(traefik_service_request_duration_seconds_bucket[5m])) by (le, service)) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High latency on {{ $labels.service }}"
+          description: "Service {{ $labels.service }} P95 latency > 1s for 5 minutes."
+
+      - alert: TraefikCertificateExpiringSoon
+        expr: traefik_tls_certs_not_after - time() < 86400 * 7
+        for: 1h
+        labels:
+          severity: warning
+        annotations:
+          summary: "TLS certificate expiring soon"
+          description: "Certificate {{ $labels.cn }} expires in less than 7 days."
+
+  # ===========================================
+  # Database Alerts
+  # ===========================================
+  - name: database
+    interval: 30s
+    rules:
+      - alert: PostgresConnectionsHigh
+        expr: |
+          pg_stat_activity_count / pg_settings_max_connections > 0.8
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "PostgreSQL connections high"
+          description: "PostgreSQL using > 80% of max connections."
+
+      - alert: PostgresReplicationLag
+        expr: pg_replication_lag > 30
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "PostgreSQL replication lag"
+          description: "Replication lag is > 30 seconds."
+
+      - alert: PostgresDeadLocks
+        expr: increase(pg_stat_database_deadlocks[5m]) > 0
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "PostgreSQL deadlocks detected"
+          description: "Deadlocks detected in PostgreSQL."
+
+  # ===========================================
+  # Redis Alerts
+  # ===========================================
+  - name: redis
+    interval: 30s
+    rules:
+      - alert: RedisMemoryHigh
+        expr: |
+          redis_memory_used_bytes / redis_memory_max_bytes > 0.9
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Redis memory usage high"
+          description: "Redis using > 90% of max memory."
+
+      - alert: RedisConnectionsHigh
+        expr: redis_connected_clients > 1000
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Redis connections high"
+          description: "Redis has > 1000 connected clients."
+
+      - alert: RedisRejectedConnections
+        expr: increase(redis_rejected_connections_total[5m]) > 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Redis rejecting connections"
+          description: "Redis is rejecting connections."
+
+  # ===========================================
+  # Kafka Alerts
+  # ===========================================
+  - name: kafka
+    interval: 30s
+    rules:
+      - alert: KafkaConsumerLagHigh
+        expr: |
+          kafka_consumergroup_lag_sum > 1000
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Kafka consumer lag high"
+          description: "Consumer group {{ $labels.consumergroup }} has lag > 1000 messages."
+
+      - alert: KafkaTopicOfflinePartitions
+        expr: kafka_topic_partition_leader == -1
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Kafka partition offline"
+          description: "Topic {{ $labels.topic }} has offline partitions."
+
+      - alert: KafkaUnderReplicatedPartitions
+        expr: kafka_topic_partition_under_replicated_partition > 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Kafka under-replicated partitions"
+          description: "Topic {{ $labels.topic }} has under-replicated partitions."
+
+  # ===========================================
+  # Resource Alerts
+  # ===========================================
+  - name: resources
+    interval: 30s
+    rules:
+      - alert: HighCPUUsage
+        expr: |
+          100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage"
+          description: "CPU usage > 80% for 10 minutes on {{ $labels.instance }}."
+
+      - alert: HighMemoryUsage
+        expr: |
+          (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 85
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage"
+          description: "Memory usage > 85% for 10 minutes on {{ $labels.instance }}."
+
+      - alert: DiskSpaceLow
+        expr: |
+          (1 - (node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"})) * 100 > 85
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Disk space low"
+          description: "Disk usage > 85% on {{ $labels.instance }}."
+
+  # ===========================================
+  # Application-Specific Alerts
+  # ===========================================
+  - name: application
+    interval: 30s
+    rules:
+      - alert: UploadProcessingBacklog
+        expr: |
+          sum(kafka_consumergroup_lag{consumergroup="upload-processor"}) > 500
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Upload processing backlog"
+          description: "Upload processing queue has > 500 pending items."
+
+      - alert: WebhookDeliveryFailures
+        expr: |
+          increase(webhook_delivery_failures_total[15m]) > 100
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High webhook delivery failures"
+          description: "More than 100 webhook delivery failures in 15 minutes."
+
+      - alert: FaceDetectionQueueBacklog
+        expr: |
+          sum(kafka_consumergroup_lag{consumergroup="face-detector"}) > 200
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Face detection backlog"
+          description: "Face detection queue has > 200 pending items."

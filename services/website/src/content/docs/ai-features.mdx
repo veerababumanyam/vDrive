@@ -1,0 +1,182 @@
+---
+title: "AI Features Guide"
+description: "Leverage vDrive's AI-powered features for automatic tagging, face recognition, and intelligent photo organization."
+order: 3
+section: "AI Features"
+lastUpdated: 2026-01-13
+---
+
+# AI Features Guide
+
+vDrive uses advanced AI to help you manage thousands of photos effortlessly. Learn how to leverage these powerful features.
+
+## Overview
+
+Our AI features include:
+
+- **Auto-Tagging**: Automatic scene, object, and color detection
+- **Face Recognition**: Identify and group people across photos
+- **Smart Search**: Find any photo using natural language
+- **Quality Detection**: Identify blurry, duplicate, or underexposed photos
+
+## Auto-Tagging
+
+When you upload photos, vDrive automatically analyzes and tags them.
+
+### Tag Categories
+
+| Category | Examples |
+|----------|----------|
+| Scene | outdoor, indoor, beach, forest, city |
+| Event | wedding, portrait, party, corporate |
+| Objects | car, flower, cake, dress, ring |
+| Colors | blue, warm, golden hour, vibrant |
+| Mood | romantic, joyful, dramatic, peaceful |
+
+### Using Tags
+
+Filter and search your library using tags:
+
+```
+Search: "outdoor wedding dress"
+Result: All outdoor wedding photos featuring a dress
+```
+
+### Custom Tags
+
+Add your own tags to complement AI detection:
+
+1. Select photos you want to tag
+2. Click **Add Tags**
+3. Enter custom tag names
+4. Tags sync across all galleries
+
+## Face Recognition
+
+Automatically identify and group people in your photos.
+
+### How It Works
+
+1. **Detection**: AI finds all faces in your photos
+2. **Grouping**: Similar faces are clustered together
+3. **Naming**: You assign names to each person
+4. **Recognition**: Future photos automatically match
+
+### Privacy & Control
+
+Face recognition respects privacy:
+
+- **Opt-out**: Clients can request face data deletion
+- **Local Processing**: Data processed securely on our servers
+- **No Third-party Sharing**: Face data never leaves vDrive
+- **GDPR Compliant**: Full data protection compliance
+
+### Client Self-Find
+
+Let clients find themselves in large event galleries:
+
+1. Client uploads a selfie
+2. AI matches their face across all photos
+3. Client sees only photos of themselves
+4. Perfect for weddings and events
+
+## Smart Search
+
+Find photos using natural language queries.
+
+### Search Examples
+
+- "Bride smiling during ceremony"
+- "Golden hour portraits"
+- "Group photos with more than 5 people"
+- "Photos taken between 2pm and 4pm"
+
+### Combining Filters
+
+Combine multiple filters for precise results:
+
+```
+Face: "Sarah" + Tag: "ceremony" + Time: "morning"
+```
+
+## Quality Detection
+
+AI helps identify photos that need attention.
+
+### Quality Checks
+
+| Check | Detection |
+|-------|-----------|
+| Blur | Motion blur, out of focus |
+| Exposure | Under/overexposed areas |
+| Duplicates | Similar or identical photos |
+| Blink | Closed eyes detection |
+| Composition | Rule of thirds, horizons |
+
+### Using Quality Detection
+
+1. Go to **Library** > **Quality Issues**
+2. Review flagged photos
+3. Keep, delete, or mark for editing
+4. Clear the queue as you work
+
+## AI Processing
+
+### Processing Time
+
+Photo processing happens in the background:
+
+| Upload Size | Processing Time |
+|-------------|-----------------|
+| 1-50 photos | Under 1 minute |
+| 50-200 photos | 2-5 minutes |
+| 200-500 photos | 5-10 minutes |
+| 500+ photos | 10-20 minutes |
+
+### Processing Status
+
+Track AI processing:
+
+- **Blue**: Queued for processing
+- **Yellow**: Currently processing
+- **Green**: Complete
+- **Red**: Error (retry available)
+
+## Best Practices
+
+### Optimize AI Results
+
+1. **Quality Uploads**: Higher resolution = better detection
+2. **Good Lighting**: Well-lit faces improve recognition
+3. **Consistent Naming**: Use the same name format for people
+4. **Review Tags**: Correct mistakes to improve accuracy
+
+### Batch Processing
+
+For large shoots:
+
+1. Upload all photos at once
+2. Let AI process overnight
+3. Review quality flags first
+4. Use Smart Albums to organize
+
+## API Access
+
+Access AI features programmatically on Business+ plans:
+
+```javascript
+// Example: Search photos using AI
+const results = await vdrive.photos.search({
+  query: "sunset beach portrait",
+  gallery_id: "gallery_123",
+  limit: 50
+});
+```
+
+See [API Reference](/docs/api) for full documentation.
+
+## Next Steps
+
+- [Smart Albums](/docs/smart-albums) - Auto-organized collections
+- [Workflow Automation](/docs/automation) - Trigger actions on AI events
+- [API Reference](/docs/api) - Integrate AI into your workflow

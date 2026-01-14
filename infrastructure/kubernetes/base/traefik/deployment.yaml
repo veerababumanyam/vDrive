@@ -1,0 +1,122 @@
+# ===========================================
+# Traefik v3 Deployment
+# ===========================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: traefik
+  namespace: vDrive
+  labels:
+    app: traefik
+    app.kubernetes.io/name: traefik
+    app.kubernetes.io/component: ingress
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: traefik
+  template:
+    metadata:
+      labels:
+        app: traefik
+        app.kubernetes.io/name: traefik
+    spec:
+      serviceAccountName: traefik
+      containers:
+        - name: traefik
+          image: traefik:v3.0
+          imagePullPolicy: IfNotPresent
+          args:
+            - --api.dashboard=true
+            - --api.insecure=false
+            - --ping=true
+            - --entrypoints.web.address=:80
+            - --entrypoints.websecure.address=:443
+            - --entrypoints.traefik.address=:8080
+            - --entrypoints.metrics.address=:8082
+            - --providers.kubernetescrd
+            - --providers.kubernetesingress
+            - --metrics.prometheus=true
+            - --metrics.prometheus.entryPoint=metrics
+            - --log.level=INFO
+            - --accesslog=true
+            - --accesslog.format=json
+          ports:
+            - name: web
+              containerPort: 80
+            - name: websecure
+              containerPort: 443
+            - name: traefik
+              containerPort: 8080
+            - name: metrics
+              containerPort: 8082
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          livenessProbe:
+            httpGet:
+              path: /ping
+              port: traefik
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /ping
+              port: traefik
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
+          securityContext:
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 65532
+            capabilities:
+              drop:
+                - ALL
+              add:
+                - NET_BIND_SERVICE
+---
+# Service for Traefik
+apiVersion: v1
+kind: Service
+metadata:
+  name: traefik
+  namespace: vDrive
+  labels:
+    app: traefik
+spec:
+  type: LoadBalancer
+  ports:
+    - name: web
+      port: 80
+      targetPort: web
+    - name: websecure
+      port: 443
+      targetPort: websecure
+  selector:
+    app: traefik
+---
+# Internal service for dashboard and metrics
+apiVersion: v1
+kind: Service
+metadata:
+  name: traefik-internal
+  namespace: vDrive
+  labels:
+    app: traefik
+spec:
+  type: ClusterIP
+  ports:
+    - name: traefik
+      port: 8080
+      targetPort: traefik
+    - name: metrics
+      port: 8082
+      targetPort: metrics
+  selector:
+    app: traefik

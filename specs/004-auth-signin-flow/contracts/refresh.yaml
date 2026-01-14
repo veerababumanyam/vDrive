@@ -1,0 +1,108 @@
+# API Contract: Token Refresh Endpoint
+# POST /api/v1/onboarding/refresh
+# Exchange refresh token for new access token
+
+openapi: 3.1.0
+info:
+  title: Token Refresh API
+  version: 1.0.0
+
+paths:
+  /api/v1/onboarding/refresh:
+    post:
+      operationId: refreshToken
+      summary: Refresh access token
+      description: |
+        Exchange a valid refresh token (from HttpOnly cookie) for a new access token.
+
+        The refresh token is read from the `refresh_token` cookie automatically.
+        On success, a new refresh token is issued (token rotation for security).
+
+        If the refresh token is expired or invalid, returns 401 and clears the cookie.
+      tags:
+        - authentication
+      security: []  # No Authorization header needed, uses cookie
+      responses:
+        '200':
+          description: Token refreshed successfully
+          headers:
+            Set-Cookie:
+              description: New HttpOnly Secure refresh token cookie (rotation)
+              schema:
+                type: string
+                example: "refresh_token=eyJ...; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=604800"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RefreshResponse'
+        '401':
+          description: Invalid or expired refresh token
+          headers:
+            Set-Cookie:
+              description: Cookie cleared
+              schema:
+                type: string
+                example: "refresh_token=; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=0"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                missing_token:
+                  summary: No refresh token cookie
+                  value:
+                    error: "missing_refresh_token"
+                    message: "No refresh token provided"
+                expired_token:
+                  summary: Refresh token expired
+                  value:
+                    error: "token_expired"
+                    message: "Session expired. Please sign in again."
+                invalid_token:
+                  summary: Invalid refresh token
+                  value:
+                    error: "invalid_token"
+                    message: "Invalid refresh token"
+                revoked_session:
+                  summary: Session was revoked
+                  value:
+                    error: "session_revoked"
+                    message: "This session has been revoked. Please sign in again."
+
+components:
+  schemas:
+    RefreshResponse:
+      type: object
+      required:
+        - access_token
+        - token_type
+        - expires_in
+      properties:
+        access_token:
+          type: string
+          description: New JWT access token (15-minute expiry)
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        token_type:
+          type: string
+          enum: [bearer]
+          description: Token type (always "bearer")
+          example: "bearer"
+        expires_in:
+          type: integer
+          description: Token expiry in seconds
+          example: 900
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+        - message
+      properties:
+        error:
+          type: string
+          description: Error code
+          example: "token_expired"
+        message:
+          type: string
+          description: Human-readable error message
+          example: "Session expired. Please sign in again."

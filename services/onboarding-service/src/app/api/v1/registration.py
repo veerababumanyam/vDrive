@@ -11,7 +11,6 @@ from src.app.core.database import get_db
 from src.app.events.kafka_producer import KafkaProducer, get_kafka_producer
 from src.app.middleware.rate_limit import get_client_ip, rate_limit_registration
 from src.app.schemas.registration import (
-    EmailCheckRequest,
     EmailCheckResponse,
     RegistrationRequest,
     RegistrationResponse,

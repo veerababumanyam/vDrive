@@ -1,0 +1,46 @@
+---
+const APP_URL = import.meta.env.APP_URL || 'https://app.vdrive.io';
+---
+
+<section class="section bg-neutral-900 dark:bg-neutral-950">
+  <div class="container-lg">
+    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary-600 to-accent-600 px-6 py-16 sm:px-12 sm:py-20 lg:py-24">
+      <!-- Background Pattern -->
+      <div class="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-10"></div>
+
+      <!-- Glow Effects -->
+      <div class="absolute -left-20 -top-20 h-64 w-64 rounded-full bg-white/20 blur-3xl"></div>
+      <div class="absolute -bottom-20 -right-20 h-64 w-64 rounded-full bg-white/20 blur-3xl"></div>
+
+      <div class="relative mx-auto max-w-2xl text-center">
+        <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl">
+          Ready to transform your photography workflow?
+        </h2>
+        <p class="mt-6 text-lg text-primary-100">
+          Join thousands of professional photographers who save hours every week with vDrive.
+          Start your 14-day free trial today.
+        </p>
+        <div class="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+          <a
+            href={`${APP_URL}/sign-up`}
+            class="inline-flex items-center gap-2 rounded-lg bg-white px-6 py-3 font-medium text-primary-600 transition-all hover:bg-primary-50 hover:shadow-lg"
+          >
+            Start Free Trial
+            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+            </svg>
+          </a>
+          <a
+            href="/contact"
+            class="inline-flex items-center gap-2 rounded-lg border border-white/30 px-6 py-3 font-medium text-white transition-all hover:bg-white/10"
+          >
+            Talk to Sales
+          </a>
+        </div>
+        <p class="mt-6 text-sm text-primary-200">
+          No credit card required. Cancel anytime.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>

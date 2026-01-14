@@ -1,0 +1,282 @@
+# ===========================================
+# Kafka and Zookeeper Deployment
+# ===========================================
+# Zookeeper StatefulSet
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: zookeeper
+  namespace: vDrive
+  labels:
+    app: zookeeper
+spec:
+  serviceName: zookeeper-headless
+  replicas: 1
+  selector:
+    matchLabels:
+      app: zookeeper
+  template:
+    metadata:
+      labels:
+        app: zookeeper
+    spec:
+      containers:
+        - name: zookeeper
+          image: confluentinc/cp-zookeeper:7.5.0
+          ports:
+            - containerPort: 2181
+              name: client
+          env:
+            - name: ZOOKEEPER_CLIENT_PORT
+              value: "2181"
+            - name: ZOOKEEPER_TICK_TIME
+              value: "2000"
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          volumeMounts:
+            - name: zookeeper-data
+              mountPath: /var/lib/zookeeper/data
+            - name: zookeeper-log
+              mountPath: /var/lib/zookeeper/log
+          livenessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - echo ruok | nc localhost 2181 | grep imok
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - echo ruok | nc localhost 2181 | grep imok
+            initialDelaySeconds: 10
+            periodSeconds: 5
+  volumeClaimTemplates:
+    - metadata:
+        name: zookeeper-data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        storageClassName: standard
+        resources:
+          requests:
+            storage: 5Gi
+    - metadata:
+        name: zookeeper-log
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        storageClassName: standard
+        resources:
+          requests:
+            storage: 5Gi
+---
+# Zookeeper Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: zookeeper
+  namespace: vDrive
+spec:
+  type: ClusterIP
+  ports:
+    - port: 2181
+      targetPort: 2181
+      name: client
+  selector:
+    app: zookeeper
+---
+# Zookeeper Headless Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: zookeeper-headless
+  namespace: vDrive
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+    - port: 2181
+      targetPort: 2181
+      name: client
+  selector:
+    app: zookeeper
+---
+# Kafka StatefulSet
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: kafka
+  namespace: vDrive
+  labels:
+    app: kafka
+spec:
+  serviceName: kafka-headless
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kafka
+  template:
+    metadata:
+      labels:
+        app: kafka
+    spec:
+      containers:
+        - name: kafka
+          image: confluentinc/cp-kafka:7.5.0
+          ports:
+            - containerPort: 9092
+              name: kafka
+          env:
+            - name: KAFKA_BROKER_ID
+              value: "1"
+            - name: KAFKA_ZOOKEEPER_CONNECT
+              value: "zookeeper:2181"
+            - name: KAFKA_ADVERTISED_LISTENERS
+              value: "PLAINTEXT://kafka:9092"
+            - name: KAFKA_LISTENER_SECURITY_PROTOCOL_MAP
+              value: "PLAINTEXT:PLAINTEXT"
+            - name: KAFKA_INTER_BROKER_LISTENER_NAME
+              value: "PLAINTEXT"
+            - name: KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR
+              value: "1"
+            - name: KAFKA_TRANSACTION_STATE_LOG_MIN_ISR
+              value: "1"
+            - name: KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR
+              value: "1"
+            - name: KAFKA_AUTO_CREATE_TOPICS_ENABLE
+              value: "false"
+            - name: KAFKA_LOG_RETENTION_HOURS
+              value: "168"
+            - name: KAFKA_NUM_PARTITIONS
+              value: "6"
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "1000m"
+              memory: "2Gi"
+          volumeMounts:
+            - name: kafka-data
+              mountPath: /var/lib/kafka/data
+          livenessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - kafka-topics --bootstrap-server localhost:9092 --list
+            initialDelaySeconds: 60
+            periodSeconds: 30
+          readinessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - kafka-topics --bootstrap-server localhost:9092 --list
+            initialDelaySeconds: 30
+            periodSeconds: 10
+  volumeClaimTemplates:
+    - metadata:
+        name: kafka-data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        storageClassName: standard
+        resources:
+          requests:
+            storage: 20Gi
+---
+# Kafka Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka
+  namespace: vDrive
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9092
+      targetPort: 9092
+      name: kafka
+  selector:
+    app: kafka
+---
+# Kafka Headless Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka-headless
+  namespace: vDrive
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+    - port: 9092
+      targetPort: 9092
+      name: kafka
+  selector:
+    app: kafka
+---
+# Kafka Topic Initialization Job
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: kafka-topic-init
+  namespace: vDrive
+spec:
+  ttlSecondsAfterFinished: 300
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: kafka-init
+          image: confluentinc/cp-kafka:7.5.0
+          command:
+            - sh
+            - -c
+            - |
+              echo "Waiting for Kafka to be ready..."
+              sleep 30
+
+              echo "Creating topics with retention settings..."
+              # Upload events (7d retention)
+              kafka-topics --create --if-not-exists --bootstrap-server kafka:9092 --partitions 6 --replication-factor 1 --topic upload.initiated --config retention.ms=604800000
+              kafka-topics --create --if-not-exists --bootstrap-server kafka:9092 --partitions 6 --replication-factor 1 --topic upload.completed --config retention.ms=604800000
+
+              # Asset processing (3d/7d retention)
+              kafka-topics --create --if-not-exists --bootstrap-server kafka:9092 --partitions 12 --replication-factor 1 --topic asset.processing --config retention.ms=259200000
+              kafka-topics --create --if-not-exists --bootstrap-server kafka:9092 --partitions 12 --replication-factor 1 --topic asset.processed --config retention.ms=604800000
+
+              # Face detection (7d retention)
+              kafka-topics --create --if-not-exists --bootstrap-server kafka:9092 --partitions 6 --replication-factor 1 --topic face.detected --config retention.ms=604800000
+
+              # Webhooks (3d/30d retention)
+              kafka-topics --create --if-not-exists --bootstrap-server kafka:9092 --partitions 6 --replication-factor 1 --topic webhook.pending --config retention.ms=259200000
+              kafka-topics --create --if-not-exists --bootstrap-server kafka:9092 --partitions 3 --replication-factor 1 --topic webhook.dlq --config retention.ms=2592000000
+
+              # Notifications (3d retention)
+              kafka-topics --create --if-not-exists --bootstrap-server kafka:9092 --partitions 6 --replication-factor 1 --topic notification.send --config retention.ms=259200000
+
+              # Gallery events (7d retention)
+              kafka-topics --create --if-not-exists --bootstrap-server kafka:9092 --partitions 6 --replication-factor 1 --topic gallery.created --config retention.ms=604800000
+              kafka-topics --create --if-not-exists --bootstrap-server kafka:9092 --partitions 6 --replication-factor 1 --topic gallery.published --config retention.ms=604800000
+
+              # User events (7d retention)
+              kafka-topics --create --if-not-exists --bootstrap-server kafka:9092 --partitions 3 --replication-factor 1 --topic user.registered --config retention.ms=604800000
+              kafka-topics --create --if-not-exists --bootstrap-server kafka:9092 --partitions 3 --replication-factor 1 --topic user.subscription.changed --config retention.ms=604800000
+
+              # AI/Search events (Phase 4.3)
+              kafka-topics --create --if-not-exists --bootstrap-server kafka:9092 --partitions 6 --replication-factor 1 --topic asset.embedding.generated --config retention.ms=604800000
+              kafka-topics --create --if-not-exists --bootstrap-server kafka:9092 --partitions 3 --replication-factor 1 --topic search.query.logged --config retention.ms=2592000000
+
+              echo "Topics created:"
+              kafka-topics --list --bootstrap-server kafka:9092

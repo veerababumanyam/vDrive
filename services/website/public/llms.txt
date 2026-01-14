@@ -1,0 +1,74 @@
+# vDrive - Professional Photography Client Galleries
+
+> vDrive is an AI-powered photography platform that helps professional photographers manage, deliver, and sell their work. Built for wedding photographers, portrait studios, and event photographers.
+
+## Product Overview
+
+vDrive provides:
+- **AI-Powered Gallery Management**: Automatically tag, sort, and organize thousands of photos
+- **Beautiful Client Portals**: Branded galleries with magic links and password protection
+- **Face Recognition**: Let clients find themselves in hundreds of photos instantly
+- **Print Album Designer**: Create professional print-ready albums with AI-suggested layouts
+- **Client Management**: CRM features for tracking shoots, contracts, and communication
+- **Secure Cloud Storage**: Enterprise-grade encryption with Cloudflare R2
+
+## Pricing (INR)
+
+- **Free**: 1 GB storage, 3 galleries, 5 clients - Perfect for getting started
+- **Starter** (Rs.500/month): 10 GB storage, 10 galleries, 20 clients - For photographers starting out
+- **Professional** (Rs.1,500/month): 100 GB storage, 50 galleries, 100 clients - Most popular for growing photographers
+- **Business** (Rs.3,000/month): 1 TB storage, 200 galleries, 500 clients - For established studios
+- **Enterprise** (Custom): Unlimited everything - For large studios and agencies
+
+All paid plans include a 14-day free trial. Annual billing saves 17%.
+
+## Key Features
+
+### AI & Automation
+- Smart photo tagging with scene, object, and color detection
+- Face detection and grouping across all galleries
+- Intelligent search across your entire library
+- Batch operations with AI assistance
+
+### Client Experience
+- Customizable gallery themes matching your brand
+- Magic links with optional password protection
+- Client proofing with favorites and comments
+- Download permissions (full-res, web-quality, or none)
+
+### Business Tools
+- Team collaboration with role-based access
+- Analytics dashboard for gallery engagement
+- Webhooks and REST API for integrations
+- White-label branding for studios
+
+## Target Users
+
+1. **Wedding Photographers**: Managing 2000+ photos per event, delivering client galleries
+2. **Portrait Studios**: Multiple sessions daily, client proofing and selection
+3. **Event Photographers**: Corporate events, conferences, parties
+4. **Photography Studios**: Teams needing collaboration and white-label features
+
+## Technical Details
+
+- **Platform**: Web-based (app.vdrive.io), mobile-responsive
+- **Storage**: Cloudflare R2 with global CDN
+- **Security**: AES-256 encryption, TLS 1.3, SOC 2 compliant
+- **API**: REST API available on Business+ plans
+
+## Links
+
+- Website: https://www.vdrive.io
+- Features: https://www.vdrive.io/features
+- Pricing: https://www.vdrive.io/pricing
+- Documentation: https://www.vdrive.io/docs
+- Blog: https://www.vdrive.io/blog
+- Sign Up: https://app.vdrive.io/sign-up
+- Contact: support@vdrive.io
+
+## Company
+
+vDrive is headquartered in India and serves photographers worldwide. Founded in 2024, we're committed to helping photographers save time and impress their clients with beautiful, AI-powered galleries.
+
+---
+Last updated: 2026-01-13

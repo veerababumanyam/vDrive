@@ -1,0 +1,1322 @@
+openapi: 3.1.0
+info:
+  title: vDrive Search & AI API
+  description: Semantic search, RAG queries, smart curation, and AI assistant
+  version: 1.0.0
+  contact:
+    name: vDrive API Support
+    email: api@vdrive.io
+
+servers:
+  - url: https://app.vdrive.io/api/v1
+    description: Production
+  - url: http://localhost:8009/api/v1
+    description: AI/Search service (local)
+
+tags:
+  - name: Search
+    description: Semantic and text search
+  - name: RAG
+    description: Retrieval-augmented generation
+  - name: Curation
+    description: AI-powered photo curation
+  - name: Assistant
+    description: AI photo assistant
+
+paths:
+  /search/photos:
+    post:
+      tags:
+        - Search
+      summary: Search photos
+      description: Search photos using natural language or keywords
+      operationId: searchPhotos
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PhotoSearchRequest'
+      responses:
+        '200':
+          description: Search results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PhotoSearchResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /search/semantic:
+    post:
+      tags:
+        - Search
+      summary: Semantic search
+      description: Search using natural language understanding
+      operationId: semanticSearch
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SemanticSearchRequest'
+      responses:
+        '200':
+          description: Semantic search results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SemanticSearchResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /search/similar:
+    post:
+      tags:
+        - Search
+      summary: Find similar photos
+      description: Find photos visually similar to a given photo
+      operationId: findSimilarPhotos
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SimilarPhotosRequest'
+      responses:
+        '200':
+          description: Similar photos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimilarPhotosResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Source photo not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /search/faces:
+    post:
+      tags:
+        - Search
+      summary: Search by face
+      description: Find all photos containing a specific person
+      operationId: searchByFace
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FaceSearchRequest'
+      responses:
+        '200':
+          description: Photos with matching face
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FaceSearchResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Person not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /search/suggestions:
+    get:
+      tags:
+        - Search
+      summary: Get search suggestions
+      description: Get autocomplete suggestions for search queries
+      operationId: getSearchSuggestions
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+            minLength: 2
+          description: Partial search query
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 20
+            default: 10
+        - name: gallery_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+          description: Scope suggestions to a gallery
+      responses:
+        '200':
+          description: Search suggestions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchSuggestionsResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /search/history:
+    get:
+      tags:
+        - Search
+      summary: Get search history
+      description: Get recent search queries
+      operationId: getSearchHistory
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 10
+      responses:
+        '200':
+          description: Search history
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchHistoryResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    delete:
+      tags:
+        - Search
+      summary: Clear search history
+      description: Clear all search history
+      operationId: clearSearchHistory
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: History cleared
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /rag/query:
+    post:
+      tags:
+        - RAG
+      summary: RAG query
+      description: Ask questions about your photos using RAG
+      operationId: ragQuery
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RagQueryRequest'
+      responses:
+        '200':
+          description: RAG response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RagQueryResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /smart-curate:
+    post:
+      tags:
+        - Curation
+      summary: Smart curate photos
+      description: AI-powered photo curation and selection
+      operationId: smartCurate
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SmartCurateRequest'
+      responses:
+        '202':
+          description: Curation started
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SmartCurateResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Gallery not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /smart-curate/{taskId}:
+    get:
+      tags:
+        - Curation
+      summary: Get curation status
+      description: Check status of a smart curation task
+      operationId: getCurationStatus
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: taskId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Curation status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CurationStatusResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /smart-curate/presets:
+    get:
+      tags:
+        - Curation
+      summary: Get curation presets
+      description: Get available curation presets
+      operationId: getCurationPresets
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Curation presets
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CurationPresetsResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /ask:
+    post:
+      tags:
+        - Assistant
+      summary: Ask AI assistant
+      description: Ask the AI assistant about your photos
+      operationId: askAssistant
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AskRequest'
+      responses:
+        '200':
+          description: Assistant response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AskResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /ask/stream:
+    post:
+      tags:
+        - Assistant
+      summary: Ask AI assistant (streaming)
+      description: Ask the AI assistant with streaming response
+      operationId: askAssistantStream
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AskRequest'
+      responses:
+        '200':
+          description: Streaming response
+          content:
+            text/event-stream:
+              schema:
+                type: string
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /analyze/photo:
+    post:
+      tags:
+        - Assistant
+      summary: Analyze photo
+      description: Get AI analysis of a photo
+      operationId: analyzePhoto
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnalyzePhotoRequest'
+      responses:
+        '200':
+          description: Photo analysis
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyzePhotoResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Photo not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /analyze/gallery:
+    post:
+      tags:
+        - Assistant
+      summary: Analyze gallery
+      description: Get AI analysis of a gallery
+      operationId: analyzeGallery
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnalyzeGalleryRequest'
+      responses:
+        '202':
+          description: Analysis started
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyzeGalleryResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Gallery not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /generate/caption:
+    post:
+      tags:
+        - Assistant
+      summary: Generate caption
+      description: Generate AI caption for a photo
+      operationId: generateCaption
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenerateCaptionRequest'
+      responses:
+        '200':
+          description: Generated caption
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenerateCaptionResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Photo not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /generate/tags:
+    post:
+      tags:
+        - Assistant
+      summary: Generate tags
+      description: Generate AI tags for photos
+      operationId: generateTags
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenerateTagsRequest'
+      responses:
+        '200':
+          description: Generated tags
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenerateTagsResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Photo not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    Unauthorized:
+      description: Authentication required
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    ValidationError:
+      description: Validation error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ValidationErrorResponse'
+
+  schemas:
+    PhotoSearchRequest:
+      type: object
+      required:
+        - query
+      properties:
+        query:
+          type: string
+          minLength: 1
+          maxLength: 500
+        gallery_id:
+          type: string
+          format: uuid
+          description: Limit search to specific gallery
+        filters:
+          $ref: '#/components/schemas/SearchFilters'
+        sort:
+          type: string
+          enum: [relevance, date_asc, date_desc, rating]
+          default: relevance
+        page:
+          type: integer
+          minimum: 1
+          default: 1
+        limit:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+
+    SearchFilters:
+      type: object
+      properties:
+        date_from:
+          type: string
+          format: date
+        date_to:
+          type: string
+          format: date
+        has_faces:
+          type: boolean
+        person_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        tags:
+          type: array
+          items:
+            type: string
+        min_rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+        color_dominant:
+          type: string
+          description: Hex color code for dominant color filter
+        orientation:
+          type: string
+          enum: [landscape, portrait, square]
+        camera_make:
+          type: string
+        lens:
+          type: string
+
+    PhotoSearchResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            results:
+              type: array
+              items:
+                $ref: '#/components/schemas/SearchResult'
+            total:
+              type: integer
+            page:
+              type: integer
+            limit:
+              type: integer
+            query_understood:
+              type: string
+              description: How the AI interpreted the query
+
+    SearchResult:
+      type: object
+      properties:
+        asset_id:
+          type: string
+          format: uuid
+        gallery_id:
+          type: string
+          format: uuid
+        thumbnail_url:
+          type: string
+          format: uri
+        filename:
+          type: string
+        score:
+          type: number
+          format: float
+          description: Relevance score (0-1)
+        match_reason:
+          type: string
+          description: Why this photo matched
+        taken_at:
+          type: string
+          format: date-time
+          nullable: true
+        faces_count:
+          type: integer
+        tags:
+          type: array
+          items:
+            type: string
+
+    SemanticSearchRequest:
+      type: object
+      required:
+        - query
+      properties:
+        query:
+          type: string
+          minLength: 3
+          maxLength: 1000
+          description: Natural language query
+        gallery_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: Galleries to search (all if empty)
+        threshold:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 1
+          default: 0.5
+          description: Minimum similarity threshold
+        limit:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+
+    SemanticSearchResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            results:
+              type: array
+              items:
+                $ref: '#/components/schemas/SearchResult'
+            total:
+              type: integer
+            embedding_model:
+              type: string
+              description: Model used for embeddings
+
+    SimilarPhotosRequest:
+      type: object
+      required:
+        - asset_id
+      properties:
+        asset_id:
+          type: string
+          format: uuid
+        similarity_type:
+          type: string
+          enum: [visual, semantic, faces]
+          default: visual
+        limit:
+          type: integer
+          minimum: 1
+          maximum: 50
+          default: 10
+        exclude_same_gallery:
+          type: boolean
+          default: false
+
+    SimilarPhotosResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            source_asset:
+              $ref: '#/components/schemas/SearchResult'
+            similar:
+              type: array
+              items:
+                allOf:
+                  - $ref: '#/components/schemas/SearchResult'
+                  - type: object
+                    properties:
+                      similarity:
+                        type: number
+                        format: float
+
+    FaceSearchRequest:
+      type: object
+      required:
+        - person_id
+      properties:
+        person_id:
+          type: string
+          format: uuid
+        gallery_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        include_unconfirmed:
+          type: boolean
+          default: false
+          description: Include unconfirmed face matches
+        page:
+          type: integer
+          minimum: 1
+          default: 1
+        limit:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+
+    FaceSearchResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            person:
+              type: object
+              properties:
+                id:
+                  type: string
+                  format: uuid
+                name:
+                  type: string
+                photo_count:
+                  type: integer
+            results:
+              type: array
+              items:
+                $ref: '#/components/schemas/SearchResult'
+            total:
+              type: integer
+            page:
+              type: integer
+
+    SearchSuggestionsResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            suggestions:
+              type: array
+              items:
+                type: object
+                properties:
+                  text:
+                    type: string
+                  type:
+                    type: string
+                    enum: [query, person, tag, location, date]
+                  count:
+                    type: integer
+                    description: Number of matching photos
+
+    SearchHistoryResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              query:
+                type: string
+              results_count:
+                type: integer
+              searched_at:
+                type: string
+                format: date-time
+
+    RagQueryRequest:
+      type: object
+      required:
+        - question
+      properties:
+        question:
+          type: string
+          minLength: 5
+          maxLength: 1000
+        gallery_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: Context galleries (all if empty)
+        conversation_id:
+          type: string
+          format: uuid
+          description: Continue existing conversation
+        include_photos:
+          type: boolean
+          default: true
+          description: Include relevant photos in response
+
+    RagQueryResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            answer:
+              type: string
+            conversation_id:
+              type: string
+              format: uuid
+            sources:
+              type: array
+              items:
+                type: object
+                properties:
+                  asset_id:
+                    type: string
+                    format: uuid
+                  thumbnail_url:
+                    type: string
+                    format: uri
+                  relevance:
+                    type: number
+                    format: float
+            suggested_followups:
+              type: array
+              items:
+                type: string
+
+    SmartCurateRequest:
+      type: object
+      required:
+        - gallery_id
+      properties:
+        gallery_id:
+          type: string
+          format: uuid
+        preset:
+          type: string
+          enum: [best_of, highlights, story, portfolio, social]
+          default: best_of
+        target_count:
+          type: integer
+          minimum: 1
+          maximum: 500
+          description: Target number of photos to select
+        criteria:
+          $ref: '#/components/schemas/CurationCriteria'
+        exclude_asset_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: Assets to exclude from curation
+
+    CurationCriteria:
+      type: object
+      properties:
+        technical_quality_weight:
+          type: number
+          minimum: 0
+          maximum: 1
+          default: 0.3
+          description: Weight for sharpness, exposure, etc.
+        composition_weight:
+          type: number
+          minimum: 0
+          maximum: 1
+          default: 0.3
+        uniqueness_weight:
+          type: number
+          minimum: 0
+          maximum: 1
+          default: 0.2
+          description: Avoid similar photos
+        faces_weight:
+          type: number
+          minimum: 0
+          maximum: 1
+          default: 0.2
+          description: Prefer photos with faces
+        min_faces:
+          type: integer
+          minimum: 0
+        require_person_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: Must include photos with these people
+        prefer_variety:
+          type: boolean
+          default: true
+          description: Ensure variety in selected photos
+
+    SmartCurateResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            task_id:
+              type: string
+              format: uuid
+            status:
+              type: string
+              enum: [queued, processing, completed, failed]
+            estimated_time_seconds:
+              type: integer
+
+    CurationStatusResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            task_id:
+              type: string
+              format: uuid
+            status:
+              type: string
+              enum: [queued, processing, completed, failed]
+            progress:
+              type: number
+              format: float
+              description: 0-100 progress percentage
+            selected_count:
+              type: integer
+              nullable: true
+            selected_assets:
+              type: array
+              items:
+                type: object
+                properties:
+                  asset_id:
+                    type: string
+                    format: uuid
+                  thumbnail_url:
+                    type: string
+                    format: uri
+                  score:
+                    type: number
+                    format: float
+                  selection_reason:
+                    type: string
+            error_message:
+              type: string
+              nullable: true
+            completed_at:
+              type: string
+              format: date-time
+              nullable: true
+
+    CurationPresetsResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              description:
+                type: string
+              default_count:
+                type: integer
+              criteria:
+                $ref: '#/components/schemas/CurationCriteria'
+
+    AskRequest:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          minLength: 1
+          maxLength: 2000
+        context:
+          type: object
+          properties:
+            gallery_id:
+              type: string
+              format: uuid
+            asset_ids:
+              type: array
+              items:
+                type: string
+                format: uuid
+              maxItems: 10
+        conversation_id:
+          type: string
+          format: uuid
+          description: Continue existing conversation
+
+    AskResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            message:
+              type: string
+            conversation_id:
+              type: string
+              format: uuid
+            referenced_assets:
+              type: array
+              items:
+                type: object
+                properties:
+                  asset_id:
+                    type: string
+                    format: uuid
+                  thumbnail_url:
+                    type: string
+                    format: uri
+            actions:
+              type: array
+              items:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    enum: [search, navigate, select, share]
+                  label:
+                    type: string
+                  params:
+                    type: object
+
+    AnalyzePhotoRequest:
+      type: object
+      required:
+        - asset_id
+      properties:
+        asset_id:
+          type: string
+          format: uuid
+        analysis_types:
+          type: array
+          items:
+            type: string
+            enum: [technical, composition, aesthetic, content, faces, metadata]
+          default: [technical, composition, content]
+
+    AnalyzePhotoResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            asset_id:
+              type: string
+              format: uuid
+            technical:
+              type: object
+              properties:
+                sharpness_score:
+                  type: number
+                exposure_score:
+                  type: number
+                noise_level:
+                  type: string
+                  enum: [low, medium, high]
+                white_balance:
+                  type: string
+                issues:
+                  type: array
+                  items:
+                    type: string
+            composition:
+              type: object
+              properties:
+                score:
+                  type: number
+                rules_detected:
+                  type: array
+                  items:
+                    type: string
+                suggestions:
+                  type: array
+                  items:
+                    type: string
+            aesthetic:
+              type: object
+              properties:
+                score:
+                  type: number
+                mood:
+                  type: string
+                dominant_colors:
+                  type: array
+                  items:
+                    type: string
+            content:
+              type: object
+              properties:
+                description:
+                  type: string
+                objects:
+                  type: array
+                  items:
+                    type: string
+                scene:
+                  type: string
+                activities:
+                  type: array
+                  items:
+                    type: string
+            faces:
+              type: object
+              properties:
+                count:
+                  type: integer
+                detected:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      person_id:
+                        type: string
+                        format: uuid
+                        nullable: true
+                      name:
+                        type: string
+                        nullable: true
+                      confidence:
+                        type: number
+                      expression:
+                        type: string
+                      bbox:
+                        type: array
+                        items:
+                          type: number
+                        minItems: 4
+                        maxItems: 4
+
+    AnalyzeGalleryRequest:
+      type: object
+      required:
+        - gallery_id
+      properties:
+        gallery_id:
+          type: string
+          format: uuid
+
+    AnalyzeGalleryResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            task_id:
+              type: string
+              format: uuid
+            status:
+              type: string
+              enum: [queued, processing]
+
+    GenerateCaptionRequest:
+      type: object
+      required:
+        - asset_id
+      properties:
+        asset_id:
+          type: string
+          format: uuid
+        style:
+          type: string
+          enum: [descriptive, poetic, social, professional]
+          default: descriptive
+        max_length:
+          type: integer
+          minimum: 20
+          maximum: 500
+          default: 150
+        include_hashtags:
+          type: boolean
+          default: false
+
+    GenerateCaptionResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            caption:
+              type: string
+            hashtags:
+              type: array
+              items:
+                type: string
+            alternatives:
+              type: array
+              items:
+                type: string
+              description: Alternative caption suggestions
+
+    GenerateTagsRequest:
+      type: object
+      required:
+        - asset_ids
+      properties:
+        asset_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          minItems: 1
+          maxItems: 50
+        max_tags_per_photo:
+          type: integer
+          minimum: 1
+          maximum: 20
+          default: 10
+        include_existing:
+          type: boolean
+          default: false
+          description: Include already assigned tags
+
+    GenerateTagsResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              asset_id:
+                type: string
+                format: uuid
+              tags:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    tag:
+                      type: string
+                    confidence:
+                      type: number
+                      format: float
+                    category:
+                      type: string
+                      enum: [object, scene, activity, emotion, color, style]
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+
+    ValidationErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          enum: [VALIDATION_ERROR]
+        message:
+          type: string
+        details:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+              message:
+                type: string
+
+security:
+  - bearerAuth: []

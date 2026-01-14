@@ -1,0 +1,95 @@
+# ===========================================
+# Upload Service Deployment
+# ===========================================
+# TUS protocol resumable uploads with chunking
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: upload-service
+  namespace: vDrive
+  labels:
+    app: upload-service
+    app.kubernetes.io/name: upload-service
+    app.kubernetes.io/component: api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: upload-service
+  template:
+    metadata:
+      labels:
+        app: upload-service
+        app.kubernetes.io/name: upload-service
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8008"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: vDrive-service
+      containers:
+        - name: upload-service
+          image: ghcr.io/vDrive/upload-service:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8008
+              name: http
+          envFrom:
+            - configMapRef:
+                name: vDrive-config
+            - secretRef:
+                name: vDrive-secrets
+          env:
+            - name: SERVICE_NAME
+              value: "upload-service"
+            - name: PORT
+              value: "8008"
+            # Upload-specific config
+            - name: MAX_FILE_SIZE
+              value: "5368709120"  # 5GB
+            - name: CHUNK_SIZE
+              value: "5242880"    # 5MB
+            - name: TUS_ENABLED
+              value: "true"
+            - name: KAFKA_TOPIC_UPLOAD_COMPLETED
+              value: "upload.completed"
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "1000m"
+              memory: "2Gi"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+      imagePullSecrets:
+        - name: vDrive-registry
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: upload-service
+  namespace: vDrive
+  labels:
+    app: upload-service
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8008
+      targetPort: 8008
+      protocol: TCP
+      name: http
+  selector:
+    app: upload-service

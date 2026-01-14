@@ -1,0 +1,228 @@
+# ===========================================
+# KEDA ScaledObjects for vDrive Services
+# ===========================================
+# Prerequisites: kubectl apply -f https://github.com/kedacore/keda/releases/download/v2.12.0/keda-2.12.0.yaml
+
+# Backend Service Autoscaling
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: backend-scaledobject
+  namespace: vDrive
+spec:
+  scaleTargetRef:
+    name: backend
+  pollingInterval: 15
+  cooldownPeriod: 60
+  minReplicaCount: 2
+  maxReplicaCount: 100
+  triggers:
+    # Scale based on HTTP request rate
+    - type: prometheus
+      metadata:
+        serverAddress: http://prometheus:9090
+        metricName: traefik_service_requests_total
+        query: sum(rate(traefik_service_requests_total{service="backend@kubernetes"}[1m]))
+        threshold: "100"
+    # Scale based on P95 latency
+    - type: prometheus
+      metadata:
+        serverAddress: http://prometheus:9090
+        metricName: traefik_service_request_duration_seconds
+        query: histogram_quantile(0.95, sum(rate(traefik_service_request_duration_seconds_bucket{service="backend@kubernetes"}[5m])) by (le))
+        threshold: "0.5"
+---
+# Gallery Service Autoscaling (High Traffic)
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: gallery-service-scaledobject
+  namespace: vDrive
+spec:
+  scaleTargetRef:
+    name: gallery-service
+  pollingInterval: 15
+  cooldownPeriod: 60
+  minReplicaCount: 5
+  maxReplicaCount: 50
+  triggers:
+    # Scale based on HTTP request rate
+    - type: prometheus
+      metadata:
+        serverAddress: http://prometheus:9090
+        metricName: traefik_service_requests_total
+        query: sum(rate(traefik_service_requests_total{service="gallery-service@kubernetes"}[1m]))
+        threshold: "100"
+    # Scale based on WebSocket connections (if exposed as metric)
+    - type: prometheus
+      metadata:
+        serverAddress: http://prometheus:9090
+        metricName: gallery_websocket_connections
+        query: sum(gallery_websocket_connections_active)
+        threshold: "500"
+---
+# Upload Service Autoscaling (Kafka-based)
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: upload-service-scaledobject
+  namespace: vDrive
+spec:
+  scaleTargetRef:
+    name: upload-service
+  pollingInterval: 15
+  cooldownPeriod: 60
+  minReplicaCount: 2
+  maxReplicaCount: 50
+  triggers:
+    # Scale based on Kafka consumer lag
+    - type: kafka
+      metadata:
+        bootstrapServers: kafka:9092
+        consumerGroup: upload-processor
+        topic: upload.completed
+        lagThreshold: "100"
+    # Scale based on HTTP request rate
+    - type: prometheus
+      metadata:
+        serverAddress: http://prometheus:9090
+        metricName: traefik_service_requests_total
+        query: sum(rate(traefik_service_requests_total{service="upload-service@kubernetes"}[1m]))
+        threshold: "50"
+---
+# Face Service Autoscaling
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: face-service-scaledobject
+  namespace: vDrive
+spec:
+  scaleTargetRef:
+    name: face-service
+  pollingInterval: 15
+  cooldownPeriod: 120  # Longer cooldown for AI workloads
+  minReplicaCount: 2
+  maxReplicaCount: 50
+  triggers:
+    # Scale based on Kafka consumer lag
+    - type: kafka
+      metadata:
+        bootstrapServers: kafka:9092
+        consumerGroup: face-detector
+        topic: face.detected
+        lagThreshold: "50"
+    # Scale based on HTTP request rate
+    - type: prometheus
+      metadata:
+        serverAddress: http://prometheus:9090
+        metricName: traefik_service_requests_total
+        query: sum(rate(traefik_service_requests_total{service="face-service@kubernetes"}[1m]))
+        threshold: "50"
+---
+# Billing Service Autoscaling
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: billing-service-scaledobject
+  namespace: vDrive
+spec:
+  scaleTargetRef:
+    name: billing-service
+  pollingInterval: 15
+  cooldownPeriod: 60
+  minReplicaCount: 2
+  maxReplicaCount: 20
+  triggers:
+    - type: prometheus
+      metadata:
+        serverAddress: http://prometheus:9090
+        metricName: traefik_service_requests_total
+        query: sum(rate(traefik_service_requests_total{service="billing-service@kubernetes"}[1m]))
+        threshold: "50"
+---
+# Webhooks Service Autoscaling (Kafka-based)
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: webhooks-service-scaledobject
+  namespace: vDrive
+spec:
+  scaleTargetRef:
+    name: webhooks-service
+  pollingInterval: 15
+  cooldownPeriod: 60
+  minReplicaCount: 2
+  maxReplicaCount: 20
+  triggers:
+    # Scale based on Kafka consumer lag for webhook delivery
+    - type: kafka
+      metadata:
+        bootstrapServers: kafka:9092
+        consumerGroup: webhook-delivery
+        topic: webhook.pending
+        lagThreshold: "50"
+---
+# Notifications Service Autoscaling
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: notifications-service-scaledobject
+  namespace: vDrive
+spec:
+  scaleTargetRef:
+    name: notifications-service
+  pollingInterval: 15
+  cooldownPeriod: 60
+  minReplicaCount: 2
+  maxReplicaCount: 10
+  triggers:
+    # Scale based on Kafka consumer lag for notifications
+    - type: kafka
+      metadata:
+        bootstrapServers: kafka:9092
+        consumerGroup: notification-sender
+        topic: notification.send
+        lagThreshold: "100"
+---
+# Onboarding Service Autoscaling
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: onboarding-service-scaledobject
+  namespace: vDrive
+spec:
+  scaleTargetRef:
+    name: onboarding-service
+  pollingInterval: 15
+  cooldownPeriod: 60
+  minReplicaCount: 2
+  maxReplicaCount: 20
+  triggers:
+    - type: prometheus
+      metadata:
+        serverAddress: http://prometheus:9090
+        metricName: traefik_service_requests_total
+        query: sum(rate(traefik_service_requests_total{service="onboarding-service@kubernetes"}[1m]))
+        threshold: "50"
+---
+# Celery Worker Autoscaling (Redis-based)
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: celery-worker-scaledobject
+  namespace: vDrive
+spec:
+  scaleTargetRef:
+    name: celery-worker
+  pollingInterval: 15
+  cooldownPeriod: 60
+  minReplicaCount: 2
+  maxReplicaCount: 20
+  triggers:
+    # Scale based on Redis queue length
+    - type: redis
+      metadata:
+        address: redis:6379
+        listName: celery
+        listLength: "100"
+        databaseIndex: "1"

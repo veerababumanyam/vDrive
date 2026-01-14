@@ -1,0 +1,110 @@
+---
+import BaseLayout from '@/components/layout/BaseLayout.astro';
+import JsonLd from '@/components/seo/JsonLd.astro';
+import { getCollection, type CollectionEntry } from 'astro:content';
+import { generateBlogPostingSchema, generateBreadcrumbSchema } from '@/utils/schema';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+    props: post,
+  }));
+}
+
+type Props = CollectionEntry<'blog'>;
+
+const post = Astro.props;
+const { Content } = await post.render();
+
+const schemas = [
+  generateBlogPostingSchema({
+    title: post.data.title,
+    description: post.data.description,
+    slug: post.slug,
+    pubDate: post.data.pubDate,
+    updatedDate: post.data.updatedDate,
+    author: post.data.author,
+    image: post.data.image,
+    tags: post.data.tags,
+  }),
+  generateBreadcrumbSchema([
+    { name: 'Home', url: '/' },
+    { name: 'Blog', url: '/blog' },
+    { name: post.data.title },
+  ]),
+];
+---
+
+<BaseLayout
+  title={post.data.title}
+  description={post.data.description}
+  image={post.data.image}
+  type="article"
+  publishedTime={post.data.pubDate}
+  modifiedTime={post.data.updatedDate}
+  author={post.data.author}
+  tags={post.data.tags}
+>
+  <JsonLd slot="head" schema={schemas} />
+  <article class="section">
+    <div class="container-sm">
+      <!-- Header -->
+      <header class="text-center">
+        <div class="flex flex-wrap justify-center gap-2">
+          {post.data.tags.map((tag) => (
+            <span class="badge badge-primary">#{tag}</span>
+          ))}
+        </div>
+        <h1 class="mt-4 text-4xl font-bold tracking-tight text-neutral-900 dark:text-white sm:text-5xl">
+          {post.data.title}
+        </h1>
+        <p class="mt-6 text-lg text-neutral-600 dark:text-neutral-400">
+          {post.data.description}
+        </p>
+        <div class="mt-6 flex items-center justify-center gap-4 text-sm text-neutral-500 dark:text-neutral-400">
+          <span>{post.data.author}</span>
+          <span>·</span>
+          <time datetime={post.data.pubDate.toISOString()}>
+            {post.data.pubDate.toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+            })}
+          </time>
+        </div>
+      </header>
+
+      <!-- Featured Image -->
+      {post.data.image && (
+        <div class="mt-12 overflow-hidden rounded-2xl">
+          <img
+            src={post.data.image}
+            alt={post.data.title}
+            class="h-auto w-full"
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+      )}
+
+      <!-- Content -->
+      <div class="prose-custom mt-12">
+        <Content />
+      </div>
+
+      <!-- Footer -->
+      <footer class="mt-16 border-t border-neutral-200 pt-8 dark:border-neutral-800">
+        <a
+          href="/blog"
+          class="inline-flex items-center gap-2 text-primary-500 hover:text-primary-600"
+        >
+          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          Back to Blog
+        </a>
+      </footer>
+    </div>
+  </article>
+</BaseLayout>

@@ -1,0 +1,224 @@
+---
+/**
+ * BlogLayout Component
+ * Layout wrapper for individual blog posts with article structure.
+ * Includes proper semantic markup and Open Graph tags.
+ */
+
+import BaseLayout from '@/components/layout/BaseLayout.astro';
+import JsonLd from '@/components/seo/JsonLd.astro';
+import { generateBlogPostingSchema, generateBreadcrumbSchema } from '@/utils/schema';
+
+interface Props {
+  title: string;
+  description: string;
+  slug: string;
+  pubDate: Date;
+  updatedDate?: Date;
+  author: string;
+  authorImage?: string;
+  image?: string;
+  tags: string[];
+  readingTime?: string;
+}
+
+const {
+  title,
+  description,
+  slug,
+  pubDate,
+  updatedDate,
+  author,
+  authorImage,
+  image,
+  tags,
+  readingTime,
+} = Astro.props;
+
+const schemas = [
+  generateBlogPostingSchema({
+    title,
+    description,
+    slug,
+    pubDate,
+    updatedDate,
+    author,
+    image,
+    tags,
+  }),
+  generateBreadcrumbSchema([
+    { name: 'Home', url: '/' },
+    { name: 'Blog', url: '/blog' },
+    { name: title },
+  ]),
+];
+
+const formattedPubDate = pubDate.toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+
+const formattedUpdatedDate = updatedDate?.toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  image={image}
+  type="article"
+  publishedTime={pubDate}
+  modifiedTime={updatedDate}
+  author={author}
+  tags={tags}
+>
+  <JsonLd slot="head" schema={schemas} />
+
+  <article class="section" itemscope itemtype="https://schema.org/BlogPosting">
+    <div class="container-sm">
+      {/* Header */}
+      <header class="text-center">
+        {/* Tags */}
+        <div class="flex flex-wrap justify-center gap-2">
+          {tags.map((tag) => (
+            <span class="badge badge-primary" itemprop="keywords">
+              #{tag}
+            </span>
+          ))}
+        </div>
+
+        {/* Title */}
+        <h1
+          class="mt-4 text-4xl font-bold tracking-tight text-neutral-900 dark:text-white sm:text-5xl"
+          itemprop="headline"
+        >
+          {title}
+        </h1>
+
+        {/* Description */}
+        <p
+          class="mt-6 text-lg text-neutral-600 dark:text-neutral-400"
+          itemprop="description"
+        >
+          {description}
+        </p>
+
+        {/* Author & Date */}
+        <div class="mt-6 flex items-center justify-center gap-4">
+          {/* Author */}
+          <div class="flex items-center gap-3" itemprop="author" itemscope itemtype="https://schema.org/Person">
+            {authorImage ? (
+              <img
+                src={authorImage}
+                alt={author}
+                class="h-10 w-10 rounded-full object-cover"
+              />
+            ) : (
+              <div class="h-10 w-10 rounded-full bg-gradient-to-br from-primary-400 to-accent-400 flex items-center justify-center text-white font-medium">
+                {author.charAt(0).toUpperCase()}
+              </div>
+            )}
+            <span class="font-medium text-neutral-900 dark:text-white" itemprop="name">
+              {author}
+            </span>
+          </div>
+
+          <span class="text-neutral-300 dark:text-neutral-700" aria-hidden="true">|</span>
+
+          {/* Date */}
+          <time
+            datetime={pubDate.toISOString()}
+            class="text-neutral-500 dark:text-neutral-400"
+            itemprop="datePublished"
+          >
+            {formattedPubDate}
+          </time>
+
+          {readingTime && (
+            <>
+              <span class="text-neutral-300 dark:text-neutral-700" aria-hidden="true">|</span>
+              <span class="text-neutral-500 dark:text-neutral-400">
+                {readingTime}
+              </span>
+            </>
+          )}
+        </div>
+
+        {updatedDate && (
+          <p class="mt-2 text-sm text-neutral-500 dark:text-neutral-400">
+            Updated on{' '}
+            <time datetime={updatedDate.toISOString()} itemprop="dateModified">
+              {formattedUpdatedDate}
+            </time>
+          </p>
+        )}
+      </header>
+
+      {/* Featured Image */}
+      {image && (
+        <div class="mt-12 overflow-hidden rounded-2xl" itemprop="image" itemscope itemtype="https://schema.org/ImageObject">
+          <img
+            src={image}
+            alt={title}
+            class="h-auto w-full"
+            itemprop="url"
+            loading="lazy"
+            decoding="async"
+          />
+          <meta itemprop="caption" content={title} />
+        </div>
+      )}
+
+      {/* Content */}
+      <div class="prose-custom mt-12" itemprop="articleBody">
+        <slot />
+      </div>
+
+      {/* Footer */}
+      <footer class="mt-16 border-t border-neutral-200 pt-8 dark:border-neutral-800">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <a
+            href="/blog"
+            class="inline-flex items-center gap-2 text-primary-500 hover:text-primary-600 transition-colors"
+          >
+            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Back to Blog
+          </a>
+
+          {/* Share Buttons */}
+          <div class="flex items-center gap-3">
+            <span class="text-sm text-neutral-500 dark:text-neutral-400">Share:</span>
+            <a
+              href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(`https://www.vdrive.io/blog/${slug}`)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors"
+              aria-label="Share on Twitter"
+            >
+              <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" />
+              </svg>
+            </a>
+            <a
+              href={`https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(`https://www.vdrive.io/blog/${slug}`)}&title=${encodeURIComponent(title)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors"
+              aria-label="Share on LinkedIn"
+            >
+              <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
+              </svg>
+            </a>
+          </div>
+        </div>
+      </footer>
+    </div>
+  </article>
+</BaseLayout>

@@ -1,0 +1,425 @@
+# ===========================================
+# Traefik v3 Dynamic Configuration
+# ===========================================
+# vDrive Service Routing with Priority-Based Rules
+# Updated: January 2026 - Added host-based routing for website/frontend separation
+
+http:
+  # ===========================================
+  # Routers (Priority-based routing)
+  # ===========================================
+  routers:
+    # ===========================================
+    # HOST-BASED ROUTING (Priority 200+)
+    # ===========================================
+
+    # Priority 250: API on App Domain (highest priority for API calls)
+    app-api:
+      rule: "Host(`app.vdrive.io`) && PathPrefix(`/api`)"
+      priority: 250
+      service: backend
+      middlewares:
+        - rate-limit-standard
+        - cors-headers
+      entryPoints:
+        - websecure
+      tls:
+        certResolver: letsencrypt
+
+    # Priority 200: Public Website (www.vdrive.io)
+    website:
+      rule: "Host(`www.vdrive.io`) || Host(`vdrive.io`)"
+      priority: 200
+      service: website-service
+      middlewares:
+        - security-headers
+        - rate-limit-website
+      entryPoints:
+        - websecure
+      tls:
+        certResolver: letsencrypt
+
+    # Priority 200: App Frontend (app.vdrive.io)
+    app-frontend:
+      rule: "Host(`app.vdrive.io`)"
+      priority: 200
+      service: frontend-service
+      middlewares:
+        - security-headers
+      entryPoints:
+        - websecure
+      tls:
+        certResolver: letsencrypt
+
+    # Priority 190: Redirect bare domain to www
+    redirect-to-www:
+      rule: "Host(`vdrive.io`)"
+      priority: 190
+      service: website-service
+      middlewares:
+        - redirect-www
+      entryPoints:
+        - websecure
+      tls:
+        certResolver: letsencrypt
+
+    # ===========================================
+    # PATH-BASED ROUTING (Legacy/API - Priority 100-150)
+    # ===========================================
+
+    # Priority 150: Stripe Webhooks (no rate limit)
+    stripe-webhooks:
+      rule: "PathPrefix(`/webhooks/stripe`)"
+      priority: 150
+      service: billing-service
+      entryPoints:
+        - websecure
+
+    # Priority 148: Razorpay Webhooks (no rate limit)
+    razorpay-webhooks:
+      rule: "PathPrefix(`/webhooks/razorpay`)"
+      priority: 148
+      service: billing-service
+      entryPoints:
+        - websecure
+
+    # Priority 145: Subscription API
+    subscription-api:
+      rule: "PathPrefix(`/api/v1/subscription`)"
+      priority: 145
+      service: billing-service
+      middlewares:
+        - rate-limit-standard
+        - cors-headers
+      entryPoints:
+        - websecure
+
+    # Priority 142: Webhooks API
+    webhooks-api:
+      rule: "PathPrefix(`/api/v1/webhooks`)"
+      priority: 142
+      service: webhooks-service
+      middlewares:
+        - rate-limit-standard
+        - cors-headers
+      entryPoints:
+        - websecure
+
+    # Priority 140: Gallery API (high traffic)
+    gallery-api:
+      rule: "PathPrefix(`/api/v1/galleries`)"
+      priority: 140
+      service: gallery-service
+      middlewares:
+        - rate-limit-gallery
+        - cors-headers
+      entryPoints:
+        - websecure
+
+    # Priority 135: Upload API
+    upload-api:
+      rule: "PathPrefix(`/api/v1/uploads`)"
+      priority: 135
+      service: upload-service
+      middlewares:
+        - rate-limit-upload
+        - cors-headers
+      entryPoints:
+        - websecure
+
+    # Priority 130: Face API
+    face-api:
+      rule: "PathPrefix(`/api/v1/face`)"
+      priority: 130
+      service: face-service
+      middlewares:
+        - rate-limit-standard
+        - cors-headers
+      entryPoints:
+        - websecure
+
+    # Priority 128: Personal Profile API
+    personal-profile-api:
+      rule: "PathPrefix(`/api/v1/personal-profile`)"
+      priority: 128
+      service: backend
+      middlewares:
+        - rate-limit-standard
+        - cors-headers
+      entryPoints:
+        - websecure
+
+    # Priority 125: Onboarding API
+    onboarding-api:
+      rule: "PathPrefix(`/api/v1/onboarding`)"
+      priority: 125
+      service: onboarding-service
+      middlewares:
+        - rate-limit-auth
+        - cors-headers
+      entryPoints:
+        - websecure
+
+    # Priority 122: Invitations API
+    invitations-api:
+      rule: "PathPrefix(`/api/v1/invitations`)"
+      priority: 122
+      service: invitations-service
+      middlewares:
+        - rate-limit-standard
+        - cors-headers
+      entryPoints:
+        - websecure
+
+    # Priority 120: Notifications API
+    notifications-api:
+      rule: "PathPrefix(`/api/v1/notifications`)"
+      priority: 120
+      service: notifications-service
+      middlewares:
+        - rate-limit-standard
+        - cors-headers
+      entryPoints:
+        - websecure
+
+    # Priority 100: Backend (fallback for all other /api routes)
+    backend-api:
+      rule: "PathPrefix(`/api`)"
+      priority: 100
+      service: backend
+      middlewares:
+        - rate-limit-standard
+        - cors-headers
+      entryPoints:
+        - websecure
+
+    # Public profile pages
+    public-profile:
+      rule: "PathPrefix(`/u/`)"
+      priority: 50
+      service: backend
+      middlewares:
+        - cors-headers
+      entryPoints:
+        - websecure
+
+  # ===========================================
+  # Services
+  # ===========================================
+  services:
+    # Website Service (Public - www.vdrive.io)
+    website-service:
+      loadBalancer:
+        servers:
+          - url: "http://website:8011"
+        healthCheck:
+          path: /
+          interval: 10s
+          timeout: 3s
+
+    # Frontend Service (App - app.vdrive.io)
+    frontend-service:
+      loadBalancer:
+        servers:
+          - url: "http://frontend:80"
+        healthCheck:
+          path: /
+          interval: 10s
+          timeout: 3s
+
+    backend:
+      loadBalancer:
+        servers:
+          - url: "http://backend:8000"
+        healthCheck:
+          path: /health
+          interval: 10s
+          timeout: 3s
+
+    billing-service:
+      loadBalancer:
+        servers:
+          - url: "http://billing-service:8005"
+        healthCheck:
+          path: /health
+          interval: 10s
+          timeout: 3s
+
+    gallery-service:
+      loadBalancer:
+        servers:
+          - url: "http://gallery-service:8004"
+        healthCheck:
+          path: /health
+          interval: 10s
+          timeout: 3s
+
+    upload-service:
+      loadBalancer:
+        servers:
+          - url: "http://upload-service:8008"
+        healthCheck:
+          path: /health
+          interval: 10s
+          timeout: 3s
+
+    face-service:
+      loadBalancer:
+        servers:
+          - url: "http://face-service:8002"
+        healthCheck:
+          path: /health
+          interval: 10s
+          timeout: 3s
+
+    webhooks-service:
+      loadBalancer:
+        servers:
+          - url: "http://webhooks-service:8003"
+        healthCheck:
+          path: /health
+          interval: 10s
+          timeout: 3s
+
+    onboarding-service:
+      loadBalancer:
+        servers:
+          - url: "http://onboarding-service:8006"
+        healthCheck:
+          path: /health
+          interval: 10s
+          timeout: 3s
+
+    invitations-service:
+      loadBalancer:
+        servers:
+          - url: "http://invitations-service:8007"
+        healthCheck:
+          path: /health
+          interval: 10s
+          timeout: 3s
+
+    notifications-service:
+      loadBalancer:
+        servers:
+          - url: "http://notifications-service:8010"
+        healthCheck:
+          path: /health
+          interval: 10s
+          timeout: 3s
+
+  # ===========================================
+  # Middlewares
+  # ===========================================
+  middlewares:
+    # Standard rate limit: 100 req/min
+    rate-limit-standard:
+      rateLimit:
+        average: 100
+        burst: 150
+        period: 1m
+
+    # Gallery rate limit: 200 req/min (high traffic)
+    rate-limit-gallery:
+      rateLimit:
+        average: 200
+        burst: 300
+        period: 1m
+
+    # Upload rate limit: 50 req/min
+    rate-limit-upload:
+      rateLimit:
+        average: 50
+        burst: 75
+        period: 1m
+
+    # Auth rate limit: 5 req/15min (prevent brute force)
+    rate-limit-auth:
+      rateLimit:
+        average: 5
+        burst: 10
+        period: 15m
+
+    # Website rate limit: 500 req/min (higher for public marketing site)
+    rate-limit-website:
+      rateLimit:
+        average: 500
+        burst: 750
+        period: 1m
+
+    # Redirect to www middleware
+    redirect-www:
+      redirectRegex:
+        regex: "^https://vdrive.io/(.*)"
+        replacement: "https://www.vdrive.io/${1}"
+        permanent: true
+
+    # CORS Headers
+    cors-headers:
+      headers:
+        accessControlAllowMethods:
+          - GET
+          - POST
+          - PUT
+          - PATCH
+          - DELETE
+          - OPTIONS
+        accessControlAllowHeaders:
+          - Content-Type
+          - Authorization
+          - X-Requested-With
+          - X-Request-ID
+        accessControlAllowOriginList:
+          - "https://www.vdrive.io"
+          - "https://vdrive.io"
+          - "https://app.vdrive.io"
+          - "http://localhost:5173"
+          - "http://localhost:4321"
+          - "http://localhost:3000"
+          - "https://app.vDrive.com"
+        accessControlMaxAge: 86400
+        accessControlAllowCredentials: true
+        addVaryHeader: true
+
+    # Security Headers
+    security-headers:
+      headers:
+        browserXssFilter: true
+        contentTypeNosniff: true
+        frameDeny: true
+        stsIncludeSubdomains: true
+        stsPreload: true
+        stsSeconds: 31536000
+        customFrameOptionsValue: DENY
+        referrerPolicy: strict-origin-when-cross-origin
+        customResponseHeaders:
+          X-Content-Type-Options: nosniff
+          X-Frame-Options: DENY
+
+    # Retry middleware for resilience
+    retry:
+      retry:
+        attempts: 3
+        initialInterval: 100ms
+
+    # Circuit breaker
+    circuit-breaker:
+      circuitBreaker:
+        expression: "NetworkErrorRatio() > 0.30 || ResponseCodeRatio(500, 600, 0, 600) > 0.25"
+
+# ===========================================
+# TCP (WebSocket support)
+# ===========================================
+tcp:
+  routers:
+    websocket:
+      rule: "HostSNI(`*`)"
+      service: gallery-websocket
+      entryPoints:
+        - websecure
+
+  services:
+    gallery-websocket:
+      loadBalancer:
+        servers:
+          - address: "gallery-service:8004"

@@ -1,0 +1,106 @@
+# ===========================================
+# Traefik v3 Static Configuration
+# ===========================================
+# vDrive API Gateway
+
+# Global settings
+global:
+  checkNewVersion: false
+  sendAnonymousUsage: false
+
+# API and Dashboard
+api:
+  dashboard: true
+  insecure: true  # Set to false in production
+
+# Ping (Health Check)
+ping:
+  entryPoint: traefik
+
+# Logging
+log:
+  level: INFO
+  format: json
+
+accessLog:
+  format: json
+  filters:
+    statusCodes:
+      - "200-299"
+      - "400-599"
+  fields:
+    defaultMode: keep
+    names:
+      ClientUsername: drop
+    headers:
+      defaultMode: keep
+      names:
+        User-Agent: keep
+        Authorization: drop
+        Content-Type: keep
+
+# Entry Points
+entryPoints:
+  web:
+    address: ":80"
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+          permanent: true
+
+  websecure:
+    address: ":443"
+    http:
+      tls:
+        certResolver: letsencrypt
+
+  traefik:
+    address: ":8080"
+
+  metrics:
+    address: ":8082"
+
+# Providers
+providers:
+  docker:
+    endpoint: "unix:///var/run/docker.sock"
+    exposedByDefault: false
+    network: vDrive-network
+    watch: true
+
+  file:
+    filename: /etc/traefik/dynamic.yaml
+    watch: true
+
+# Certificate Resolvers (Let's Encrypt)
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      email: admin@yourdomain.com  # Change this
+      storage: /letsencrypt/acme.json
+      httpChallenge:
+        entryPoint: web
+
+# Metrics (Prometheus)
+metrics:
+  prometheus:
+    entryPoint: metrics
+    addEntryPointsLabels: true
+    addRoutersLabels: true
+    addServicesLabels: true
+    buckets:
+      - 0.1
+      - 0.3
+      - 0.5
+      - 1.0
+      - 2.5
+      - 5.0
+      - 10.0
+
+# Tracing (optional - uncomment for Jaeger/Tempo)
+# tracing:
+#   jaeger:
+#     samplingServerURL: http://jaeger:5778/sampling
+#     localAgentHostPort: jaeger:6831

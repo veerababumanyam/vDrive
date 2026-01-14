@@ -1,0 +1,228 @@
+# API Contract: Login Endpoint
+# POST /api/v1/onboarding/login
+# Email/password authentication with OAuth2 Password Grant
+
+openapi: 3.1.0
+info:
+  title: Login API
+  version: 1.0.0
+
+paths:
+  /api/v1/onboarding/login:
+    post:
+      operationId: login
+      summary: Authenticate user with email and password
+      description: |
+        OAuth2 Password Grant flow. Returns access token in JSON body,
+        sets refresh token as HttpOnly Secure cookie.
+
+        Rate limited to 5 attempts per IP per 15 minutes.
+        Account locked after 5 consecutive failed attempts for 30 minutes.
+      tags:
+        - authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+            examples:
+              standard:
+                summary: Standard login
+                value:
+                  email: "photographer@example.com"
+                  password: "SecureP@ss123!"
+                  turnstile_token: "0.abc123..."
+                  remember_me: false
+              remember_me:
+                summary: Login with remember me
+                value:
+                  email: "photographer@example.com"
+                  password: "SecureP@ss123!"
+                  turnstile_token: "0.abc123..."
+                  remember_me: true
+      responses:
+        '200':
+          description: Login successful
+          headers:
+            Set-Cookie:
+              description: HttpOnly Secure refresh token cookie
+              schema:
+                type: string
+                example: "refresh_token=eyJ...; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=604800"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '400':
+          description: Invalid request (missing fields, invalid format)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "validation_error"
+                message: "Invalid email format"
+                details:
+                  - field: "email"
+                    message: "Must be a valid email address"
+        '401':
+          description: Authentication failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalid_credentials:
+                  summary: Wrong email or password
+                  value:
+                    error: "invalid_credentials"
+                    message: "Invalid email or password"
+                unverified_email:
+                  summary: Email not verified
+                  value:
+                    error: "email_not_verified"
+                    message: "Please verify your email address before signing in"
+                account_disabled:
+                  summary: Account suspended
+                  value:
+                    error: "account_disabled"
+                    message: "Your account has been suspended. Please contact support."
+        '403':
+          description: Account locked
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "account_locked"
+                message: "Account temporarily locked due to too many failed attempts"
+                details:
+                  locked_until: "2026-01-14T11:30:00Z"
+                  retry_after_seconds: 1800
+        '429':
+          description: Rate limit exceeded
+          headers:
+            Retry-After:
+              description: Seconds until rate limit resets
+              schema:
+                type: integer
+                example: 900
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "rate_limit_exceeded"
+                message: "Too many login attempts. Please try again later."
+                details:
+                  retry_after_seconds: 900
+
+components:
+  schemas:
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+        - turnstile_token
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 255
+          description: User's email address
+          example: "photographer@example.com"
+        password:
+          type: string
+          minLength: 8
+          maxLength: 128
+          description: User's password
+          example: "SecureP@ss123!"
+        turnstile_token:
+          type: string
+          description: Cloudflare Turnstile verification token
+          example: "0.abc123..."
+        remember_me:
+          type: boolean
+          default: false
+          description: |
+            If true, refresh token expiry extends to 30 days.
+            Default is 7 days.
+
+    LoginResponse:
+      type: object
+      required:
+        - access_token
+        - token_type
+        - expires_in
+        - user
+      properties:
+        access_token:
+          type: string
+          description: JWT access token (15-minute expiry)
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        token_type:
+          type: string
+          enum: [bearer]
+          description: Token type (always "bearer")
+          example: "bearer"
+        expires_in:
+          type: integer
+          description: Token expiry in seconds
+          example: 900
+        user:
+          $ref: '#/components/schemas/UserInfo'
+
+    UserInfo:
+      type: object
+      required:
+        - id
+        - email
+        - first_name
+        - last_name
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: User's unique identifier
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        email:
+          type: string
+          format: email
+          description: User's email address
+          example: "photographer@example.com"
+        first_name:
+          type: string
+          description: User's first name
+          example: "John"
+        last_name:
+          type: string
+          description: User's last name
+          example: "Photographer"
+        workspace_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: IDs of workspaces user has access to
+          example: ["ws-uuid-1", "ws-uuid-2"]
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+        - message
+      properties:
+        error:
+          type: string
+          description: Error code
+          example: "invalid_credentials"
+        message:
+          type: string
+          description: Human-readable error message
+          example: "Invalid email or password"
+        details:
+          type: object
+          additionalProperties: true
+          description: Additional error context

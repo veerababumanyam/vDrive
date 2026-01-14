@@ -1,0 +1,102 @@
+# ===========================================
+# Gallery Service Deployment
+# ===========================================
+# High-performance gallery viewing, Magic Links, WebSocket proofing
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gallery-service
+  namespace: vDrive
+  labels:
+    app: gallery-service
+    app.kubernetes.io/name: gallery-service
+    app.kubernetes.io/component: api
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: gallery-service
+  template:
+    metadata:
+      labels:
+        app: gallery-service
+        app.kubernetes.io/name: gallery-service
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8004"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: vDrive-service
+      containers:
+        - name: gallery-service
+          image: ghcr.io/vDrive/gallery-service:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8004
+              name: http
+          envFrom:
+            - configMapRef:
+                name: vDrive-config
+            - secretRef:
+                name: vDrive-secrets
+          env:
+            - name: SERVICE_NAME
+              value: "gallery-service"
+            - name: PORT
+              value: "8004"
+            # Gallery-specific config
+            - name: SIGNED_URL_TTL_SECONDS
+              value: "14400"  # 4 hours
+            - name: LQIP_ENABLED
+              value: "true"
+            - name: WEBSOCKET_ENABLED
+              value: "true"
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "1000m"
+              memory: "2Gi"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+      imagePullSecrets:
+        - name: vDrive-registry
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app: gallery-service
+                topologyKey: kubernetes.io/hostname
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gallery-service
+  namespace: vDrive
+  labels:
+    app: gallery-service
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8004
+      targetPort: 8004
+      protocol: TCP
+      name: http
+  selector:
+    app: gallery-service

@@ -1,0 +1,134 @@
+# ===========================================
+# PostgreSQL 16 StatefulSet with pgvector
+# ===========================================
+# Data persists across pod restarts via PVC
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+  namespace: vDrive
+  labels:
+    app: postgres
+    app.kubernetes.io/name: postgres
+    app.kubernetes.io/component: database
+spec:
+  serviceName: postgres
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+        app.kubernetes.io/name: postgres
+    spec:
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: postgres
+          image: timescale/timescaledb-ha:pg16
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5432
+              name: postgres
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: username
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: password
+            - name: POSTGRES_DB
+              value: vDrive
+            - name: PGDATA
+              value: /home/postgres/pgdata/data
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "1Gi"
+            limits:
+              cpu: "2000m"
+              memory: "4Gi"
+          volumeMounts:
+            - name: postgres-data
+              mountPath: /home/postgres/pgdata
+            - name: postgres-init
+              mountPath: /docker-entrypoint-initdb.d
+          livenessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - $(POSTGRES_USER)
+                - -d
+                - vDrive
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 6
+          readinessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - $(POSTGRES_USER)
+                - -d
+                - vDrive
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+      volumes:
+        - name: postgres-init
+          configMap:
+            name: postgres-init-scripts
+  # PersistentVolumeClaim template - DATA PERSISTS HERE
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-data
+        labels:
+          app: postgres
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        storageClassName: standard  # Change based on your cluster
+        resources:
+          requests:
+            storage: 50Gi
+---
+# Secret for PostgreSQL credentials
+apiVersion: v1
+kind: Secret
+metadata:
+  name: postgres-secret
+  namespace: vDrive
+type: Opaque
+stringData:
+  username: vDrive
+  password: changeme_in_production  # CHANGE THIS!
+---
+# ConfigMap for init scripts
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-init-scripts
+  namespace: vDrive
+data:
+  init-db.sql: |
+    -- Enable required extensions
+    CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+    CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+    CREATE EXTENSION IF NOT EXISTS "pg_trgm";
+    CREATE EXTENSION IF NOT EXISTS "vector";
+
+    -- Create schemas
+    CREATE SCHEMA IF NOT EXISTS app;
+    CREATE SCHEMA IF NOT EXISTS audit;
+
+    -- Grant permissions
+    GRANT ALL ON SCHEMA app TO vDrive;
+    GRANT ALL ON SCHEMA audit TO vDrive;

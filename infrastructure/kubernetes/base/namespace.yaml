@@ -1,0 +1,41 @@
+# ===========================================
+# vDrive Kubernetes Namespace
+# ===========================================
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: vDrive
+  labels:
+    app.kubernetes.io/name: vDrive
+    app.kubernetes.io/part-of: vDrive-platform
+---
+# Resource Quota for the namespace
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: vDrive-quota
+  namespace: vDrive
+spec:
+  hard:
+    requests.cpu: "20"
+    requests.memory: 40Gi
+    limits.cpu: "40"
+    limits.memory: 80Gi
+    persistentvolumeclaims: "20"
+    services.loadbalancers: "5"
+---
+# Limit Range for default resource limits
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: vDrive-limit-range
+  namespace: vDrive
+spec:
+  limits:
+    - default:
+        cpu: "500m"
+        memory: "512Mi"
+      defaultRequest:
+        cpu: "100m"
+        memory: "128Mi"
+      type: Container

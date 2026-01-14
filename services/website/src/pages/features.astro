@@ -1,0 +1,165 @@
+---
+import BaseLayout from '@/components/layout/BaseLayout.astro';
+import CTASection from '@/components/landing/CTASection.astro';
+import JsonLd from '@/components/seo/JsonLd.astro';
+import { generateSoftwareApplicationSchema, generateBreadcrumbSchema } from '@/utils/schema';
+
+const APP_URL = import.meta.env.APP_URL || 'https://app.vdrive.io';
+
+// JSON-LD schemas for features page
+const schemas = [
+  generateSoftwareApplicationSchema(),
+  generateBreadcrumbSchema([
+    { name: 'Home', url: '/' },
+    { name: 'Features' },
+  ]),
+];
+
+const featureCategories = [
+  {
+    title: 'Photo Management',
+    description: 'Powerful tools to organize and manage your photo library.',
+    features: [
+      {
+        name: 'AI-Powered Tagging',
+        description: 'Automatically tag photos with scenes, objects, and colors. Find any photo in seconds.',
+        icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />`,
+      },
+      {
+        name: 'Face Recognition',
+        description: 'Identify and group people across thousands of photos. Let clients find themselves instantly.',
+        icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />`,
+      },
+      {
+        name: 'Smart Albums',
+        description: 'Create albums that automatically update based on tags, dates, or faces.',
+        icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />`,
+      },
+      {
+        name: 'Batch Operations',
+        description: 'Edit metadata, move, copy, or delete hundreds of photos at once.',
+        icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4" />`,
+      },
+    ],
+  },
+  {
+    title: 'Client Galleries',
+    description: 'Beautiful galleries that impress your clients and make delivery easy.',
+    features: [
+      {
+        name: 'Customizable Themes',
+        description: 'Choose from multiple gallery layouts and customize colors to match your brand.',
+        icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />`,
+      },
+      {
+        name: 'Magic Links',
+        description: 'Share galleries with a single link. Optional password protection for privacy.',
+        icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />`,
+      },
+      {
+        name: 'Client Proofing',
+        description: 'Let clients select favorites, leave comments, and approve photos for print.',
+        icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />`,
+      },
+      {
+        name: 'Download Control',
+        description: 'Set download permissions per gallery. Full-resolution, web-quality, or no downloads.',
+        icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />`,
+      },
+    ],
+  },
+  {
+    title: 'Business Tools',
+    description: 'Everything you need to run your photography business.',
+    features: [
+      {
+        name: 'Team Collaboration',
+        description: 'Invite editors, assistants, and second shooters. Control access with roles.',
+        icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />`,
+      },
+      {
+        name: 'Digital Invitations',
+        description: 'Create beautiful event invitations with RSVP tracking and guest management.',
+        icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />`,
+      },
+      {
+        name: 'Analytics Dashboard',
+        description: 'Track gallery views, downloads, and client engagement. Know what resonates.',
+        icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />`,
+      },
+      {
+        name: 'Webhooks & API',
+        description: 'Automate your workflow with webhooks and REST API for custom integrations.',
+        icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />`,
+      },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title="Features"
+  description="Explore all the powerful features that make vDrive the best photography platform for professionals. AI-powered tagging, face recognition, client galleries, and more."
+>
+  <JsonLd slot="head" schema={schemas} />
+  <!-- Hero -->
+  <section class="section bg-gradient-to-b from-primary-50 to-white dark:from-neutral-900 dark:to-neutral-950">
+    <div class="container-lg">
+      <div class="mx-auto max-w-3xl text-center">
+        <span class="badge badge-primary">Features</span>
+        <h1 class="mt-4 text-4xl font-bold tracking-tight text-neutral-900 dark:text-white sm:text-5xl">
+          Everything you need to run your photography business
+        </h1>
+        <p class="mt-6 text-lg text-neutral-600 dark:text-neutral-400">
+          From intelligent photo management to stunning client galleries, vDrive has all the tools
+          professional photographers need to save time and impress clients.
+        </p>
+        <div class="mt-10">
+          <a href={`${APP_URL}/sign-up`} class="btn btn-primary btn-lg">
+            Start Free Trial
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Feature Categories -->
+  {featureCategories.map((category, index) => (
+    <section class={`section ${index % 2 === 0 ? 'bg-white dark:bg-neutral-950' : 'bg-neutral-50 dark:bg-neutral-900'}`}>
+      <div class="container-lg">
+        <div class="mx-auto max-w-2xl text-center">
+          <h2 class="text-3xl font-bold tracking-tight text-neutral-900 dark:text-white">
+            {category.title}
+          </h2>
+          <p class="mt-4 text-lg text-neutral-600 dark:text-neutral-400">
+            {category.description}
+          </p>
+        </div>
+
+        <div class="mt-16 grid gap-8 sm:grid-cols-2">
+          {category.features.map((feature) => (
+            <div class="flex gap-4">
+              <div class="flex-shrink-0">
+                <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-primary-100 text-primary-600 dark:bg-primary-900/30 dark:text-primary-400">
+                  <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <Fragment set:html={feature.icon} />
+                  </svg>
+                </div>
+              </div>
+              <div>
+                <h3 class="text-lg font-semibold text-neutral-900 dark:text-white">
+                  {feature.name}
+                </h3>
+                <p class="mt-2 text-neutral-600 dark:text-neutral-400">
+                  {feature.description}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  ))}
+
+  <CTASection />
+</BaseLayout>

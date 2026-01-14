@@ -1,0 +1,154 @@
+# ===========================================
+# Prometheus Configuration
+# ===========================================
+# vDrive Metrics Collection
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: vDrive
+    env: production
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - alertmanager:9093
+
+# Rule files
+rule_files:
+  - /etc/prometheus/alerts.yaml
+
+# Scrape configurations
+scrape_configs:
+  # ===========================================
+  # Prometheus self-monitoring
+  # ===========================================
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+    metrics_path: /metrics
+
+  # ===========================================
+  # Traefik API Gateway
+  # ===========================================
+  - job_name: 'traefik'
+    static_configs:
+      - targets: ['traefik:8082']
+    metrics_path: /metrics
+
+  # ===========================================
+  # PostgreSQL Exporter
+  # ===========================================
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['postgres-exporter:9187']
+    metrics_path: /metrics
+
+  # ===========================================
+  # Redis Exporter
+  # ===========================================
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis-exporter:9121']
+    metrics_path: /metrics
+
+  # ===========================================
+  # Kafka Exporter
+  # ===========================================
+  - job_name: 'kafka'
+    static_configs:
+      - targets: ['kafka-exporter:9308']
+    metrics_path: /metrics
+
+  # ===========================================
+  # Backend Service
+  # ===========================================
+  - job_name: 'backend'
+    static_configs:
+      - targets: ['backend:8000']
+    metrics_path: /metrics
+    scrape_interval: 15s
+
+  # ===========================================
+  # Gallery Service
+  # ===========================================
+  - job_name: 'gallery-service'
+    static_configs:
+      - targets: ['gallery-service:8004']
+    metrics_path: /metrics
+    scrape_interval: 15s
+
+  # ===========================================
+  # Billing Service
+  # ===========================================
+  - job_name: 'billing-service'
+    static_configs:
+      - targets: ['billing-service:8005']
+    metrics_path: /metrics
+
+  # ===========================================
+  # Upload Service
+  # ===========================================
+  - job_name: 'upload-service'
+    static_configs:
+      - targets: ['upload-service:8008']
+    metrics_path: /metrics
+
+  # ===========================================
+  # Face Service
+  # ===========================================
+  - job_name: 'face-service'
+    static_configs:
+      - targets: ['face-service:8002']
+    metrics_path: /metrics
+
+  # ===========================================
+  # Webhooks Service
+  # ===========================================
+  - job_name: 'webhooks-service'
+    static_configs:
+      - targets: ['webhooks-service:8003']
+    metrics_path: /metrics
+
+  # ===========================================
+  # Onboarding Service
+  # ===========================================
+  - job_name: 'onboarding-service'
+    static_configs:
+      - targets: ['onboarding-service:8006']
+    metrics_path: /metrics
+
+  # ===========================================
+  # Invitations Service
+  # ===========================================
+  - job_name: 'invitations-service'
+    static_configs:
+      - targets: ['invitations-service:8007']
+    metrics_path: /metrics
+
+  # ===========================================
+  # Notifications Service
+  # ===========================================
+  - job_name: 'notifications-service'
+    static_configs:
+      - targets: ['notifications-service:8010']
+    metrics_path: /metrics
+
+  # ===========================================
+  # Docker containers (via cAdvisor if deployed)
+  # ===========================================
+  # - job_name: 'cadvisor'
+  #   static_configs:
+  #     - targets: ['cadvisor:8080']
+  #   metrics_path: /metrics
+
+  # ===========================================
+  # Node Exporter (host metrics)
+  # ===========================================
+  # - job_name: 'node'
+  #   static_configs:
+  #     - targets: ['node-exporter:9100']
+  #   metrics_path: /metrics

@@ -1,0 +1,234 @@
+# ===========================================
+# Celery Workers Deployment
+# ===========================================
+# Background task processing
+
+# Celery Worker - General Tasks
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: celery-worker
+  namespace: vDrive
+  labels:
+    app: celery-worker
+    app.kubernetes.io/name: celery-worker
+    app.kubernetes.io/component: worker
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: celery-worker
+  template:
+    metadata:
+      labels:
+        app: celery-worker
+        app.kubernetes.io/name: celery-worker
+    spec:
+      serviceAccountName: vDrive-service
+      containers:
+        - name: celery-worker
+          image: ghcr.io/vDrive/backend:latest
+          imagePullPolicy: Always
+          command: ["celery"]
+          args:
+            - "-A"
+            - "app.workers.celery_app"
+            - "worker"
+            - "--loglevel=INFO"
+            - "--concurrency=4"
+            - "-Q"
+            - "default,thumbnails,notifications"
+          envFrom:
+            - configMapRef:
+                name: vDrive-config
+            - secretRef:
+                name: vDrive-secrets
+          env:
+            - name: SERVICE_NAME
+              value: "celery-worker"
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "1000m"
+              memory: "2Gi"
+          livenessProbe:
+            exec:
+              command:
+                - celery
+                - "-A"
+                - "app.workers.celery_app"
+                - "inspect"
+                - "ping"
+                - "-d"
+                - "celery@$HOSTNAME"
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 10
+      imagePullSecrets:
+        - name: vDrive-registry
+---
+# Celery Worker - AI/ML Tasks (heavier workloads)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: celery-worker-ai
+  namespace: vDrive
+  labels:
+    app: celery-worker-ai
+    app.kubernetes.io/name: celery-worker-ai
+    app.kubernetes.io/component: worker
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: celery-worker-ai
+  template:
+    metadata:
+      labels:
+        app: celery-worker-ai
+        app.kubernetes.io/name: celery-worker-ai
+    spec:
+      serviceAccountName: vDrive-service
+      containers:
+        - name: celery-worker-ai
+          image: ghcr.io/vDrive/backend:latest
+          imagePullPolicy: Always
+          command: ["celery"]
+          args:
+            - "-A"
+            - "app.workers.celery_app"
+            - "worker"
+            - "--loglevel=INFO"
+            - "--concurrency=2"
+            - "-Q"
+            - "ai,face_detection,smart_curate"
+          envFrom:
+            - configMapRef:
+                name: vDrive-config
+            - secretRef:
+                name: vDrive-secrets
+          env:
+            - name: SERVICE_NAME
+              value: "celery-worker-ai"
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "1Gi"
+            limits:
+              cpu: "2000m"
+              memory: "4Gi"
+      imagePullSecrets:
+        - name: vDrive-registry
+---
+# Celery Beat - Scheduled Tasks
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: celery-beat
+  namespace: vDrive
+  labels:
+    app: celery-beat
+    app.kubernetes.io/name: celery-beat
+    app.kubernetes.io/component: scheduler
+spec:
+  replicas: 1  # Only 1 beat scheduler
+  selector:
+    matchLabels:
+      app: celery-beat
+  template:
+    metadata:
+      labels:
+        app: celery-beat
+        app.kubernetes.io/name: celery-beat
+    spec:
+      serviceAccountName: vDrive-service
+      containers:
+        - name: celery-beat
+          image: ghcr.io/vDrive/backend:latest
+          imagePullPolicy: Always
+          command: ["celery"]
+          args:
+            - "-A"
+            - "app.workers.celery_app"
+            - "beat"
+            - "--loglevel=INFO"
+          envFrom:
+            - configMapRef:
+                name: vDrive-config
+            - secretRef:
+                name: vDrive-secrets
+          env:
+            - name: SERVICE_NAME
+              value: "celery-beat"
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "128Mi"
+            limits:
+              cpu: "200m"
+              memory: "256Mi"
+      imagePullSecrets:
+        - name: vDrive-registry
+---
+# Flower - Celery Monitoring Dashboard
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flower
+  namespace: vDrive
+  labels:
+    app: flower
+    app.kubernetes.io/name: flower
+    app.kubernetes.io/component: monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: flower
+  template:
+    metadata:
+      labels:
+        app: flower
+        app.kubernetes.io/name: flower
+    spec:
+      containers:
+        - name: flower
+          image: mher/flower:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 5555
+              name: http
+          env:
+            - name: CELERY_BROKER_URL
+              value: "redis://redis:6379/1"
+            - name: FLOWER_PORT
+              value: "5555"
+            - name: FLOWER_BASIC_AUTH
+              valueFrom:
+                secretKeyRef:
+                  name: vDrive-secrets
+                  key: FLOWER_AUTH
+                  optional: true
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "128Mi"
+            limits:
+              cpu: "200m"
+              memory: "256Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: flower
+  namespace: vDrive
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5555
+      targetPort: 5555
+      name: http
+  selector:
+    app: flower

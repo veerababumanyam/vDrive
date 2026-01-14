@@ -1,0 +1,80 @@
+# ===========================================
+# vDrive Kubernetes Kustomization (Complete)
+# ===========================================
+# Usage: kubectl apply -k infrastructure/kubernetes/overlays/dev
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+metadata:
+  name: vDrive-platform
+
+# All resources in deployment order
+resources:
+  # 1. Namespace and RBAC
+  - base/namespace.yaml
+
+  # 2. Configuration
+  - base/config/configmap.yaml
+  - base/config/secrets.yaml
+
+  # 3. Data Layer
+  - base/postgres/statefulset.yaml
+  - base/postgres/service.yaml
+  - base/redis/deployment.yaml
+  - base/redis/service.yaml
+
+  # 4. Message Queue
+  - base/kafka/kafka.yaml
+
+  # 5. API Gateway
+  - base/traefik/rbac.yaml
+  - base/traefik/deployment.yaml
+  - base/traefik/ingressroutes.yaml
+
+  # 6. Core Services
+  - base/services/backend/deployment.yaml
+  - base/services/gallery-service/deployment.yaml
+  - base/services/billing-service/deployment.yaml
+  - base/services/upload-service/deployment.yaml
+  - base/services/face-service/deployment.yaml
+  - base/services/webhooks-service/deployment.yaml
+  - base/services/onboarding-service/deployment.yaml
+  - base/services/invitations-service/deployment.yaml
+  - base/services/notifications-service/deployment.yaml
+
+  # 7. Background Workers
+  - base/services/celery/deployment.yaml
+
+  # 8. Autoscaling (KEDA)
+  - base/keda/scaledobjects.yaml
+
+# Common labels for all resources
+commonLabels:
+  app.kubernetes.io/part-of: vDrive-platform
+  app.kubernetes.io/managed-by: kustomize
+  app.kubernetes.io/version: "0.3.2"
+
+# Default namespace
+namespace: vDrive
+
+# Image customization (can be overridden in overlays)
+images:
+  - name: ghcr.io/vDrive/backend
+    newTag: latest
+  - name: ghcr.io/vDrive/gallery-service
+    newTag: latest
+  - name: ghcr.io/vDrive/billing-service
+    newTag: latest
+  - name: ghcr.io/vDrive/upload-service
+    newTag: latest
+  - name: ghcr.io/vDrive/face-service
+    newTag: latest
+  - name: ghcr.io/vDrive/webhooks-service
+    newTag: latest
+  - name: ghcr.io/vDrive/onboarding-service
+    newTag: latest
+  - name: ghcr.io/vDrive/invitations-service
+    newTag: latest
+  - name: ghcr.io/vDrive/notifications-service
+    newTag: latest

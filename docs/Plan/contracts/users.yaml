@@ -1,0 +1,797 @@
+openapi: 3.1.0
+info:
+  title: vDrive Users API
+  description: User profile and settings management
+  version: 1.0.0
+  contact:
+    name: vDrive API Support
+    email: api@vdrive.io
+
+servers:
+  - url: https://app.vdrive.io/api/v1
+    description: Production
+  - url: http://localhost:8000/api/v1
+    description: Local development
+
+tags:
+  - name: Profile
+    description: User profile management
+  - name: Settings
+    description: User settings and preferences
+  - name: MFA
+    description: Multi-factor authentication
+  - name: Sessions
+    description: Session management
+
+paths:
+  /users/me:
+    get:
+      tags:
+        - Profile
+      summary: Get current user
+      description: Get the authenticated user's profile
+      operationId: getCurrentUser
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: User profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    patch:
+      tags:
+        - Profile
+      summary: Update profile
+      description: Update the authenticated user's profile
+      operationId: updateProfile
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfileUpdateRequest'
+      responses:
+        '200':
+          description: Profile updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+    delete:
+      tags:
+        - Profile
+      summary: Delete account
+      description: Permanently delete user account and all data
+      operationId: deleteAccount
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeleteAccountRequest'
+      responses:
+        '204':
+          description: Account deleted
+        '400':
+          description: Active subscription exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /users/me/avatar:
+    post:
+      tags:
+        - Profile
+      summary: Upload avatar
+      description: Upload a new profile avatar
+      operationId: uploadAvatar
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                avatar:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Avatar uploaded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AvatarResponse'
+        '400':
+          description: Invalid image
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    delete:
+      tags:
+        - Profile
+      summary: Remove avatar
+      description: Remove profile avatar
+      operationId: removeAvatar
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: Avatar removed
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /users/me/settings:
+    get:
+      tags:
+        - Settings
+      summary: Get settings
+      description: Get user preferences and settings
+      operationId: getSettings
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: User settings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SettingsResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    patch:
+      tags:
+        - Settings
+      summary: Update settings
+      description: Update user preferences and settings
+      operationId: updateSettings
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SettingsUpdateRequest'
+      responses:
+        '200':
+          description: Settings updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SettingsResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /users/me/mfa:
+    get:
+      tags:
+        - MFA
+      summary: Get MFA status
+      description: Get current MFA configuration status
+      operationId: getMfaStatus
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: MFA status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MfaStatusResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /users/me/mfa/enable:
+    post:
+      tags:
+        - MFA
+      summary: Enable MFA
+      description: Start MFA setup process
+      operationId: enableMfa
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: MFA setup initiated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MfaSetupResponse'
+        '400':
+          description: MFA already enabled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /users/me/mfa/verify:
+    post:
+      tags:
+        - MFA
+      summary: Verify MFA setup
+      description: Verify TOTP code to complete MFA setup
+      operationId: verifyMfaSetup
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MfaVerifyRequest'
+      responses:
+        '200':
+          description: MFA enabled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MfaEnabledResponse'
+        '400':
+          description: Invalid TOTP code
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /users/me/mfa/disable:
+    post:
+      tags:
+        - MFA
+      summary: Disable MFA
+      description: Disable MFA (requires password verification)
+      operationId: disableMfa
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MfaDisableRequest'
+      responses:
+        '200':
+          description: MFA disabled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '400':
+          description: Invalid password or TOTP code
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /users/me/mfa/backup-codes:
+    get:
+      tags:
+        - MFA
+      summary: Get backup codes
+      description: Generate new backup codes (invalidates existing)
+      operationId: getBackupCodes
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BackupCodesRequest'
+      responses:
+        '200':
+          description: Backup codes generated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BackupCodesResponse'
+        '400':
+          description: MFA not enabled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /users/me/sessions:
+    get:
+      tags:
+        - Sessions
+      summary: List sessions
+      description: Get all active sessions for the user
+      operationId: listSessions
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Active sessions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /users/me/sessions/{sessionId}:
+    delete:
+      tags:
+        - Sessions
+      summary: Revoke session
+      description: Revoke a specific session
+      operationId: revokeSession
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Session revoked
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /users/me/export:
+    post:
+      tags:
+        - Profile
+      summary: Export data
+      description: Request export of all user data (GDPR compliance)
+      operationId: exportUserData
+      security:
+        - bearerAuth: []
+      responses:
+        '202':
+          description: Export initiated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExportResponse'
+        '429':
+          description: Export already in progress
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /users/me/export/{exportId}:
+    get:
+      tags:
+        - Profile
+      summary: Get export status
+      description: Check status of data export request
+      operationId: getExportStatus
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: exportId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Export status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExportStatusResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    Unauthorized:
+      description: Authentication required
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    ValidationError:
+      description: Validation error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ValidationErrorResponse'
+
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        email_verified:
+          type: boolean
+        first_name:
+          type: string
+        last_name:
+          type: string
+        display_name:
+          type: string
+          nullable: true
+        avatar_url:
+          type: string
+          format: uri
+          nullable: true
+        bio:
+          type: string
+          nullable: true
+        phone:
+          type: string
+          nullable: true
+        status:
+          type: string
+          enum: [active, suspended, pending_verification]
+        mfa_enabled:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    UserResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/User'
+
+    ProfileUpdateRequest:
+      type: object
+      properties:
+        first_name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        last_name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        display_name:
+          type: string
+          maxLength: 200
+        bio:
+          type: string
+          maxLength: 1000
+        phone:
+          type: string
+          maxLength: 20
+
+    DeleteAccountRequest:
+      type: object
+      required:
+        - password
+        - confirmation
+      properties:
+        password:
+          type: string
+        confirmation:
+          type: string
+          const: DELETE MY ACCOUNT
+          description: Must be exactly "DELETE MY ACCOUNT"
+
+    AvatarResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            avatar_url:
+              type: string
+              format: uri
+
+    Settings:
+      type: object
+      properties:
+        timezone:
+          type: string
+          default: UTC
+        language:
+          type: string
+          default: en
+        date_format:
+          type: string
+          enum: [YYYY-MM-DD, MM/DD/YYYY, DD/MM/YYYY]
+          default: YYYY-MM-DD
+        theme:
+          type: string
+          enum: [light, dark, system]
+          default: system
+        email_notifications:
+          type: boolean
+          default: true
+        push_notifications:
+          type: boolean
+          default: true
+        marketing_emails:
+          type: boolean
+          default: false
+
+    SettingsResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Settings'
+
+    SettingsUpdateRequest:
+      type: object
+      properties:
+        timezone:
+          type: string
+        language:
+          type: string
+        date_format:
+          type: string
+          enum: [YYYY-MM-DD, MM/DD/YYYY, DD/MM/YYYY]
+        theme:
+          type: string
+          enum: [light, dark, system]
+        email_notifications:
+          type: boolean
+        push_notifications:
+          type: boolean
+        marketing_emails:
+          type: boolean
+
+    MfaStatusResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            enabled:
+              type: boolean
+            type:
+              type: string
+              enum: [totp]
+              nullable: true
+            backup_codes_remaining:
+              type: integer
+              nullable: true
+
+    MfaSetupResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            secret:
+              type: string
+              description: TOTP secret (base32 encoded)
+            qr_code_url:
+              type: string
+              format: uri
+              description: URL for QR code image
+            manual_entry_key:
+              type: string
+              description: Key for manual entry in authenticator app
+
+    MfaVerifyRequest:
+      type: object
+      required:
+        - code
+      properties:
+        code:
+          type: string
+          minLength: 6
+          maxLength: 6
+          pattern: "^[0-9]{6}$"
+
+    MfaEnabledResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            enabled:
+              type: boolean
+            backup_codes:
+              type: array
+              items:
+                type: string
+              description: One-time backup codes (shown only once)
+
+    MfaDisableRequest:
+      type: object
+      required:
+        - password
+        - code
+      properties:
+        password:
+          type: string
+        code:
+          type: string
+          minLength: 6
+          maxLength: 6
+          description: Current TOTP code
+
+    BackupCodesRequest:
+      type: object
+      required:
+        - password
+      properties:
+        password:
+          type: string
+
+    BackupCodesResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            codes:
+              type: array
+              items:
+                type: string
+              description: New backup codes (previous codes invalidated)
+
+    Session:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        ip_address:
+          type: string
+        user_agent:
+          type: string
+        device_type:
+          type: string
+          enum: [desktop, mobile, tablet, unknown]
+        location:
+          type: string
+          nullable: true
+        is_current:
+          type: boolean
+        last_active_at:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+
+    SessionListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Session'
+
+    ExportResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            export_id:
+              type: string
+              format: uuid
+            status:
+              type: string
+              enum: [pending]
+            estimated_time_minutes:
+              type: integer
+
+    ExportStatusResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            export_id:
+              type: string
+              format: uuid
+            status:
+              type: string
+              enum: [pending, processing, completed, failed]
+            download_url:
+              type: string
+              format: uri
+              nullable: true
+              description: Available when status is completed
+            expires_at:
+              type: string
+              format: date-time
+              nullable: true
+            error_message:
+              type: string
+              nullable: true
+
+    MessageResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            message:
+              type: string
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+
+    ValidationErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          enum: [VALIDATION_ERROR]
+        message:
+          type: string
+        details:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+              message:
+                type: string
+
+security:
+  - bearerAuth: []

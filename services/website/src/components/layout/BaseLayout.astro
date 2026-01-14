@@ -1,0 +1,136 @@
+---
+import '@/styles/global.css';
+import Header from '@/components/shared/Header.astro';
+import Footer from '@/components/shared/Footer.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  noIndex?: boolean;
+  type?: 'website' | 'article';
+  publishedTime?: Date;
+  modifiedTime?: Date;
+  author?: string;
+  tags?: string[];
+}
+
+const {
+  title,
+  description = 'Professional Photography Client Galleries Made Simple. Share, deliver, and sell your photos with AI-powered galleries. No technical skills needed.',
+  image = '/og-image.png',
+  noIndex = false,
+  type = 'website',
+  publishedTime,
+  modifiedTime,
+  author,
+  tags,
+} = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const socialImageURL = new URL(image, Astro.site);
+const fullTitle = title ? `${title} | vDrive` : 'vDrive - Professional Photography Client Galleries';
+---
+
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content={Astro.generator} />
+
+    <!-- Primary Meta Tags -->
+    <title>{fullTitle}</title>
+    <meta name="title" content={fullTitle} />
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalURL} />
+
+    {noIndex ? (
+      <meta name="robots" content="noindex, nofollow" />
+    ) : (
+      <meta name="robots" content="index, follow" />
+    )}
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content={type} />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={socialImageURL} />
+    <meta property="og:site_name" content="vDrive" />
+    <meta property="og:locale" content="en_US" />
+
+    {type === 'article' && publishedTime && (
+      <meta property="article:published_time" content={publishedTime.toISOString()} />
+    )}
+    {type === 'article' && modifiedTime && (
+      <meta property="article:modified_time" content={modifiedTime.toISOString()} />
+    )}
+    {type === 'article' && author && (
+      <meta property="article:author" content={author} />
+    )}
+    {type === 'article' && tags && tags.length > 0 && (
+      <meta property="article:tag" content={tags.join(', ')} />
+    )}
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content={canonicalURL} />
+    <meta property="twitter:title" content={fullTitle} />
+    <meta property="twitter:description" content={description} />
+    <meta property="twitter:image" content={socialImageURL} />
+    <meta property="twitter:site" content="@vdriveio" />
+    <meta property="twitter:creator" content="@vdriveio" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- JSON-LD Structured Data Slot -->
+    <slot name="head" />
+
+    <!-- Theme Script (prevents flash) -->
+    <script is:inline>
+      const getTheme = () => {
+        const stored = localStorage.getItem('theme');
+        if (stored === 'light' || stored === 'dark') {
+          return stored;
+        }
+        if (stored === 'system' || !stored) {
+          return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        return 'light';
+      };
+
+      const theme = getTheme();
+      if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    </script>
+  </head>
+  <body class="min-h-screen flex flex-col bg-white text-neutral-900 dark:bg-neutral-950 dark:text-neutral-100 transition-colors duration-200">
+    <!-- Skip to main content link for accessibility -->
+    <a
+      href="#main-content"
+      class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary-500 focus:text-white focus:rounded-lg focus:outline-none"
+    >
+      Skip to main content
+    </a>
+
+    <Header />
+    <main id="main-content" class="flex-1" role="main">
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>

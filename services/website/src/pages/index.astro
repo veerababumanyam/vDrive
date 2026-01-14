@@ -1,0 +1,36 @@
+---
+import BaseLayout from '@/components/layout/BaseLayout.astro';
+import HeroSection from '@/components/landing/HeroSection.astro';
+import FeaturesSection from '@/components/landing/FeaturesSection.astro';
+import PricingSection from '@/components/landing/PricingSection.astro';
+import FAQSection from '@/components/landing/FAQSection.astro';
+import CTASection from '@/components/landing/CTASection.astro';
+import JsonLd from '@/components/seo/JsonLd.astro';
+import {
+  generateOrganizationSchema,
+  generateWebSiteSchema,
+  generateSoftwareApplicationSchema,
+  generateFAQSchema,
+} from '@/utils/schema';
+import { faqData } from '@/data/faq';
+
+// Generate JSON-LD schemas for homepage
+const schemas = [
+  generateOrganizationSchema(),
+  generateWebSiteSchema(),
+  generateSoftwareApplicationSchema(),
+  generateFAQSchema(faqData),
+];
+---
+
+<BaseLayout
+  title="Professional Photography Client Galleries Made Simple"
+  description="Share, deliver, and sell your photos with AI-powered galleries. Manage thousands of photos, create stunning client portals, and deliver with confidence. No technical skills needed."
+>
+  <JsonLd slot="head" schema={schemas} />
+  <HeroSection />
+  <FeaturesSection />
+  <PricingSection />
+  <FAQSection />
+  <CTASection />
+</BaseLayout>

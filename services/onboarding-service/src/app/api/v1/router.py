@@ -6,6 +6,7 @@ Combines all endpoint routers under /api/v1/onboarding prefix.
 
 from fastapi import APIRouter
 
+from src.app.api.v1.auth import router as auth_router
 from src.app.api.v1.oauth import router as oauth_router
 from src.app.api.v1.onboarding import router as onboarding_router
 from src.app.api.v1.registration import router as registration_router
@@ -16,6 +17,12 @@ from src.app.api.v1.workspace import router as workspace_router
 api_router = APIRouter()
 
 # Include all sub-routers
+api_router.include_router(
+    auth_router,
+    prefix="",
+    tags=["auth"],
+)
+
 api_router.include_router(
     registration_router,
     prefix="",

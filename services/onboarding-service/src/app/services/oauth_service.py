@@ -3,6 +3,7 @@ OAuth service for Google OAuth authentication.
 """
 
 from typing import Optional, Tuple
+from urllib.parse import urlencode
 
 import httpx
 from redis.asyncio import Redis
@@ -66,7 +67,7 @@ class OAuthService:
         key = RedisKeys.oauth_state(state)
         await self.redis.setex(key, self.OAUTH_STATE_TTL, "pending")
 
-        # Build authorization URL
+        # Build authorization URL with proper URL encoding
         params = {
             "client_id": settings.GOOGLE_CLIENT_ID,
             "redirect_uri": settings.GOOGLE_REDIRECT_URI,
@@ -77,7 +78,7 @@ class OAuthService:
             "prompt": "consent",
         }
 
-        query_string = "&".join(f"{k}={v}" for k, v in params.items())
+        query_string = urlencode(params)
         return f"{self.GOOGLE_AUTH_URL}?{query_string}"
 
     async def handle_google_callback(

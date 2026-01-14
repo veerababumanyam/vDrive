@@ -1,0 +1,97 @@
+# ===========================================
+# Face Service Deployment
+# ===========================================
+# Face detection (GCV), recognition (ArcFace), "Find Me" search
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: face-service
+  namespace: vDrive
+  labels:
+    app: face-service
+    app.kubernetes.io/name: face-service
+    app.kubernetes.io/component: api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: face-service
+  template:
+    metadata:
+      labels:
+        app: face-service
+        app.kubernetes.io/name: face-service
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8002"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: vDrive-service
+      containers:
+        - name: face-service
+          image: ghcr.io/vDrive/face-service:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8002
+              name: http
+          envFrom:
+            - configMapRef:
+                name: vDrive-config
+            - secretRef:
+                name: vDrive-secrets
+          env:
+            - name: SERVICE_NAME
+              value: "face-service"
+            - name: PORT
+              value: "8002"
+            # Face service config
+            - name: FACE_DETECTION_PROVIDER
+              value: "google_cloud_vision"
+            - name: EMBEDDING_MODEL
+              value: "arcface"
+            - name: EMBEDDING_DIMENSIONS
+              value: "512"
+            - name: SIMILARITY_THRESHOLD
+              value: "0.6"
+            - name: KAFKA_TOPIC_FACE_DETECTED
+              value: "face.detected"
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "1Gi"
+            limits:
+              cpu: "2000m"
+              memory: "4Gi"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 5
+            timeoutSeconds: 3
+      imagePullSecrets:
+        - name: vDrive-registry
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: face-service
+  namespace: vDrive
+  labels:
+    app: face-service
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8002
+      targetPort: 8002
+      protocol: TCP
+      name: http
+  selector:
+    app: face-service

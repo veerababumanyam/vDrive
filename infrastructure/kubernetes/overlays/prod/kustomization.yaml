@@ -1,0 +1,124 @@
+# ===========================================
+# Production Environment Overlay
+# ===========================================
+# Usage: kubectl apply -k infrastructure/kubernetes/overlays/prod
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+metadata:
+  name: vDrive-prod
+
+resources:
+  - ../../
+
+namePrefix: prod-
+
+commonLabels:
+  environment: production
+
+# Production-grade resources
+patches:
+  # PostgreSQL - production resources
+  - patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/cpu
+        value: "1000m"
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/memory
+        value: "2Gi"
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/cpu
+        value: "4000m"
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/memory
+        value: "8Gi"
+    target:
+      kind: StatefulSet
+      name: postgres
+
+  # Redis - production resources
+  - patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/cpu
+        value: "250m"
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/memory
+        value: "512Mi"
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/cpu
+        value: "1000m"
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/memory
+        value: "2Gi"
+    target:
+      kind: Deployment
+      name: redis
+
+  # Kafka - production resources
+  - patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/cpu
+        value: "500m"
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/memory
+        value: "1Gi"
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/cpu
+        value: "2000m"
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/memory
+        value: "4Gi"
+    target:
+      kind: StatefulSet
+      name: kafka
+
+  # Traefik - HA with 3 replicas
+  - patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 3
+    target:
+      kind: Deployment
+      name: traefik
+
+  # KEDA - production scaling limits (as defined in base)
+  # Backend: 2-100
+  # Gallery: 5-50
+  # Upload: 2-50
+  # etc.
+
+  # Add pod disruption budgets for HA
+  - patch: |-
+      apiVersion: policy/v1
+      kind: PodDisruptionBudget
+      metadata:
+        name: traefik-pdb
+      spec:
+        minAvailable: 2
+        selector:
+          matchLabels:
+            app: traefik
+
+# ConfigMap for production-specific settings
+configMapGenerator:
+  - name: vDrive-config
+    literals:
+      - APP_ENV=production
+      - LOG_LEVEL=WARNING
+      - CORS_ORIGINS=https://app.vDrive.com
+
+# Production storage sizes
+# Note: Storage cannot be reduced, only increased
+# These are just annotations for documentation
+# Actual sizes are in the base volumeClaimTemplates
+
+replicas:
+  - name: postgres
+    count: 1  # Use external managed PostgreSQL in production
+  - name: redis
+    count: 1  # Use external managed Redis in production
+  - name: kafka
+    count: 3  # 3-node Kafka cluster in production
+  - name: zookeeper
+    count: 3  # 3-node Zookeeper ensemble in production

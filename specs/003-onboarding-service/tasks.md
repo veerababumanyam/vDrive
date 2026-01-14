@@ -127,14 +127,14 @@
 
 ### Frontend Implementation for User Story 1
 
-- [ ] T048 [P] [US1] Create onboarding API service with registration methods in frontend/src/services/onboarding-api.ts
-- [ ] T049 [P] [US1] Create useRegistration hook with form state and validation in frontend/src/hooks/useRegistration.ts
-- [ ] T050 [P] [US1] Create PasswordStrengthMeter component with real-time feedback in frontend/src/components/onboarding/PasswordStrengthMeter.tsx
-- [ ] T051 [US1] Create RegistrationForm component with Turnstile integration in frontend/src/components/onboarding/RegistrationForm.tsx
-- [ ] T052 [US1] Create Register page with mobile-first responsive layout in frontend/src/pages/Register.tsx
-- [ ] T053 [US1] Create VerifyEmail page for verification link handling in frontend/src/pages/VerifyEmail.tsx
-- [ ] T054 [P] [US1] Create useTheme hook with system preference detection in frontend/src/hooks/useTheme.ts
-- [ ] T055 [P] [US1] Create ThemeToggle component in frontend/src/components/onboarding/ThemeToggle.tsx
+- [x] T048 [P] [US1] Create onboarding API service with registration methods in frontend/src/services/onboarding-api.ts
+- [x] T049 [P] [US1] Create useRegistration hook with form state and validation in frontend/src/hooks/useRegistration.ts
+- [x] T050 [P] [US1] Create PasswordStrengthMeter component with real-time feedback in frontend/src/components/onboarding/PasswordStrengthMeter.tsx
+- [x] T051 [US1] Create RegistrationForm component with Turnstile integration in frontend/src/components/onboarding/RegistrationForm.tsx
+- [x] T052 [US1] Create Register page with mobile-first responsive layout in frontend/src/pages/Register.tsx
+- [x] T053 [US1] Create VerifyEmail page for verification link handling in frontend/src/pages/VerifyEmail.tsx
+- [x] T054 [P] [US1] Create useTheme hook with system preference detection in frontend/src/hooks/useTheme.ts
+- [x] T055 [P] [US1] Create ThemeToggle component in frontend/src/components/onboarding/ThemeToggle.tsx
 - [ ] T056 [US1] Write frontend tests for Register page in frontend/src/tests/Register.test.tsx
 
 **Checkpoint**: User Story 1 complete - registration and verification flow functional
@@ -166,9 +166,9 @@
 
 ### Frontend Implementation for User Story 2
 
-- [ ] T068 [P] [US2] Create GoogleOAuthButton component in frontend/src/components/onboarding/GoogleOAuthButton.tsx
-- [ ] T069 [US2] Integrate GoogleOAuthButton into RegistrationForm in frontend/src/components/onboarding/RegistrationForm.tsx
-- [ ] T070 [US2] Add OAuth callback handling to Register page in frontend/src/pages/Register.tsx
+- [x] T068 [P] [US2] Create GoogleOAuthButton component in frontend/src/components/onboarding/GoogleOAuthButton.tsx
+- [x] T069 [US2] Integrate GoogleOAuthButton into RegistrationForm in frontend/src/components/onboarding/RegistrationForm.tsx
+- [x] T070 [US2] Add OAuth callback handling to Register page in frontend/src/pages/Register.tsx
 
 **Checkpoint**: User Story 2 complete - Google OAuth signup functional
 
@@ -206,10 +206,10 @@
 
 ### Frontend Implementation for User Story 3
 
-- [ ] T088 [P] [US3] Create SlugInput component with real-time availability check in frontend/src/components/onboarding/SlugInput.tsx
-- [ ] T089 [P] [US3] Create useOnboardingState hook for wizard state in frontend/src/hooks/useOnboardingState.ts
-- [ ] T090 [US3] Create WorkspaceWizard multi-step component in frontend/src/components/onboarding/WorkspaceWizard.tsx
-- [ ] T091 [US3] Create WorkspaceSetup page with wizard integration in frontend/src/pages/WorkspaceSetup.tsx
+- [x] T088 [P] [US3] Create SlugInput component with real-time availability check in frontend/src/components/onboarding/SlugInput.tsx
+- [x] T089 [P] [US3] Create useOnboardingState hook for wizard state in frontend/src/hooks/useOnboardingState.ts
+- [x] T090 [US3] Create WorkspaceWizard multi-step component in frontend/src/components/onboarding/WorkspaceWizard.tsx
+- [x] T091 [US3] Create WorkspaceSetup page with wizard integration in frontend/src/pages/WorkspaceSetup.tsx
 - [ ] T092 [US3] Write frontend tests for WorkspaceSetup page in frontend/src/tests/WorkspaceSetup.test.tsx
 
 **Checkpoint**: User Story 3 complete - workspace initialization functional
@@ -237,8 +237,8 @@
 
 ### Frontend Implementation for User Story 4
 
-- [ ] T100 [US4] Add resend button to VerifyEmail page in frontend/src/pages/VerifyEmail.tsx
-- [ ] T101 [US4] Add expired link UI with resend option in frontend/src/pages/VerifyEmail.tsx
+- [x] T100 [US4] Add resend button to VerifyEmail page in frontend/src/pages/VerifyEmail.tsx
+- [x] T101 [US4] Add expired link UI with resend option in frontend/src/pages/VerifyEmail.tsx
 
 **Checkpoint**: User Story 4 complete - verification resend functional
 
@@ -272,9 +272,9 @@
 
 ### Frontend Implementation for User Story 5
 
-- [ ] T115 [US5] Extend useOnboardingState hook with API persistence in frontend/src/hooks/useOnboardingState.ts
-- [ ] T116 [US5] Add state restoration logic to WorkspaceWizard in frontend/src/components/onboarding/WorkspaceWizard.tsx
-- [ ] T117 [US5] Add "Continue or Start Fresh" prompt in frontend/src/pages/WorkspaceSetup.tsx
+- [x] T115 [US5] Extend useOnboardingState hook with API persistence in frontend/src/hooks/useOnboardingState.ts
+- [x] T116 [US5] Add state restoration logic to WorkspaceWizard in frontend/src/components/onboarding/WorkspaceWizard.tsx
+- [x] T117 [US5] Add "Continue or Start Fresh" prompt in frontend/src/pages/WorkspaceSetup.tsx
 
 **Checkpoint**: User Story 5 complete - progress persistence functional
 
@@ -300,10 +300,10 @@
 
 ### Frontend Implementation for User Story 6
 
-- [ ] T124 [US6] Create ActivationChecklist component with progress tracking in frontend/src/components/onboarding/ActivationChecklist.tsx
-- [ ] T125 [US6] Integrate ActivationChecklist into Dashboard page in frontend/src/pages/Dashboard.tsx
-- [ ] T126 [US6] Add dismiss and re-access functionality in frontend/src/components/onboarding/ActivationChecklist.tsx
-- [ ] T127 [US6] Add completion celebration animation in frontend/src/components/onboarding/ActivationChecklist.tsx
+- [x] T124 [US6] Create ActivationChecklist component with progress tracking in frontend/src/components/onboarding/ActivationChecklist.tsx
+- [x] T125 [US6] Integrate ActivationChecklist into Dashboard page in frontend/src/pages/Dashboard.tsx
+- [x] T126 [US6] Add dismiss and re-access functionality in frontend/src/components/onboarding/ActivationChecklist.tsx
+- [x] T127 [US6] Add completion celebration animation in frontend/src/components/onboarding/ActivationChecklist.tsx
 
 **Checkpoint**: User Story 6 complete - activation checklist functional
 
@@ -465,14 +465,14 @@ With 3 developers after Foundational phase:
 |-------|-------|-------|-----------|-------------|
 | 1 | - | 8 | 8 | Setup |
 | 2 | - | 18 | 18 | Foundational |
-| 3 | US1 | 32 | 23 | Registration |
-| 4 | US2 | 14 | 7 | OAuth |
-| 5 | US3 | 23 | 16 | Workspace |
-| 6 | US4 | 9 | 4 | Resend |
-| 7 | US5 | 17 | 11 | Progress |
-| 8 | US6 | 10 | 4 | Checklist |
+| 3 | US1 | 32 | 31 | Registration |
+| 4 | US2 | 14 | 10 | OAuth |
+| 5 | US3 | 23 | 20 | Workspace |
+| 6 | US4 | 9 | 6 | Resend |
+| 7 | US5 | 17 | 14 | Progress |
+| 8 | US6 | 10 | 8 | Checklist |
 | 9 | - | 13 | 2 | Polish |
-| **Total** | - | **144** | **82** | **57% complete** |
+| **Total** | - | **144** | **117** | **81% complete** |
 
 ---
 

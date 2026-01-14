@@ -1,0 +1,249 @@
+<!DOCTYPE html><html lang="en" class="scroll-smooth"> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="Astro v5.16.9"><!-- Primary Meta Tags --><title>AI Features Guide | vDrive</title><meta name="title" content="AI Features Guide | vDrive"><meta name="description" content="Leverage vDrive's AI-powered features for automatic tagging, face recognition, and intelligent photo organization."><link rel="canonical" href="https://www.vdrive.io/docs/ai-features/"><meta name="robots" content="index, follow"><!-- Open Graph / Facebook --><meta property="og:type" content="website"><meta property="og:url" content="https://www.vdrive.io/docs/ai-features/"><meta property="og:title" content="AI Features Guide | vDrive"><meta property="og:description" content="Leverage vDrive's AI-powered features for automatic tagging, face recognition, and intelligent photo organization."><meta property="og:image" content="https://www.vdrive.io/og-image.png"><meta property="og:site_name" content="vDrive"><meta property="og:locale" content="en_US"><!-- Twitter --><meta property="twitter:card" content="summary_large_image"><meta property="twitter:url" content="https://www.vdrive.io/docs/ai-features/"><meta property="twitter:title" content="AI Features Guide | vDrive"><meta property="twitter:description" content="Leverage vDrive's AI-powered features for automatic tagging, face recognition, and intelligent photo organization."><meta property="twitter:image" content="https://www.vdrive.io/og-image.png"><meta property="twitter:site" content="@vdriveio"><meta property="twitter:creator" content="@vdriveio"><!-- Favicon --><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><!-- Fonts --><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"><!-- JSON-LD Structured Data Slot --><script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"AI Features Guide","description":"Leverage vDrive's AI-powered features for automatic tagging, face recognition, and intelligent photo organization.","url":"https://www.vdrive.io/docs/ai-features","dateModified":"2026-01-13T00:00:00.000Z","author":{"@type":"Organization","name":"vDrive"},"publisher":{"@type":"Organization","name":"vDrive","logo":{"@type":"ImageObject","url":"https://www.vdrive.io/logo.svg"}},"articleSection":"AI Features","mainEntityOfPage":{"@type":"WebPage","@id":"https://www.vdrive.io/docs/ai-features"}}</script><script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.vdrive.io/"},{"@type":"ListItem","position":2,"name":"Documentation","item":"https://www.vdrive.io/docs"},{"@type":"ListItem","position":3,"name":"AI Features Guide"}]}</script><!-- Theme Script (prevents flash) --><script>
+      const getTheme = () => {
+        const stored = localStorage.getItem('theme');
+        if (stored === 'light' || stored === 'dark') {
+          return stored;
+        }
+        if (stored === 'system' || !stored) {
+          return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        return 'light';
+      };
+
+      const theme = getTheme();
+      if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    </script><link rel="stylesheet" href="/_astro/_slug_.DYv_9dGM.css"><script type="module" src="/_astro/page.sJrt8mpm.js"></script></head> <body class="min-h-screen flex flex-col bg-white text-neutral-900 dark:bg-neutral-950 dark:text-neutral-100 transition-colors duration-200"> <!-- Skip to main content link for accessibility --> <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary-500 focus:text-white focus:rounded-lg focus:outline-none">
+Skip to main content
+</a> <header class="sticky top-0 z-50 w-full border-b border-neutral-200 bg-white/80 backdrop-blur-md dark:border-neutral-800 dark:bg-neutral-950/80 transition-colors duration-200"> <nav class="container-lg" aria-label="Main navigation"> <div class="flex h-16 items-center justify-between"> <!-- Logo --> <a href="/" class="flex items-center gap-2" aria-label="vDrive Home"> <svg class="h-8 w-8 text-primary-500" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"> <rect width="32" height="32" rx="8" fill="currentColor"></rect> <path d="M8 12L16 8L24 12V20L16 24L8 20V12Z" stroke="white" stroke-width="2" fill="none"></path> <circle cx="16" cy="16" r="3" fill="white"></circle> </svg> <span class="text-xl font-bold text-neutral-900 dark:text-white">
+vDrive
+</span> </a> <!-- Desktop Navigation --> <div class="hidden md:flex md:items-center md:gap-8"> <a href="/features" class="text-sm font-medium text-neutral-600 transition-colors hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white"> Features </a><a href="/pricing" class="text-sm font-medium text-neutral-600 transition-colors hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white"> Pricing </a><a href="/blog" class="text-sm font-medium text-neutral-600 transition-colors hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white"> Blog </a><a href="/docs" class="text-sm font-medium text-neutral-600 transition-colors hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white"> Docs </a> </div> <!-- Actions --> <div class="flex items-center gap-3"> <!-- Theme Toggle --> <div class="theme-toggle-container relative"> <button id="theme-toggle-btn" type="button" class="flex items-center gap-1.5 rounded-lg p-2 text-neutral-500 hover:bg-neutral-100 dark:text-neutral-400 dark:hover:bg-neutral-800 transition-colors" aria-label="Toggle theme" aria-haspopup="menu" aria-expanded="false"> <!-- Sun icon (light mode) --> <svg id="theme-icon-light" class="h-5 w-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"> <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path> </svg> <!-- Moon icon (dark mode) --> <svg id="theme-icon-dark" class="h-5 w-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"> <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path> </svg> <!-- System icon (auto mode) --> <svg id="theme-icon-system" class="h-5 w-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"> <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path> </svg> </button> <!-- Dropdown menu --> <div id="theme-menu" class="absolute right-0 top-full mt-2 hidden w-36 origin-top-right rounded-lg border border-neutral-200 bg-white py-1 shadow-lg dark:border-neutral-700 dark:bg-neutral-800" role="menu" aria-orientation="vertical" aria-labelledby="theme-toggle-btn"> <button type="button" class="theme-option flex w-full items-center gap-2 px-3 py-2 text-sm text-neutral-700 hover:bg-neutral-100 dark:text-neutral-200 dark:hover:bg-neutral-700" data-theme="light" role="menuitem"> <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"> <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path> </svg> <span>Light</span> <svg id="check-light" class="ml-auto h-4 w-4 hidden text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"> <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path> </svg> </button> <button type="button" class="theme-option flex w-full items-center gap-2 px-3 py-2 text-sm text-neutral-700 hover:bg-neutral-100 dark:text-neutral-200 dark:hover:bg-neutral-700" data-theme="dark" role="menuitem"> <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"> <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path> </svg> <span>Dark</span> <svg id="check-dark" class="ml-auto h-4 w-4 hidden text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"> <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path> </svg> </button> <button type="button" class="theme-option flex w-full items-center gap-2 px-3 py-2 text-sm text-neutral-700 hover:bg-neutral-100 dark:text-neutral-200 dark:hover:bg-neutral-700" data-theme="system" role="menuitem"> <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"> <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path> </svg> <span>System</span> <svg id="check-system" class="ml-auto h-4 w-4 hidden text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"> <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path> </svg> </button> </div> </div> <script type="module">function i(){const t=document.getElementById("theme-toggle-btn"),n=document.getElementById("theme-menu"),a=document.querySelectorAll(".theme-option"),o=document.getElementById("theme-icon-light"),m=document.getElementById("theme-icon-dark"),l=document.getElementById("theme-icon-system"),r=document.getElementById("check-light"),h=document.getElementById("check-dark"),g=document.getElementById("check-system");function d(){const e=localStorage.getItem("theme");return e==="light"||e==="dark"||e==="system"?e:"system"}function u(e){return e==="system"?window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light":e}function s(e){u(e)==="dark"?document.documentElement.classList.add("dark"):document.documentElement.classList.remove("dark"),o?.classList.toggle("hidden",e!=="light"),m?.classList.toggle("hidden",e!=="dark"),l?.classList.toggle("hidden",e!=="system"),r?.classList.toggle("hidden",e!=="light"),h?.classList.toggle("hidden",e!=="dark"),g?.classList.toggle("hidden",e!=="system")}function k(e){localStorage.setItem("theme",e),s(e)}const y=d();s(y),t?.addEventListener("click",()=>{const e=t.getAttribute("aria-expanded")==="true";t.setAttribute("aria-expanded",String(!e)),n?.classList.toggle("hidden")}),a.forEach(e=>{e.addEventListener("click",()=>{const c=e.dataset.theme;k(c),n?.classList.add("hidden"),t?.setAttribute("aria-expanded","false")})}),document.addEventListener("click",e=>{!t?.contains(e.target)&&!n?.contains(e.target)&&(n?.classList.add("hidden"),t?.setAttribute("aria-expanded","false"))}),t?.addEventListener("keydown",e=>{e.key==="Escape"&&(n?.classList.add("hidden"),t.setAttribute("aria-expanded","false"))}),window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>{d()==="system"&&s("system")})}i();document.addEventListener("astro:after-swap",i);</script> <!-- Sign In (desktop only) --> <a href="https://app.vdrive.io/sign-in" class="hidden text-sm font-medium text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white sm:block transition-colors"> Sign In </a> <!-- Start Free CTA --> <a href="https://app.vdrive.io/sign-up" class="btn btn-primary btn-sm"> Start Free </a> <!-- Mobile Menu Button --> <button id="mobile-menu-button" type="button" class="rounded-lg p-2 text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800 md:hidden transition-colors" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu"> <svg id="menu-icon-open" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path> </svg> <svg id="menu-icon-close" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path> </svg> </button> </div> </div> </nav> <!-- Mobile Menu --> <div id="mobile-menu" class="hidden border-t border-neutral-200 bg-white px-4 py-4 dark:border-neutral-800 dark:bg-neutral-950 md:hidden transition-colors" role="navigation" aria-label="Mobile navigation"> <div class="flex flex-col gap-4"> <a href="/features" class="text-base font-medium text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors"> Features </a><a href="/pricing" class="text-base font-medium text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors"> Pricing </a><a href="/blog" class="text-base font-medium text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors"> Blog </a><a href="/docs" class="text-base font-medium text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors"> Docs </a> <hr class="border-neutral-200 dark:border-neutral-800"> <a href="https://app.vdrive.io/sign-in" class="text-base font-medium text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors">
+Sign in
+</a> <a href="https://app.vdrive.io/sign-up" class="btn btn-primary w-full text-center">
+Start Free Trial
+</a> </div> </div> </header> <script type="module">function i(){const e=document.getElementById("mobile-menu-button"),t=document.getElementById("mobile-menu"),d=document.getElementById("menu-icon-open"),s=document.getElementById("menu-icon-close");e?.addEventListener("click",()=>{const n=e.getAttribute("aria-expanded")==="true";e.setAttribute("aria-expanded",String(!n)),t?.classList.toggle("hidden"),d?.classList.toggle("hidden"),s?.classList.toggle("hidden")}),document.addEventListener("keydown",n=>{n.key==="Escape"&&!t?.classList.contains("hidden")&&(t?.classList.add("hidden"),e?.setAttribute("aria-expanded","false"),d?.classList.remove("hidden"),s?.classList.add("hidden"))})}i();document.addEventListener("astro:after-swap",i);</script> <main id="main-content" class="flex-1" role="main">   <section class="section"> <div class="container-lg"> <div class="grid gap-12 lg:grid-cols-4"> <!-- Sidebar --> <aside class="lg:col-span-1"> <nav class="sticky top-24" aria-label="Documentation navigation"> <a href="/docs" class="mb-4 inline-flex items-center gap-2 text-sm text-primary-500 hover:text-primary-600 transition-colors"> <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path> </svg>
+All Docs
+</a> <ul class="space-y-1" role="list"> <li> <span class="block py-2 text-sm font-medium text-neutral-900 dark:text-white"> Getting Started </span> <ul class="ml-3 space-y-1 border-l border-neutral-200 dark:border-neutral-800" role="list"> <li> <a href="/docs/introduction" class="block py-1 pl-4 text-sm transition-colors text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white"> Introduction to vDrive </a> </li><li> <a href="/docs/getting-started" class="block py-1 pl-4 text-sm transition-colors text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white"> Getting Started with vDrive </a> </li> </ul> </li><li> <span class="block py-2 text-sm font-medium text-neutral-900 dark:text-white"> Galleries </span> <ul class="ml-3 space-y-1 border-l border-neutral-200 dark:border-neutral-800" role="list"> <li> <a href="/docs/first-gallery" class="block py-1 pl-4 text-sm transition-colors text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white"> Creating Your First Gallery </a> </li> </ul> </li><li> <span class="block py-2 text-sm font-medium text-neutral-900 dark:text-white"> AI Features </span> <ul class="ml-3 space-y-1 border-l border-neutral-200 dark:border-neutral-800" role="list"> <li> <a href="/docs/ai-features" class="block py-1 pl-4 text-sm transition-colors border-l-2 border-primary-500 -ml-px font-medium text-primary-600 dark:text-primary-400" aria-current="page"> AI Features Guide </a> </li> </ul> </li> </ul> </nav> </aside> <!-- Main Content --> <main class="lg:col-span-3" id="doc-content"> <div class="max-w-3xl"> <header class="mb-8"> <span class="text-sm font-medium text-primary-600 dark:text-primary-400"> AI Features </span> <h1 class="mt-2 text-4xl font-bold tracking-tight text-neutral-900 dark:text-white"> AI Features Guide </h1> <p class="mt-4 text-lg text-neutral-600 dark:text-neutral-400"> Leverage vDrive&#39;s AI-powered features for automatic tagging, face recognition, and intelligent photo organization. </p> <p class="mt-2 text-sm text-neutral-500">
+Last updated:  <time datetime="2026-01-13T00:00:00.000Z"> January 13, 2026 </time> </p> </header> <div class="prose-custom">  <h1 id="ai-features-guide">AI Features Guide</h1>
+<p>vDrive uses advanced AI to help you manage thousands of photos effortlessly. Learn how to leverage these powerful features.</p>
+<h2 id="overview">Overview</h2>
+<p>Our AI features include:</p>
+<ul>
+<li><strong>Auto-Tagging</strong>: Automatic scene, object, and color detection</li>
+<li><strong>Face Recognition</strong>: Identify and group people across photos</li>
+<li><strong>Smart Search</strong>: Find any photo using natural language</li>
+<li><strong>Quality Detection</strong>: Identify blurry, duplicate, or underexposed photos</li>
+</ul>
+<h2 id="auto-tagging">Auto-Tagging</h2>
+<p>When you upload photos, vDrive automatically analyzes and tags them.</p>
+<h3 id="tag-categories">Tag Categories</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Category</th><th>Examples</th></tr></thead><tbody><tr><td>Scene</td><td>outdoor, indoor, beach, forest, city</td></tr><tr><td>Event</td><td>wedding, portrait, party, corporate</td></tr><tr><td>Objects</td><td>car, flower, cake, dress, ring</td></tr><tr><td>Colors</td><td>blue, warm, golden hour, vibrant</td></tr><tr><td>Mood</td><td>romantic, joyful, dramatic, peaceful</td></tr></tbody></table>
+<h3 id="using-tags">Using Tags</h3>
+<p>Filter and search your library using tags:</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto;white-space:pre-wrap;word-wrap:break-word" tabindex="0" data-language="plaintext"><code><span class="line"><span>Search: &quot;outdoor wedding dress&quot;</span></span>
+<span class="line"><span>Result: All outdoor wedding photos featuring a dress</span></span></code></pre>
+<h3 id="custom-tags">Custom Tags</h3>
+<p>Add your own tags to complement AI detection:</p>
+<ol>
+<li>Select photos you want to tag</li>
+<li>Click <strong>Add Tags</strong></li>
+<li>Enter custom tag names</li>
+<li>Tags sync across all galleries</li>
+</ol>
+<h2 id="face-recognition">Face Recognition</h2>
+<p>Automatically identify and group people in your photos.</p>
+<h3 id="how-it-works">How It Works</h3>
+<ol>
+<li><strong>Detection</strong>: AI finds all faces in your photos</li>
+<li><strong>Grouping</strong>: Similar faces are clustered together</li>
+<li><strong>Naming</strong>: You assign names to each person</li>
+<li><strong>Recognition</strong>: Future photos automatically match</li>
+</ol>
+<h3 id="privacy--control">Privacy &amp; Control</h3>
+<p>Face recognition respects privacy:</p>
+<ul>
+<li><strong>Opt-out</strong>: Clients can request face data deletion</li>
+<li><strong>Local Processing</strong>: Data processed securely on our servers</li>
+<li><strong>No Third-party Sharing</strong>: Face data never leaves vDrive</li>
+<li><strong>GDPR Compliant</strong>: Full data protection compliance</li>
+</ul>
+<h3 id="client-self-find">Client Self-Find</h3>
+<p>Let clients find themselves in large event galleries:</p>
+<ol>
+<li>Client uploads a selfie</li>
+<li>AI matches their face across all photos</li>
+<li>Client sees only photos of themselves</li>
+<li>Perfect for weddings and events</li>
+</ol>
+<h2 id="smart-search">Smart Search</h2>
+<p>Find photos using natural language queries.</p>
+<h3 id="search-examples">Search Examples</h3>
+<ul>
+<li>“Bride smiling during ceremony”</li>
+<li>“Golden hour portraits”</li>
+<li>“Group photos with more than 5 people”</li>
+<li>“Photos taken between 2pm and 4pm”</li>
+</ul>
+<h3 id="combining-filters">Combining Filters</h3>
+<p>Combine multiple filters for precise results:</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto;white-space:pre-wrap;word-wrap:break-word" tabindex="0" data-language="plaintext"><code><span class="line"><span>Face: &quot;Sarah&quot; + Tag: &quot;ceremony&quot; + Time: &quot;morning&quot;</span></span></code></pre>
+<h2 id="quality-detection">Quality Detection</h2>
+<p>AI helps identify photos that need attention.</p>
+<h3 id="quality-checks">Quality Checks</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Check</th><th>Detection</th></tr></thead><tbody><tr><td>Blur</td><td>Motion blur, out of focus</td></tr><tr><td>Exposure</td><td>Under/overexposed areas</td></tr><tr><td>Duplicates</td><td>Similar or identical photos</td></tr><tr><td>Blink</td><td>Closed eyes detection</td></tr><tr><td>Composition</td><td>Rule of thirds, horizons</td></tr></tbody></table>
+<h3 id="using-quality-detection">Using Quality Detection</h3>
+<ol>
+<li>Go to <strong>Library</strong> &gt; <strong>Quality Issues</strong></li>
+<li>Review flagged photos</li>
+<li>Keep, delete, or mark for editing</li>
+<li>Clear the queue as you work</li>
+</ol>
+<h2 id="ai-processing">AI Processing</h2>
+<h3 id="processing-time">Processing Time</h3>
+<p>Photo processing happens in the background:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Upload Size</th><th>Processing Time</th></tr></thead><tbody><tr><td>1-50 photos</td><td>Under 1 minute</td></tr><tr><td>50-200 photos</td><td>2-5 minutes</td></tr><tr><td>200-500 photos</td><td>5-10 minutes</td></tr><tr><td>500+ photos</td><td>10-20 minutes</td></tr></tbody></table>
+<h3 id="processing-status">Processing Status</h3>
+<p>Track AI processing:</p>
+<ul>
+<li><strong>Blue</strong>: Queued for processing</li>
+<li><strong>Yellow</strong>: Currently processing</li>
+<li><strong>Green</strong>: Complete</li>
+<li><strong>Red</strong>: Error (retry available)</li>
+</ul>
+<h2 id="best-practices">Best Practices</h2>
+<h3 id="optimize-ai-results">Optimize AI Results</h3>
+<ol>
+<li><strong>Quality Uploads</strong>: Higher resolution = better detection</li>
+<li><strong>Good Lighting</strong>: Well-lit faces improve recognition</li>
+<li><strong>Consistent Naming</strong>: Use the same name format for people</li>
+<li><strong>Review Tags</strong>: Correct mistakes to improve accuracy</li>
+</ol>
+<h3 id="batch-processing">Batch Processing</h3>
+<p>For large shoots:</p>
+<ol>
+<li>Upload all photos at once</li>
+<li>Let AI process overnight</li>
+<li>Review quality flags first</li>
+<li>Use Smart Albums to organize</li>
+</ol>
+<h2 id="api-access">API Access</h2>
+<p>Access AI features programmatically on Business+ plans:</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto;white-space:pre-wrap;word-wrap:break-word" tabindex="0" data-language="javascript"><code><span class="line"><span style="color:#6A737D">// Example: Search photos using AI</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> results</span><span style="color:#F97583"> =</span><span style="color:#F97583"> await</span><span style="color:#E1E4E8"> vdrive.photos.</span><span style="color:#B392F0">search</span><span style="color:#E1E4E8">({</span></span>
+<span class="line"><span style="color:#E1E4E8">  query: </span><span style="color:#9ECBFF">&quot;sunset beach portrait&quot;</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">  gallery_id: </span><span style="color:#9ECBFF">&quot;gallery_123&quot;</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#E1E4E8">  limit: </span><span style="color:#79B8FF">50</span></span>
+<span class="line"><span style="color:#E1E4E8">});</span></span></code></pre>
+<p>See <a href="/docs/api">API Reference</a> for full documentation.</p>
+<h2 id="next-steps">Next Steps</h2>
+<ul>
+<li><a href="/docs/smart-albums">Smart Albums</a> - Auto-organized collections</li>
+<li><a href="/docs/automation">Workflow Automation</a> - Trigger actions on AI events</li>
+<li><a href="/docs/api">API Reference</a> - Integrate AI into your workflow</li>
+</ul>  </div> </div> </main> </div> </div> </section>  </main> <footer class="border-t border-neutral-200 bg-neutral-50 dark:border-neutral-800 dark:bg-neutral-900 transition-colors duration-200"> <div class="container-lg py-12 lg:py-16"> <!-- Newsletter Section --> <div class="mb-12 rounded-2xl bg-gradient-to-r from-primary-500 to-accent-500 p-8 text-white lg:p-12"> <div class="mx-auto max-w-2xl text-center"> <h2 class="text-2xl font-bold lg:text-3xl">
+Stay updated with vDrive
+</h2> <p class="mt-2 text-primary-100">
+Get photography tips, product updates, and exclusive offers delivered to your inbox.
+</p> <form class="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center" id="newsletter-form"> <label for="newsletter-email" class="sr-only">Email address</label> <input type="email" id="newsletter-email" name="email" placeholder="Enter your email" required class="w-full rounded-lg border-0 px-4 py-3 text-neutral-900 placeholder-neutral-500 focus:ring-2 focus:ring-white sm:w-72"> <button type="submit" class="rounded-lg bg-white px-6 py-3 font-semibold text-primary-600 transition-colors hover:bg-primary-50 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-primary-500">
+Subscribe
+</button> </form> <p class="mt-3 text-xs text-primary-200">
+No spam, unsubscribe anytime. Read our <a href="/privacy" class="underline hover:text-white">Privacy Policy</a>.
+</p> </div> </div> <div class="grid gap-8 lg:grid-cols-6"> <!-- Brand --> <div class="lg:col-span-2"> <a href="/" class="flex items-center gap-2" aria-label="vDrive Home"> <svg class="h-8 w-8 text-primary-500" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"> <rect width="32" height="32" rx="8" fill="currentColor"></rect> <path d="M8 12L16 8L24 12V20L16 24L8 20V12Z" stroke="white" stroke-width="2" fill="none"></path> <circle cx="16" cy="16" r="3" fill="white"></circle> </svg> <span class="text-xl font-bold text-neutral-900 dark:text-white">
+vDrive
+</span> </a> <p class="mt-4 max-w-xs text-sm text-neutral-600 dark:text-neutral-400">
+Professional Photography Client Galleries Made Simple. Share, deliver, and sell your photos with AI-powered galleries.
+</p> <div class="mt-6 flex gap-4"> <a href="https://twitter.com/vdriveio" class="text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors" target="_blank" rel="noopener noreferrer" aria-label="Twitter"> <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"> <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"/> </svg> </a><a href="https://instagram.com/vdriveio" class="text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors" target="_blank" rel="noopener noreferrer" aria-label="Instagram"> <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"> <path fill-rule="evenodd" d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.45 2.525c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.466.399.8.748 1.15.35.35.683.566 1.15.748.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 3.96-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-3.96-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z" clip-rule="evenodd"/> </svg> </a><a href="https://linkedin.com/company/vdriveio" class="text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"> <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">  </svg> </a><a href="https://youtube.com/@vdriveio" class="text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors" target="_blank" rel="noopener noreferrer" aria-label="YouTube"> <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">  </svg> </a> </div> </div> <!-- Links --> <div> <h3 class="text-sm font-semibold text-neutral-900 dark:text-white"> Product </h3> <ul class="mt-4 space-y-3" role="list"> <li> <a href="/features" class="text-sm text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors"> Features </a> </li><li> <a href="/pricing" class="text-sm text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors"> Pricing </a> </li><li> <a href="/integrations" class="text-sm text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors"> Integrations </a> </li><li> <a href="/changelog" class="text-sm text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors"> Changelog </a> </li> </ul> </div><div> <h3 class="text-sm font-semibold text-neutral-900 dark:text-white"> Resources </h3> <ul class="mt-4 space-y-3" role="list"> <li> <a href="/docs" class="text-sm text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors"> Documentation </a> </li><li> <a href="/blog" class="text-sm text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors"> Blog </a> </li><li> <a href="/docs/help" class="text-sm text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors"> Help Center </a> </li><li> <a href="/docs/api" class="text-sm text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors"> API Reference </a> </li> </ul> </div><div> <h3 class="text-sm font-semibold text-neutral-900 dark:text-white"> Company </h3> <ul class="mt-4 space-y-3" role="list"> <li> <a href="/about" class="text-sm text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors"> About </a> </li><li> <a href="/careers" class="text-sm text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors"> Careers </a> </li><li> <a href="/press" class="text-sm text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors"> Press </a> </li><li> <a href="/contact" class="text-sm text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors"> Contact </a> </li> </ul> </div><div> <h3 class="text-sm font-semibold text-neutral-900 dark:text-white"> Legal </h3> <ul class="mt-4 space-y-3" role="list"> <li> <a href="/privacy" class="text-sm text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors"> Privacy Policy </a> </li><li> <a href="/terms" class="text-sm text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors"> Terms of Service </a> </li><li> <a href="/cookies" class="text-sm text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors"> Cookie Policy </a> </li><li> <a href="/gdpr" class="text-sm text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors"> GDPR </a> </li> </ul> </div> </div> <!-- Bottom --> <div class="mt-12 flex flex-col items-center justify-between gap-4 border-t border-neutral-200 pt-8 dark:border-neutral-800 sm:flex-row"> <p class="text-sm text-neutral-500 dark:text-neutral-400">
+&copy; 2026 vDrive. All rights reserved. Made in India.
+</p> <div class="flex flex-wrap justify-center gap-6"> <a href="/privacy" class="text-sm text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-300 transition-colors">
+Privacy
+</a> <a href="/terms" class="text-sm text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-300 transition-colors">
+Terms
+</a> <a href="/cookies" class="text-sm text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-300 transition-colors">
+Cookies
+</a> </div> </div> </div> </footer> <script type="module">function t(){const e=document.getElementById("newsletter-form");e?.addEventListener("submit",async n=>{n.preventDefault();const a=new FormData(e).get("email");alert(`Thanks for subscribing! We'll send updates to ${a}`),e.reset()})}t();document.addEventListener("astro:after-swap",t);</script> </body></html>

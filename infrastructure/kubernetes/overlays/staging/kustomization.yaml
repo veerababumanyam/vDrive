@@ -1,0 +1,94 @@
+# ===========================================
+# Staging Environment Overlay
+# ===========================================
+# Usage: kubectl apply -k infrastructure/kubernetes/overlays/staging
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+metadata:
+  name: vDrive-staging
+
+resources:
+  - ../../
+
+namePrefix: staging-
+
+commonLabels:
+  environment: staging
+
+# Moderate resources for staging (between dev and prod)
+patches:
+  # PostgreSQL - moderate resources
+  - patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/cpu
+        value: "500m"
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/memory
+        value: "1Gi"
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/cpu
+        value: "2000m"
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/memory
+        value: "4Gi"
+    target:
+      kind: StatefulSet
+      name: postgres
+
+  # Redis - moderate resources
+  - patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/cpu
+        value: "100m"
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/memory
+        value: "256Mi"
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/cpu
+        value: "500m"
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/memory
+        value: "1Gi"
+    target:
+      kind: Deployment
+      name: redis
+
+  # Traefik - 2 replicas for staging
+  - patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 2
+    target:
+      kind: Deployment
+      name: traefik
+
+  # KEDA - moderate scaling limits
+  - patch: |-
+      - op: replace
+        path: /spec/minReplicaCount
+        value: 1
+      - op: replace
+        path: /spec/maxReplicaCount
+        value: 10
+    target:
+      kind: ScaledObject
+
+# ConfigMap for staging-specific settings
+configMapGenerator:
+  - name: vDrive-config
+    literals:
+      - APP_ENV=staging
+      - LOG_LEVEL=INFO
+      - CORS_ORIGINS=https://staging.vDrive.com
+
+replicas:
+  - name: postgres
+    count: 1
+  - name: redis
+    count: 1
+  - name: kafka
+    count: 1
+  - name: zookeeper
+    count: 1

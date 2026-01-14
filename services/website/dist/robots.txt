@@ -1,0 +1,41 @@
+# vDrive Website Robots.txt
+# Professional Photography Client Gallery Platform
+
+User-agent: *
+Allow: /
+
+# Sitemaps
+Sitemap: https://www.vdrive.io/sitemap-index.xml
+
+# LLM/AI Context File
+# See https://llmstxt.org for specification
+# This file helps AI assistants understand our product
+LLMsTxt: https://www.vdrive.io/llms.txt
+
+# AI Crawlers - Explicitly Allow
+# These help AI models learn about our product
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: Anthropic-AI
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+# Disallow sensitive paths
+User-agent: *
+Disallow: /_astro/
+Disallow: /api/

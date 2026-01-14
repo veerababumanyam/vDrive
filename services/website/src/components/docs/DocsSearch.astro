@@ -1,0 +1,162 @@
+---
+/**
+ * DocsSearch Component
+ * Client-side search for documentation using content collection.
+ * Uses a simple text matching algorithm for lightweight search.
+ */
+
+import { getCollection } from 'astro:content';
+
+const docs = await getCollection('docs');
+
+// Prepare search index for client-side use
+const searchIndex = docs
+  .filter((doc) => !doc.data.draft)
+  .map((doc) => ({
+    slug: doc.slug,
+    title: doc.data.title,
+    description: doc.data.description,
+    section: doc.data.section || 'General',
+  }));
+---
+
+<div class="docs-search relative">
+  <label for="docs-search-input" class="sr-only">Search documentation</label>
+  <div class="relative">
+    <svg
+      class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      aria-hidden="true"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+      />
+    </svg>
+    <input
+      type="search"
+      id="docs-search-input"
+      placeholder="Search docs..."
+      class="w-full rounded-lg border border-neutral-200 bg-white py-2 pl-10 pr-4 text-sm text-neutral-900 placeholder-neutral-500 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100 dark:placeholder-neutral-400 dark:focus:border-primary-400 dark:focus:ring-primary-400"
+      autocomplete="off"
+    />
+    <kbd
+      class="pointer-events-none absolute right-3 top-1/2 hidden -translate-y-1/2 rounded border border-neutral-200 bg-neutral-100 px-1.5 py-0.5 text-xs text-neutral-500 dark:border-neutral-700 dark:bg-neutral-800 sm:inline-block"
+      aria-hidden="true"
+    >
+      /
+    </kbd>
+  </div>
+
+  <!-- Search Results -->
+  <div
+    id="docs-search-results"
+    class="absolute left-0 right-0 top-full z-50 mt-2 hidden max-h-64 overflow-y-auto rounded-lg border border-neutral-200 bg-white shadow-lg dark:border-neutral-700 dark:bg-neutral-800"
+    role="listbox"
+    aria-label="Search results"
+  >
+    <div class="p-2 text-sm text-neutral-500 dark:text-neutral-400" id="docs-no-results">
+      No results found
+    </div>
+  </div>
+</div>
+
+<script is:inline define:vars={{ searchIndex }}>
+  function initDocsSearch() {
+    const input = document.getElementById('docs-search-input');
+    const results = document.getElementById('docs-search-results');
+    const noResults = document.getElementById('docs-no-results');
+
+    if (!input || !results || !noResults) return;
+
+    // Build result item using safe DOM methods
+    function createResultItem(doc) {
+      const link = document.createElement('a');
+      link.href = `/docs/${doc.slug}`;
+      link.className = 'block px-3 py-2 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-700 focus:bg-neutral-100 dark:focus:bg-neutral-700 focus:outline-none';
+      link.setAttribute('role', 'option');
+
+      const title = document.createElement('div');
+      title.className = 'font-medium text-neutral-900 dark:text-white';
+      title.textContent = doc.title;
+
+      const section = document.createElement('div');
+      section.className = 'text-xs text-neutral-500 dark:text-neutral-400';
+      section.textContent = doc.section;
+
+      link.appendChild(title);
+      link.appendChild(section);
+      return link;
+    }
+
+    // Handle input changes
+    input.addEventListener('input', (e) => {
+      const query = (e.target).value.toLowerCase().trim();
+
+      if (query.length < 2) {
+        results.classList.add('hidden');
+        return;
+      }
+
+      // Filter matching docs
+      const matches = searchIndex.filter(
+        (doc) =>
+          doc.title.toLowerCase().includes(query) ||
+          doc.description.toLowerCase().includes(query) ||
+          doc.section.toLowerCase().includes(query)
+      );
+
+      // Clear previous results
+      while (results.firstChild) {
+        results.removeChild(results.firstChild);
+      }
+
+      if (matches.length === 0) {
+        const noResultsClone = noResults.cloneNode(true);
+        noResultsClone.classList.remove('hidden');
+        results.appendChild(noResultsClone);
+        results.classList.remove('hidden');
+        return;
+      }
+
+      // Build results using safe DOM methods
+      matches.forEach((doc) => {
+        results.appendChild(createResultItem(doc));
+      });
+      results.classList.remove('hidden');
+    });
+
+    // Handle keyboard navigation
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        results.classList.add('hidden');
+        input.blur();
+      }
+    });
+
+    // Close on outside click
+    document.addEventListener('click', (e) => {
+      if (!input.contains(e.target) && !results.contains(e.target)) {
+        results.classList.add('hidden');
+      }
+    });
+
+    // Global keyboard shortcut
+    document.addEventListener('keydown', (e) => {
+      if (e.key === '/' && !['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName || '')) {
+        e.preventDefault();
+        input.focus();
+      }
+    });
+  }
+
+  // Initialize on page load
+  initDocsSearch();
+
+  // Re-initialize on Astro view transitions
+  document.addEventListener('astro:after-swap', initDocsSearch);
+</script>

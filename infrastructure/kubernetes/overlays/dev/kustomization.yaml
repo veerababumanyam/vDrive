@@ -1,0 +1,113 @@
+# ===========================================
+# Development Environment Overlay
+# ===========================================
+# Usage: kubectl apply -k infrastructure/kubernetes/overlays/dev
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+metadata:
+  name: vDrive-dev
+
+resources:
+  - ../../
+
+namePrefix: dev-
+
+commonLabels:
+  environment: development
+
+# Reduce resource requests for development
+patches:
+  # Reduce PostgreSQL resources
+  - patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/cpu
+        value: "250m"
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/memory
+        value: "512Mi"
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/cpu
+        value: "1000m"
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/memory
+        value: "2Gi"
+    target:
+      kind: StatefulSet
+      name: postgres
+
+  # Reduce Redis resources
+  - patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/cpu
+        value: "50m"
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/memory
+        value: "128Mi"
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/cpu
+        value: "250m"
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/memory
+        value: "512Mi"
+    target:
+      kind: Deployment
+      name: redis
+
+  # Reduce Traefik replicas
+  - patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 1
+    target:
+      kind: Deployment
+      name: traefik
+
+  # Reduce Kafka resources
+  - patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/cpu
+        value: "100m"
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/memory
+        value: "256Mi"
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/cpu
+        value: "500m"
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/memory
+        value: "1Gi"
+    target:
+      kind: StatefulSet
+      name: kafka
+
+  # Reduce KEDA min replicas for dev
+  - patch: |-
+      - op: replace
+        path: /spec/minReplicaCount
+        value: 1
+      - op: replace
+        path: /spec/maxReplicaCount
+        value: 3
+    target:
+      kind: ScaledObject
+
+# ConfigMap for dev-specific settings
+configMapGenerator:
+  - name: vDrive-config
+    literals:
+      - APP_ENV=development
+      - LOG_LEVEL=DEBUG
+      - CORS_ORIGINS=http://localhost:5173,http://localhost:3000
+
+# Reduce storage for dev
+replicas:
+  - name: postgres
+    count: 1
+  - name: redis
+    count: 1
+  - name: kafka
+    count: 1
+  - name: zookeeper
+    count: 1

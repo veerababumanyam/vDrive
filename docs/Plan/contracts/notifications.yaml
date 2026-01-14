@@ -1,0 +1,749 @@
+openapi: 3.1.0
+info:
+  title: vDrive Notifications API
+  description: Notification preferences and delivery management
+  version: 1.0.0
+  contact:
+    name: vDrive API Support
+    email: api@vdrive.io
+
+servers:
+  - url: https://app.vdrive.io/api/v1
+    description: Production
+  - url: http://localhost:8010/api/v1
+    description: Notifications service (local)
+
+tags:
+  - name: Preferences
+    description: Notification preferences
+  - name: Templates
+    description: Email templates
+  - name: Send
+    description: Send notifications
+
+paths:
+  /notifications/preferences:
+    get:
+      tags:
+        - Preferences
+      summary: Get preferences
+      description: Get current notification preferences
+      operationId: getNotificationPreferences
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Notification preferences
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PreferencesResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    patch:
+      tags:
+        - Preferences
+      summary: Update preferences
+      description: Update notification preferences
+      operationId: updateNotificationPreferences
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PreferencesUpdateRequest'
+      responses:
+        '200':
+          description: Preferences updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PreferencesResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /notifications/unsubscribe:
+    post:
+      tags:
+        - Preferences
+      summary: Unsubscribe
+      description: Unsubscribe from notifications (one-click unsubscribe)
+      operationId: unsubscribe
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UnsubscribeRequest'
+      responses:
+        '200':
+          description: Unsubscribed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '400':
+          description: Invalid token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /notifications/templates:
+    get:
+      tags:
+        - Templates
+      summary: List templates
+      description: Get available notification templates
+      operationId: listTemplates
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of templates
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemplateListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /notifications/templates/{templateId}:
+    get:
+      tags:
+        - Templates
+      summary: Get template
+      description: Get template details and preview
+      operationId: getTemplate
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: templateId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Template details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemplateResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /notifications/templates/{templateId}/preview:
+    post:
+      tags:
+        - Templates
+      summary: Preview template
+      description: Preview template with sample data
+      operationId: previewTemplate
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: templateId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PreviewRequest'
+      responses:
+        '200':
+          description: Template preview
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PreviewResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /notifications/send:
+    post:
+      tags:
+        - Send
+      summary: Send notification
+      description: Send a notification to one or more recipients
+      operationId: sendNotification
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendNotificationRequest'
+      responses:
+        '202':
+          description: Notification queued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendNotificationResponse'
+        '400':
+          description: Invalid template or recipients
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /notifications/send/gallery-invite:
+    post:
+      tags:
+        - Send
+      summary: Send gallery invitation
+      description: Send gallery invitation to clients
+      operationId: sendGalleryInvite
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GalleryInviteRequest'
+      responses:
+        '202':
+          description: Invitations queued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendNotificationResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Gallery not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /notifications/send/selection-reminder:
+    post:
+      tags:
+        - Send
+      summary: Send selection reminder
+      description: Send reminder to complete photo selection
+      operationId: sendSelectionReminder
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SelectionReminderRequest'
+      responses:
+        '202':
+          description: Reminder queued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendNotificationResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /notifications/history:
+    get:
+      tags:
+        - Send
+      summary: Get notification history
+      description: Get sent notification history
+      operationId: getNotificationHistory
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - name: channel
+          in: query
+          schema:
+            type: string
+            enum: [email, push, in_app]
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, sent, delivered, failed]
+        - name: from_date
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: to_date
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Notification history
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationHistoryResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /notifications/push/register:
+    post:
+      tags:
+        - Preferences
+      summary: Register push token
+      description: Register device for push notifications
+      operationId: registerPushToken
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterPushTokenRequest'
+      responses:
+        '200':
+          description: Token registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /notifications/push/unregister:
+    post:
+      tags:
+        - Preferences
+      summary: Unregister push token
+      description: Unregister device from push notifications
+      operationId: unregisterPushToken
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UnregisterPushTokenRequest'
+      responses:
+        '204':
+          description: Token unregistered
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    PageParam:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+
+    LimitParam:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+
+  responses:
+    Unauthorized:
+      description: Authentication required
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    ValidationError:
+      description: Validation error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ValidationErrorResponse'
+
+  schemas:
+    Preferences:
+      type: object
+      properties:
+        gallery_viewed:
+          $ref: '#/components/schemas/ChannelPreferences'
+        selection_complete:
+          $ref: '#/components/schemas/ChannelPreferences'
+        payment_received:
+          $ref: '#/components/schemas/ChannelPreferences'
+        new_booking:
+          $ref: '#/components/schemas/ChannelPreferences'
+        marketing:
+          $ref: '#/components/schemas/ChannelPreferences'
+        quiet_hours:
+          type: object
+          properties:
+            enabled:
+              type: boolean
+            start:
+              type: string
+              pattern: "^[0-2][0-9]:[0-5][0-9]$"
+            end:
+              type: string
+              pattern: "^[0-2][0-9]:[0-5][0-9]$"
+        timezone:
+          type: string
+
+    ChannelPreferences:
+      type: object
+      properties:
+        email:
+          type: boolean
+        push:
+          type: boolean
+        in_app:
+          type: boolean
+
+    PreferencesResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Preferences'
+
+    PreferencesUpdateRequest:
+      type: object
+      properties:
+        gallery_viewed:
+          $ref: '#/components/schemas/ChannelPreferences'
+        selection_complete:
+          $ref: '#/components/schemas/ChannelPreferences'
+        payment_received:
+          $ref: '#/components/schemas/ChannelPreferences'
+        new_booking:
+          $ref: '#/components/schemas/ChannelPreferences'
+        marketing:
+          $ref: '#/components/schemas/ChannelPreferences'
+        quiet_hours:
+          type: object
+          properties:
+            enabled:
+              type: boolean
+            start:
+              type: string
+            end:
+              type: string
+        timezone:
+          type: string
+
+    UnsubscribeRequest:
+      type: object
+      required:
+        - token
+      properties:
+        token:
+          type: string
+        category:
+          type: string
+          description: Optional category to unsubscribe from
+
+    Template:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        category:
+          type: string
+        channels:
+          type: array
+          items:
+            type: string
+            enum: [email, push, in_app]
+        required_variables:
+          type: array
+          items:
+            type: string
+        sample_data:
+          type: object
+
+    TemplateResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Template'
+
+    TemplateListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Template'
+
+    PreviewRequest:
+      type: object
+      required:
+        - data
+      properties:
+        data:
+          type: object
+          description: Variables to populate template
+
+    PreviewResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            subject:
+              type: string
+            html_body:
+              type: string
+            text_body:
+              type: string
+
+    SendNotificationRequest:
+      type: object
+      required:
+        - template_id
+        - recipients
+      properties:
+        template_id:
+          type: string
+        recipients:
+          type: array
+          items:
+            type: object
+            properties:
+              email:
+                type: string
+                format: email
+              name:
+                type: string
+          minItems: 1
+          maxItems: 100
+        data:
+          type: object
+          description: Template variables
+        channels:
+          type: array
+          items:
+            type: string
+            enum: [email, push, in_app]
+          default: [email]
+        schedule_at:
+          type: string
+          format: date-time
+          description: Optional scheduled send time
+
+    SendNotificationResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            notification_id:
+              type: string
+              format: uuid
+            recipient_count:
+              type: integer
+            status:
+              type: string
+              enum: [queued, scheduled]
+            scheduled_at:
+              type: string
+              format: date-time
+              nullable: true
+
+    GalleryInviteRequest:
+      type: object
+      required:
+        - gallery_id
+        - recipients
+      properties:
+        gallery_id:
+          type: string
+          format: uuid
+        recipients:
+          type: array
+          items:
+            type: object
+            properties:
+              email:
+                type: string
+                format: email
+              name:
+                type: string
+              access_level:
+                type: string
+                enum: [view, select, download]
+                default: view
+          minItems: 1
+          maxItems: 100
+        personal_message:
+          type: string
+          maxLength: 2000
+
+    SelectionReminderRequest:
+      type: object
+      required:
+        - gallery_id
+      properties:
+        gallery_id:
+          type: string
+          format: uuid
+        client_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: Specific clients to remind (all if empty)
+
+    NotificationLog:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        channel:
+          type: string
+          enum: [email, push, in_app]
+        template_name:
+          type: string
+        recipient:
+          type: string
+        subject:
+          type: string
+          nullable: true
+        status:
+          type: string
+          enum: [pending, sent, delivered, failed]
+        sent_at:
+          type: string
+          format: date-time
+          nullable: true
+        delivered_at:
+          type: string
+          format: date-time
+          nullable: true
+        failure_reason:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+
+    NotificationHistoryResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/NotificationLog'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    RegisterPushTokenRequest:
+      type: object
+      required:
+        - token
+        - platform
+      properties:
+        token:
+          type: string
+        platform:
+          type: string
+          enum: [ios, android, web]
+        device_name:
+          type: string
+
+    UnregisterPushTokenRequest:
+      type: object
+      required:
+        - token
+      properties:
+        token:
+          type: string
+
+    MessageResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            message:
+              type: string
+
+    Pagination:
+      type: object
+      properties:
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        total_pages:
+          type: integer
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+
+    ValidationErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          enum: [VALIDATION_ERROR]
+        message:
+          type: string
+        details:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+              message:
+                type: string
+
+security:
+  - bearerAuth: []

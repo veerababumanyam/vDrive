@@ -1,0 +1,895 @@
+openapi: 3.1.0
+info:
+  title: vDrive Face Recognition API
+  description: Face detection, recognition, and people management
+  version: 1.0.0
+  contact:
+    name: vDrive API Support
+    email: api@vdrive.io
+
+servers:
+  - url: https://app.vdrive.io/api/v1
+    description: Production
+  - url: http://localhost:8002/api/v1
+    description: Face service (local)
+
+tags:
+  - name: Detection
+    description: Face detection operations
+  - name: People
+    description: People management
+  - name: Find Me
+    description: Client face search feature
+
+paths:
+  /faces/detect:
+    post:
+      tags:
+        - Detection
+      summary: Detect faces in image
+      description: Detect faces in an image and return bounding boxes
+      operationId: detectFaces
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DetectRequest'
+      responses:
+        '200':
+          description: Faces detected
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetectResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Asset not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /faces/recognize:
+    post:
+      tags:
+        - Detection
+      summary: Recognize faces
+      description: Identify detected faces against known people
+      operationId: recognizeFaces
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecognizeRequest'
+      responses:
+        '200':
+          description: Recognition results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecognizeResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /faces/{faceId}/assign:
+    post:
+      tags:
+        - Detection
+      summary: Assign face to person
+      description: Manually assign a detected face to a person
+      operationId: assignFaceToPerson
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: faceId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssignFaceRequest'
+      responses:
+        '200':
+          description: Face assigned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FaceDetectionResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /faces/{faceId}/verify:
+    post:
+      tags:
+        - Detection
+      summary: Verify face assignment
+      description: Mark a face-person assignment as verified
+      operationId: verifyFaceAssignment
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: faceId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Face verified
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FaceDetectionResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /faces/{faceId}/unassign:
+    post:
+      tags:
+        - Detection
+      summary: Unassign face from person
+      description: Remove person assignment from a face
+      operationId: unassignFace
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: faceId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Face unassigned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FaceDetectionResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /people:
+    get:
+      tags:
+        - People
+      summary: List people
+      description: Get paginated list of people in workspace
+      operationId: listPeople
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - name: search
+          in: query
+          schema:
+            type: string
+          description: Search by name
+      responses:
+        '200':
+          description: List of people
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PeopleListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    post:
+      tags:
+        - People
+      summary: Create person
+      description: Create a new person for face tagging
+      operationId: createPerson
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PersonCreateRequest'
+      responses:
+        '201':
+          description: Person created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /people/{personId}:
+    get:
+      tags:
+        - People
+      summary: Get person
+      description: Get person details by ID
+      operationId: getPerson
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: personId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Person details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    patch:
+      tags:
+        - People
+      summary: Update person
+      description: Update person details
+      operationId: updatePerson
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: personId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PersonUpdateRequest'
+      responses:
+        '200':
+          description: Person updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags:
+        - People
+      summary: Delete person
+      description: Delete a person and unassign all faces
+      operationId: deletePerson
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: personId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Person deleted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /people/{personId}/photos:
+    get:
+      tags:
+        - People
+      summary: Get person's photos
+      description: Get all photos containing this person
+      operationId: getPersonPhotos
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: personId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - name: gallery_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+          description: Filter by gallery
+      responses:
+        '200':
+          description: Photos containing person
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonPhotosResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /people/{personId}/merge:
+    post:
+      tags:
+        - People
+      summary: Merge people
+      description: Merge another person into this one
+      operationId: mergePeople
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: personId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Target person (to merge into)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MergePeopleRequest'
+      responses:
+        '200':
+          description: People merged
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /find-me:
+    post:
+      tags:
+        - Find Me
+      summary: Find photos of client
+      description: Client-facing endpoint to find photos of themselves
+      operationId: findMe
+      security: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FindMeRequest'
+      responses:
+        '200':
+          description: Matching photos found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FindMeResponse'
+        '400':
+          description: No face detected in selfie
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Invalid gallery token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /find-me/config:
+    get:
+      tags:
+        - Find Me
+      summary: Get Find Me config
+      description: Get Find Me feature configuration for a gallery
+      operationId: getFindMeConfig
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: gallery_id
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Find Me configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FindMeConfigResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    patch:
+      tags:
+        - Find Me
+      summary: Update Find Me config
+      description: Enable or configure Find Me for a gallery
+      operationId: updateFindMeConfig
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FindMeConfigUpdateRequest'
+      responses:
+        '200':
+          description: Configuration updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FindMeConfigResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    PageParam:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+
+    LimitParam:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+
+  responses:
+    Unauthorized:
+      description: Authentication required
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    ValidationError:
+      description: Validation error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ValidationErrorResponse'
+
+  schemas:
+    FaceDetection:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        asset_id:
+          type: string
+          format: uuid
+        person_id:
+          type: string
+          format: uuid
+          nullable: true
+        person_name:
+          type: string
+          nullable: true
+        bounding_box:
+          type: object
+          properties:
+            x:
+              type: number
+            y:
+              type: number
+            width:
+              type: number
+            height:
+              type: number
+        detection_confidence:
+          type: number
+        recognition_confidence:
+          type: number
+          nullable: true
+        is_verified:
+          type: boolean
+        attributes:
+          type: object
+          properties:
+            joy_likelihood:
+              type: string
+            roll_angle:
+              type: number
+            pan_angle:
+              type: number
+        created_at:
+          type: string
+          format: date-time
+
+    FaceDetectionResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/FaceDetection'
+
+    DetectRequest:
+      type: object
+      required:
+        - asset_id
+      properties:
+        asset_id:
+          type: string
+          format: uuid
+        auto_recognize:
+          type: boolean
+          default: true
+          description: Automatically attempt to recognize detected faces
+
+    DetectResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            faces:
+              type: array
+              items:
+                $ref: '#/components/schemas/FaceDetection'
+            processing_time_ms:
+              type: integer
+
+    RecognizeRequest:
+      type: object
+      required:
+        - face_ids
+      properties:
+        face_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          minItems: 1
+          maxItems: 100
+        threshold:
+          type: number
+          minimum: 0.3
+          maximum: 1.0
+          default: 0.5
+          description: Minimum confidence threshold for recognition
+
+    RecognizeResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            results:
+              type: array
+              items:
+                type: object
+                properties:
+                  face_id:
+                    type: string
+                    format: uuid
+                  matches:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        person_id:
+                          type: string
+                          format: uuid
+                        person_name:
+                          type: string
+                        confidence:
+                          type: number
+
+    AssignFaceRequest:
+      type: object
+      required:
+        - person_id
+      properties:
+        person_id:
+          type: string
+          format: uuid
+        verified:
+          type: boolean
+          default: false
+          description: Mark as verified assignment
+
+    Person:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        profile_photo_url:
+          type: string
+          format: uri
+          nullable: true
+        photo_count:
+          type: integer
+        email:
+          type: string
+          format: email
+          nullable: true
+        client_id:
+          type: string
+          format: uuid
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    PersonResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Person'
+
+    PeopleListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Person'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    PersonCreateRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 200
+        description:
+          type: string
+          maxLength: 1000
+        email:
+          type: string
+          format: email
+        client_id:
+          type: string
+          format: uuid
+          description: Link to existing client
+
+    PersonUpdateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 200
+        description:
+          type: string
+          maxLength: 1000
+        email:
+          type: string
+          format: email
+        client_id:
+          type: string
+          format: uuid
+
+    PersonPhotosResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              asset_id:
+                type: string
+                format: uuid
+              gallery_id:
+                type: string
+                format: uuid
+              gallery_name:
+                type: string
+              thumbnail_url:
+                type: string
+                format: uri
+              face_bounding_box:
+                type: object
+                properties:
+                  x:
+                    type: number
+                  y:
+                    type: number
+                  width:
+                    type: number
+                  height:
+                    type: number
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    MergePeopleRequest:
+      type: object
+      required:
+        - source_person_id
+      properties:
+        source_person_id:
+          type: string
+          format: uuid
+          description: Person to merge from (will be deleted)
+
+    FindMeRequest:
+      type: object
+      required:
+        - selfie
+        - gallery_token
+      properties:
+        selfie:
+          type: string
+          format: binary
+          description: Selfie image for face matching
+        gallery_token:
+          type: string
+          description: Magic link token for gallery access
+
+    FindMeResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            matches:
+              type: array
+              items:
+                type: object
+                properties:
+                  asset_id:
+                    type: string
+                    format: uuid
+                  thumbnail_url:
+                    type: string
+                    format: uri
+                  confidence:
+                    type: number
+            total_matches:
+              type: integer
+
+    FindMeConfigResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            gallery_id:
+              type: string
+              format: uuid
+            enabled:
+              type: boolean
+            min_confidence:
+              type: number
+            max_results:
+              type: integer
+            allow_download:
+              type: boolean
+
+    FindMeConfigUpdateRequest:
+      type: object
+      required:
+        - gallery_id
+      properties:
+        gallery_id:
+          type: string
+          format: uuid
+        enabled:
+          type: boolean
+        min_confidence:
+          type: number
+          minimum: 0.3
+          maximum: 1.0
+        max_results:
+          type: integer
+          minimum: 1
+          maximum: 500
+        allow_download:
+          type: boolean
+
+    Pagination:
+      type: object
+      properties:
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        total_pages:
+          type: integer
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+
+    ValidationErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          enum: [VALIDATION_ERROR]
+        message:
+          type: string
+        details:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+              message:
+                type: string
+
+security:
+  - bearerAuth: []

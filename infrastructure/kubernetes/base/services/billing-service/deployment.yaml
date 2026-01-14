@@ -1,0 +1,86 @@
+# ===========================================
+# Billing Service Deployment
+# ===========================================
+# Payment processing with Stripe/Razorpay
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: billing-service
+  namespace: vDrive
+  labels:
+    app: billing-service
+    app.kubernetes.io/name: billing-service
+    app.kubernetes.io/component: api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: billing-service
+  template:
+    metadata:
+      labels:
+        app: billing-service
+        app.kubernetes.io/name: billing-service
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8005"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: vDrive-service
+      containers:
+        - name: billing-service
+          image: ghcr.io/vDrive/billing-service:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8005
+              name: http
+          envFrom:
+            - configMapRef:
+                name: vDrive-config
+            - secretRef:
+                name: vDrive-secrets
+          env:
+            - name: SERVICE_NAME
+              value: "billing-service"
+            - name: PORT
+              value: "8005"
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "1Gi"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+      imagePullSecrets:
+        - name: vDrive-registry
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: billing-service
+  namespace: vDrive
+  labels:
+    app: billing-service
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8005
+      targetPort: 8005
+      protocol: TCP
+      name: http
+  selector:
+    app: billing-service

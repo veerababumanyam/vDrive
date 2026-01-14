@@ -1,0 +1,96 @@
+---
+import BaseLayout from '@/components/layout/BaseLayout.astro';
+import JsonLd from '@/components/seo/JsonLd.astro';
+import { getCollection } from 'astro:content';
+import { generateBreadcrumbSchema, generateOrganizationSchema } from '@/utils/schema';
+
+const posts = (await getCollection('blog'))
+  .filter((post) => !post.data.draft)
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+const schemas = [
+  generateOrganizationSchema(),
+  generateBreadcrumbSchema([
+    { name: 'Home', url: '/' },
+    { name: 'Blog' },
+  ]),
+];
+---
+
+<BaseLayout
+  title="Blog"
+  description="Insights, tutorials, and news for professional photographers using vDrive. Tips on AI tagging, client galleries, and growing your photography business."
+>
+  <JsonLd slot="head" schema={schemas} />
+  <section class="section">
+    <div class="container-lg">
+      <!-- Header -->
+      <div class="mx-auto max-w-2xl text-center">
+        <span class="badge badge-primary">Blog</span>
+        <h1 class="mt-4 text-4xl font-bold tracking-tight text-neutral-900 dark:text-white sm:text-5xl">
+          Insights for Photographers
+        </h1>
+        <p class="mt-6 text-lg text-neutral-600 dark:text-neutral-400">
+          Tips, tutorials, and news to help you grow your photography business.
+        </p>
+      </div>
+
+      <!-- Posts Grid -->
+      <div class="mt-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        {posts.map((post) => (
+          <article class="card-hover group">
+            <a href={`/blog/${post.slug}`} class="block">
+              {post.data.image ? (
+                <div class="aspect-video w-full overflow-hidden rounded-lg bg-neutral-100 dark:bg-neutral-800">
+                  <img
+                    src={post.data.image}
+                    alt={post.data.title}
+                    class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </div>
+              ) : (
+                <div class="aspect-video w-full rounded-lg bg-gradient-to-br from-primary-100 to-accent-100 dark:from-primary-900/30 dark:to-accent-900/30" />
+              )}
+              <div class="mt-4">
+                <div class="flex flex-wrap gap-2">
+                  {post.data.tags.slice(0, 3).map((tag) => (
+                    <span class="text-xs font-medium text-primary-600 dark:text-primary-400">
+                      #{tag}
+                    </span>
+                  ))}
+                </div>
+                <h2 class="mt-2 text-xl font-semibold text-neutral-900 dark:text-white">
+                  {post.data.title}
+                </h2>
+                <p class="mt-2 line-clamp-2 text-neutral-600 dark:text-neutral-400">
+                  {post.data.description}
+                </p>
+                <div class="mt-4 flex items-center gap-3 text-sm text-neutral-500 dark:text-neutral-400">
+                  <span>{post.data.author}</span>
+                  <span>·</span>
+                  <time datetime={post.data.pubDate.toISOString()}>
+                    {post.data.pubDate.toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric',
+                    })}
+                  </time>
+                </div>
+              </div>
+            </a>
+          </article>
+        ))}
+      </div>
+
+      {posts.length === 0 && (
+        <div class="mt-16 text-center">
+          <p class="text-neutral-600 dark:text-neutral-400">
+            No posts yet. Check back soon!
+          </p>
+        </div>
+      )}
+    </div>
+  </section>
+</BaseLayout>

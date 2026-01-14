@@ -1,0 +1,81 @@
+# ===========================================
+# Invitations Service Deployment
+# ===========================================
+# Digital wedding invitations, guest management, RSVP
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: invitations-service
+  namespace: vDrive
+  labels:
+    app: invitations-service
+    app.kubernetes.io/name: invitations-service
+    app.kubernetes.io/component: api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: invitations-service
+  template:
+    metadata:
+      labels:
+        app: invitations-service
+        app.kubernetes.io/name: invitations-service
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8007"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: vDrive-service
+      containers:
+        - name: invitations-service
+          image: ghcr.io/vDrive/invitations-service:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8007
+              name: http
+          envFrom:
+            - configMapRef:
+                name: vDrive-config
+            - secretRef:
+                name: vDrive-secrets
+          env:
+            - name: SERVICE_NAME
+              value: "invitations-service"
+            - name: PORT
+              value: "8007"
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 5
+      imagePullSecrets:
+        - name: vDrive-registry
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: invitations-service
+  namespace: vDrive
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8007
+      targetPort: 8007
+      name: http
+  selector:
+    app: invitations-service

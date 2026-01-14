@@ -2,6 +2,39 @@
 
 User registration, email verification, and workspace initialization microservice.
 
+## Quick Start
+
+```bash
+# 1. Start infrastructure (from project root)
+cd infrastructure/docker
+docker compose -f docker-compose.dev.yml up -d
+
+# 2. Navigate to service
+cd services/onboarding-service
+
+# 3. Install dependencies
+pip install -r requirements.txt
+
+# 4. Create .env file (or copy from example)
+cp .env.example .env
+
+# 5. Seed test users (optional)
+python scripts/seed_test_users.py
+
+# 6. Start the service
+python -m uvicorn src.app.main:app --host 0.0.0.0 --port 8006 --reload
+```
+
+## Service URLs
+
+| Endpoint | URL |
+|----------|-----|
+| API Base | http://localhost:8006 |
+| Health Check | http://localhost:8006/health |
+| API Docs (Swagger) | http://localhost:8006/docs |
+| API Docs (ReDoc) | http://localhost:8006/redoc |
+| OpenAPI Schema | http://localhost:8006/openapi.json |
+
 ## Overview
 
 The Onboarding Service handles the complete user onboarding flow:
@@ -15,6 +48,14 @@ The Onboarding Service handles the complete user onboarding flow:
 ## API Reference
 
 Base URL: `/api/v1/onboarding`
+
+### Authentication
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/auth/login` | POST | User login (returns JWT) |
+| `/auth/logout` | POST | User logout |
+| `/auth/refresh` | POST | Refresh access token |
 
 ### Registration
 
@@ -201,6 +242,65 @@ Published to Kafka:
 - `user.email.verified` - Email verified
 - `workspace.created` - Workspace created
 - `onboarding.completed` - Onboarding finished
+
+## Test Users
+
+All test users use password: `Test@123`
+
+To seed test users:
+```bash
+python scripts/seed_test_users.py
+```
+
+### Tier Users
+| Email | Name | User ID |
+|-------|------|---------|
+| free@test.vdrive.in | Free Tier | 11111111-1111-1111-1111-111111111001 |
+| starter@test.vdrive.in | Starter Tier | 11111111-1111-1111-1111-111111111002 |
+| professional@test.vdrive.in | Professional Tier | 11111111-1111-1111-1111-111111111003 |
+| business@test.vdrive.in | Business Tier | 11111111-1111-1111-1111-111111111004 |
+| enterprise@test.vdrive.in | Enterprise Tier | 11111111-1111-1111-1111-111111111005 |
+
+### Platform Admins
+| Email | Name | User ID |
+|-------|------|---------|
+| superadmin@test.vdrive.in | Super Admin | 22222222-2222-2222-2222-222222222001 |
+| platformadmin@test.vdrive.in | Platform Admin | 22222222-2222-2222-2222-222222222002 |
+
+## Testing Login
+
+### Using curl
+
+```bash
+# Login
+curl -X POST http://localhost:8006/api/v1/onboarding/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email": "free@test.vdrive.in", "password": "Test@123"}'
+
+# Response
+{
+  "access_token": "eyJhbG...",
+  "token_type": "bearer",
+  "user_id": "11111111-1111-1111-1111-111111111001",
+  "email": "free@test.vdrive.in",
+  "full_name": "Free Tier",
+  "email_verified": true
+}
+
+# Use access token for authenticated requests
+curl http://localhost:8006/api/v1/onboarding/state \
+  -H "Authorization: Bearer <access_token>"
+```
+
+### Using PowerShell
+
+```powershell
+# Run test script
+.\scripts\test_login.ps1
+
+# With custom credentials
+.\scripts\test_login.ps1 -Email "superadmin@test.vdrive.in" -Password "Test@123"
+```
 
 ## Autoscaling
 

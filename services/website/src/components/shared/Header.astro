@@ -1,0 +1,176 @@
+---
+import ThemeToggle from '@/components/shared/ThemeToggle.astro';
+import { headerNav, headerCTAs } from '@/data/navigation';
+
+const APP_URL = import.meta.env.APP_URL || 'https://app.vdrive.io';
+---
+
+<header class="sticky top-0 z-50 w-full border-b border-neutral-200 bg-white/80 backdrop-blur-md dark:border-neutral-800 dark:bg-neutral-950/80 transition-colors duration-200">
+  <nav class="container-lg" aria-label="Main navigation">
+    <div class="flex h-16 items-center justify-between">
+      <!-- Logo -->
+      <a href="/" class="flex items-center gap-2" aria-label="vDrive Home">
+        <svg
+          class="h-8 w-8 text-primary-500"
+          viewBox="0 0 32 32"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true"
+        >
+          <rect width="32" height="32" rx="8" fill="currentColor" />
+          <path
+            d="M8 12L16 8L24 12V20L16 24L8 20V12Z"
+            stroke="white"
+            stroke-width="2"
+            fill="none"
+          />
+          <circle cx="16" cy="16" r="3" fill="white" />
+        </svg>
+        <span class="text-xl font-bold text-neutral-900 dark:text-white">
+          vDrive
+        </span>
+      </a>
+
+      <!-- Desktop Navigation -->
+      <div class="hidden md:flex md:items-center md:gap-8">
+        {
+          headerNav.map((item) => (
+            <a
+              href={item.href}
+              class="text-sm font-medium text-neutral-600 transition-colors hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white"
+            >
+              {item.label}
+            </a>
+          ))
+        }
+      </div>
+
+      <!-- Actions -->
+      <div class="flex items-center gap-3">
+        <!-- Theme Toggle -->
+        <ThemeToggle />
+
+        <!-- Sign In (desktop only) -->
+        <a
+          href={`${APP_URL}/sign-in`}
+          class="hidden text-sm font-medium text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white sm:block transition-colors"
+        >
+          {headerCTAs.signIn.label}
+        </a>
+
+        <!-- Start Free CTA -->
+        <a href={`${APP_URL}/sign-up`} class="btn btn-primary btn-sm">
+          {headerCTAs.signUp.label}
+        </a>
+
+        <!-- Mobile Menu Button -->
+        <button
+          id="mobile-menu-button"
+          type="button"
+          class="rounded-lg p-2 text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800 md:hidden transition-colors"
+          aria-label="Open menu"
+          aria-expanded="false"
+          aria-controls="mobile-menu"
+        >
+          <svg
+            id="menu-icon-open"
+            class="h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            aria-hidden="true"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M4 6h16M4 12h16M4 18h16"
+            />
+          </svg>
+          <svg
+            id="menu-icon-close"
+            class="h-6 w-6 hidden"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            aria-hidden="true"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Mobile Menu -->
+  <div
+    id="mobile-menu"
+    class="hidden border-t border-neutral-200 bg-white px-4 py-4 dark:border-neutral-800 dark:bg-neutral-950 md:hidden transition-colors"
+    role="navigation"
+    aria-label="Mobile navigation"
+  >
+    <div class="flex flex-col gap-4">
+      {
+        headerNav.map((item) => (
+          <a
+            href={item.href}
+            class="text-base font-medium text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors"
+          >
+            {item.label}
+          </a>
+        ))
+      }
+      <hr class="border-neutral-200 dark:border-neutral-800" />
+      <a
+        href={`${APP_URL}/sign-in`}
+        class="text-base font-medium text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white transition-colors"
+      >
+        Sign in
+      </a>
+      <a
+        href={`${APP_URL}/sign-up`}
+        class="btn btn-primary w-full text-center"
+      >
+        Start Free Trial
+      </a>
+    </div>
+  </div>
+</header>
+
+<script>
+  function initMobileMenu() {
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const menuIconOpen = document.getElementById('menu-icon-open');
+    const menuIconClose = document.getElementById('menu-icon-close');
+
+    mobileMenuButton?.addEventListener('click', () => {
+      const isExpanded = mobileMenuButton.getAttribute('aria-expanded') === 'true';
+      mobileMenuButton.setAttribute('aria-expanded', String(!isExpanded));
+      mobileMenu?.classList.toggle('hidden');
+      menuIconOpen?.classList.toggle('hidden');
+      menuIconClose?.classList.toggle('hidden');
+    });
+
+    // Close menu on escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !mobileMenu?.classList.contains('hidden')) {
+        mobileMenu?.classList.add('hidden');
+        mobileMenuButton?.setAttribute('aria-expanded', 'false');
+        menuIconOpen?.classList.remove('hidden');
+        menuIconClose?.classList.add('hidden');
+      }
+    });
+  }
+
+  // Initialize on page load
+  initMobileMenu();
+
+  // Re-initialize on Astro view transitions
+  document.addEventListener('astro:after-swap', initMobileMenu);
+</script>

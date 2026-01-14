@@ -4,6 +4,7 @@ OAuth API endpoints.
 Handles Google OAuth authentication flow.
 """
 
+import logging
 from urllib.parse import quote
 
 from fastapi import APIRouter, Depends, Query, status
@@ -12,10 +13,13 @@ from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.app.core.config import settings
+
 from src.app.core.database import get_db
 from src.app.core.redis import get_redis
 from src.app.events.kafka_producer import KafkaProducer, get_kafka_producer
 from src.app.services.oauth_service import OAuthService
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=["oauth"])
 
@@ -92,6 +96,10 @@ async def google_oauth_callback(
         return RedirectResponse(url=redirect_url, status_code=status.HTTP_302_FOUND)
 
     except Exception as e:
+        # Log the error for debugging
+        logger.error("OAuth callback failed", extra={"error": str(e)}, exc_info=True)
         # Redirect to login with error
-        error_url = f"{settings.APP_URL}/login?error=oauth_failed&message=Authentication failed"
+        error_url = (
+            f"{settings.APP_URL}/login?error=oauth_failed&message=Authentication failed"
+        )
         return RedirectResponse(url=error_url, status_code=status.HTTP_302_FOUND)

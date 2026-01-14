@@ -4,13 +4,14 @@ Email verification API endpoints.
 Handles email verification and resend functionality.
 """
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.app.core.config import settings
 from src.app.core.database import get_db
+from src.app.core.redis import RedisKeys
 from src.app.events.kafka_producer import KafkaProducer, get_kafka_producer
-from src.app.middleware.auth import CurrentUser, get_current_user
-from src.app.middleware.rate_limit import RateLimiter, get_rate_limiter, rate_limit_resend
+from src.app.middleware.rate_limit import RateLimiter, get_client_ip, get_rate_limiter
 from src.app.schemas.verification import (
     ResendVerificationRequest,
     ResendVerificationResponse,
@@ -63,6 +64,7 @@ async def verify_email(
 )
 async def resend_verification(
     request: ResendVerificationRequest,
+    http_request: Request,
     db: AsyncSession = Depends(get_db),
     rate_limiter: RateLimiter = Depends(get_rate_limiter),
 ) -> ResendVerificationResponse:
@@ -73,10 +75,29 @@ async def resend_verification(
     - Generates new verification token
     - Sends new verification email
 
-    Rate limited to 3 requests per user per hour.
+    Rate limited to 3 requests per IP per hour.
     """
-    # Note: Rate limiting by email is done inside the service
-    # to avoid revealing if email exists
+    # Rate limit by IP to prevent abuse while not revealing email existence
+    ip = get_client_ip(http_request)
+    key = RedisKeys.rate_limit_resend(ip)
+
+    allowed, remaining, retry_after = await rate_limiter.check_rate_limit(
+        key=key,
+        max_requests=settings.RATE_LIMIT_RESEND_MAX,
+        window_seconds=settings.RATE_LIMIT_RESEND_WINDOW_SECONDS,
+    )
+
+    if not allowed:
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail={
+                "error": "RateLimitExceeded",
+                "message": "Too many resend requests. Please wait before trying again.",
+                "retry_after": retry_after,
+            },
+            headers={"Retry-After": str(retry_after)},
+        )
+
     service = VerificationService(db)
     result = await service.resend_verification_email(request)
     return ResendVerificationResponse(**result)

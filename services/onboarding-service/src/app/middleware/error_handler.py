@@ -4,7 +4,7 @@ Centralized error handling for consistent API responses.
 Provides custom exceptions and exception handlers for FastAPI.
 """
 
-import traceback
+import logging
 from typing import Any, Dict, List, Optional
 
 from fastapi import FastAPI, Request, status
@@ -12,7 +12,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from pydantic import ValidationError as PydanticValidationError
 
-from src.app.core.config import settings
+logger = logging.getLogger(__name__)
 
 
 # ===========================================
@@ -222,9 +222,17 @@ async def pydantic_error_handler(
 
 async def generic_error_handler(request: Request, exc: Exception) -> JSONResponse:
     """Handle unexpected errors."""
-    # Log the full error in development
-    if settings.APP_ENV != "production":
-        traceback.print_exc()
+    # Log the full error with structured logging
+    logger.error(
+        "Unhandled exception",
+        extra={
+            "error_type": type(exc).__name__,
+            "error_message": str(exc),
+            "path": str(request.url.path),
+            "method": request.method,
+        },
+        exc_info=True,
+    )
 
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

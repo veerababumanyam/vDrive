@@ -1,0 +1,1436 @@
+openapi: 3.1.0
+info:
+  title: vDrive Invitations API
+  description: Event invitations, RSVPs, and guest list management
+  version: 1.0.0
+  contact:
+    name: vDrive API Support
+    email: api@vdrive.io
+
+servers:
+  - url: https://app.vdrive.io/api/v1
+    description: Production
+  - url: http://localhost:8007/api/v1
+    description: Invitations service (local)
+
+tags:
+  - name: Invitations
+    description: Event invitation management
+  - name: RSVP
+    description: RSVP handling
+  - name: Guests
+    description: Guest list management
+  - name: Templates
+    description: Invitation templates
+
+paths:
+  /invitations:
+    get:
+      tags:
+        - Invitations
+      summary: List invitations
+      description: Get all invitations for the workspace
+      operationId: listInvitations
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [draft, sent, cancelled]
+        - name: event_type
+          in: query
+          schema:
+            type: string
+            enum: [wedding, corporate, birthday, other]
+        - name: search
+          in: query
+          schema:
+            type: string
+          description: Search by title or client name
+      responses:
+        '200':
+          description: List of invitations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvitationListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    post:
+      tags:
+        - Invitations
+      summary: Create invitation
+      description: Create a new event invitation
+      operationId: createInvitation
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateInvitationRequest'
+      responses:
+        '201':
+          description: Invitation created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvitationResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /invitations/{invitationId}:
+    get:
+      tags:
+        - Invitations
+      summary: Get invitation
+      description: Get invitation details
+      operationId: getInvitation
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: invitationId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Invitation details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvitationResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    patch:
+      tags:
+        - Invitations
+      summary: Update invitation
+      description: Update invitation details
+      operationId: updateInvitation
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: invitationId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateInvitationRequest'
+      responses:
+        '200':
+          description: Invitation updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvitationResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+    delete:
+      tags:
+        - Invitations
+      summary: Delete invitation
+      description: Delete an invitation (only drafts)
+      operationId: deleteInvitation
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: invitationId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Invitation deleted
+        '400':
+          description: Cannot delete sent invitation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /invitations/{invitationId}/send:
+    post:
+      tags:
+        - Invitations
+      summary: Send invitation
+      description: Send invitation to all guests
+      operationId: sendInvitation
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: invitationId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendInvitationRequest'
+      responses:
+        '202':
+          description: Invitations queued for sending
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendInvitationResponse'
+        '400':
+          description: No guests to send to
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /invitations/{invitationId}/cancel:
+    post:
+      tags:
+        - Invitations
+      summary: Cancel invitation
+      description: Cancel a sent invitation
+      operationId: cancelInvitation
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: invitationId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+                  maxLength: 500
+                notify_guests:
+                  type: boolean
+                  default: true
+      responses:
+        '200':
+          description: Invitation cancelled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvitationResponse'
+        '400':
+          description: Invitation not sent yet
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /invitations/{invitationId}/preview:
+    get:
+      tags:
+        - Invitations
+      summary: Preview invitation
+      description: Get invitation preview HTML
+      operationId: previewInvitation
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: invitationId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Invitation preview
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PreviewResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /invitations/{invitationId}/guests:
+    get:
+      tags:
+        - Guests
+      summary: List guests
+      description: Get guest list for an invitation
+      operationId: listGuests
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: invitationId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - name: rsvp_status
+          in: query
+          schema:
+            type: string
+            enum: [pending, attending, declined, maybe]
+        - name: search
+          in: query
+          schema:
+            type: string
+          description: Search by name or email
+      responses:
+        '200':
+          description: Guest list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GuestListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    post:
+      tags:
+        - Guests
+      summary: Add guests
+      description: Add guests to invitation
+      operationId: addGuests
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: invitationId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddGuestsRequest'
+      responses:
+        '201':
+          description: Guests added
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddGuestsResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /invitations/{invitationId}/guests/{guestId}:
+    get:
+      tags:
+        - Guests
+      summary: Get guest
+      description: Get guest details
+      operationId: getGuest
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: invitationId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: guestId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Guest details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GuestResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    patch:
+      tags:
+        - Guests
+      summary: Update guest
+      description: Update guest information
+      operationId: updateGuest
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: invitationId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: guestId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateGuestRequest'
+      responses:
+        '200':
+          description: Guest updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GuestResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags:
+        - Guests
+      summary: Remove guest
+      description: Remove guest from invitation
+      operationId: removeGuest
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: invitationId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: guestId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Guest removed
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /invitations/{invitationId}/guests/import:
+    post:
+      tags:
+        - Guests
+      summary: Import guests
+      description: Import guests from CSV file
+      operationId: importGuests
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: invitationId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: CSV file with guest data
+                skip_duplicates:
+                  type: boolean
+                  default: true
+      responses:
+        '200':
+          description: Import results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportGuestsResponse'
+        '400':
+          description: Invalid CSV format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /invitations/{invitationId}/guests/export:
+    get:
+      tags:
+        - Guests
+      summary: Export guests
+      description: Export guest list to CSV
+      operationId: exportGuests
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: invitationId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: format
+          in: query
+          schema:
+            type: string
+            enum: [csv, xlsx]
+            default: csv
+      responses:
+        '200':
+          description: Guest list export
+          content:
+            text/csv:
+              schema:
+                type: string
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+                format: binary
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /invitations/{invitationId}/rsvp:
+    get:
+      tags:
+        - RSVP
+      summary: Get RSVP page
+      description: Get public RSVP page data (no auth required)
+      operationId: getRsvpPage
+      security: []
+      parameters:
+        - name: invitationId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: token
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Guest-specific RSVP token
+      responses:
+        '200':
+          description: RSVP page data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RsvpPageResponse'
+        '400':
+          description: Invalid or expired token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    post:
+      tags:
+        - RSVP
+      summary: Submit RSVP
+      description: Submit RSVP response (no auth required)
+      operationId: submitRsvp
+      security: []
+      parameters:
+        - name: invitationId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubmitRsvpRequest'
+      responses:
+        '200':
+          description: RSVP submitted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RsvpResponse'
+        '400':
+          description: Invalid token or RSVP closed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /invitations/{invitationId}/stats:
+    get:
+      tags:
+        - Invitations
+      summary: Get RSVP statistics
+      description: Get RSVP response statistics
+      operationId: getRsvpStats
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: invitationId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: RSVP statistics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RsvpStatsResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /invitations/{invitationId}/reminder:
+    post:
+      tags:
+        - Invitations
+      summary: Send RSVP reminder
+      description: Send reminder to guests who haven't responded
+      operationId: sendRsvpReminder
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: invitationId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                guest_ids:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+                  description: Specific guests to remind (all pending if empty)
+                custom_message:
+                  type: string
+                  maxLength: 500
+      responses:
+        '202':
+          description: Reminders queued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendInvitationResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /invitation-templates:
+    get:
+      tags:
+        - Templates
+      summary: List templates
+      description: Get available invitation templates
+      operationId: listInvitationTemplates
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: event_type
+          in: query
+          schema:
+            type: string
+            enum: [wedding, corporate, birthday, other]
+      responses:
+        '200':
+          description: List of templates
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemplateListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /invitation-templates/{templateId}:
+    get:
+      tags:
+        - Templates
+      summary: Get template
+      description: Get template details and preview
+      operationId: getInvitationTemplate
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: templateId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Template details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemplateResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    PageParam:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+
+    LimitParam:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+
+  responses:
+    Unauthorized:
+      description: Authentication required
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    ValidationError:
+      description: Validation error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ValidationErrorResponse'
+
+  schemas:
+    Invitation:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        workspace_id:
+          type: string
+          format: uuid
+        client_id:
+          type: string
+          format: uuid
+          nullable: true
+        title:
+          type: string
+        event_type:
+          type: string
+          enum: [wedding, corporate, birthday, other]
+        event_date:
+          type: string
+          format: date-time
+        event_end_date:
+          type: string
+          format: date-time
+          nullable: true
+        venue_name:
+          type: string
+          nullable: true
+        venue_address:
+          type: string
+          nullable: true
+        venue_map_url:
+          type: string
+          format: uri
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        template_id:
+          type: string
+        custom_styles:
+          type: object
+          nullable: true
+        cover_image_url:
+          type: string
+          format: uri
+          nullable: true
+        rsvp_deadline:
+          type: string
+          format: date-time
+          nullable: true
+        allow_plus_ones:
+          type: boolean
+        max_plus_ones:
+          type: integer
+        dietary_options:
+          type: array
+          items:
+            type: string
+        custom_questions:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomQuestion'
+        status:
+          type: string
+          enum: [draft, sent, cancelled]
+        sent_at:
+          type: string
+          format: date-time
+          nullable: true
+        guest_count:
+          type: integer
+        rsvp_stats:
+          $ref: '#/components/schemas/RsvpStatsSummary'
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    CustomQuestion:
+      type: object
+      properties:
+        id:
+          type: string
+        question:
+          type: string
+        type:
+          type: string
+          enum: [text, select, multiselect]
+        options:
+          type: array
+          items:
+            type: string
+        required:
+          type: boolean
+
+    RsvpStatsSummary:
+      type: object
+      properties:
+        pending:
+          type: integer
+        attending:
+          type: integer
+        declined:
+          type: integer
+        maybe:
+          type: integer
+
+    Guest:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        invitation_id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        name:
+          type: string
+        phone:
+          type: string
+          nullable: true
+        group_name:
+          type: string
+          nullable: true
+          description: E.g., "Family", "Friends", "Colleagues"
+        rsvp_status:
+          type: string
+          enum: [pending, attending, declined, maybe]
+        rsvp_token:
+          type: string
+        plus_ones:
+          type: integer
+          nullable: true
+        plus_one_names:
+          type: array
+          items:
+            type: string
+        dietary_requirements:
+          type: array
+          items:
+            type: string
+        custom_answers:
+          type: object
+        notes:
+          type: string
+          nullable: true
+        responded_at:
+          type: string
+          format: date-time
+          nullable: true
+        reminder_sent_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+
+    InvitationTemplate:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        event_type:
+          type: string
+          enum: [wedding, corporate, birthday, other]
+        preview_url:
+          type: string
+          format: uri
+        is_premium:
+          type: boolean
+        customizable_fields:
+          type: array
+          items:
+            type: string
+
+    CreateInvitationRequest:
+      type: object
+      required:
+        - title
+        - event_type
+        - event_date
+        - template_id
+      properties:
+        client_id:
+          type: string
+          format: uuid
+        title:
+          type: string
+          maxLength: 200
+        event_type:
+          type: string
+          enum: [wedding, corporate, birthday, other]
+        event_date:
+          type: string
+          format: date-time
+        event_end_date:
+          type: string
+          format: date-time
+        venue_name:
+          type: string
+          maxLength: 200
+        venue_address:
+          type: string
+          maxLength: 500
+        venue_map_url:
+          type: string
+          format: uri
+        description:
+          type: string
+          maxLength: 5000
+        template_id:
+          type: string
+        custom_styles:
+          type: object
+        cover_image_url:
+          type: string
+          format: uri
+        rsvp_deadline:
+          type: string
+          format: date-time
+        allow_plus_ones:
+          type: boolean
+          default: true
+        max_plus_ones:
+          type: integer
+          default: 1
+        dietary_options:
+          type: array
+          items:
+            type: string
+        custom_questions:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomQuestion'
+
+    UpdateInvitationRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          maxLength: 200
+        event_date:
+          type: string
+          format: date-time
+        event_end_date:
+          type: string
+          format: date-time
+        venue_name:
+          type: string
+          maxLength: 200
+        venue_address:
+          type: string
+          maxLength: 500
+        venue_map_url:
+          type: string
+          format: uri
+        description:
+          type: string
+          maxLength: 5000
+        template_id:
+          type: string
+        custom_styles:
+          type: object
+        cover_image_url:
+          type: string
+          format: uri
+        rsvp_deadline:
+          type: string
+          format: date-time
+        allow_plus_ones:
+          type: boolean
+        max_plus_ones:
+          type: integer
+        dietary_options:
+          type: array
+          items:
+            type: string
+        custom_questions:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomQuestion'
+
+    SendInvitationRequest:
+      type: object
+      properties:
+        guest_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: Specific guests to send to (all if empty)
+        schedule_at:
+          type: string
+          format: date-time
+          description: Schedule send time (immediate if not specified)
+
+    SendInvitationResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            sent_count:
+              type: integer
+            scheduled_at:
+              type: string
+              format: date-time
+              nullable: true
+
+    AddGuestsRequest:
+      type: object
+      required:
+        - guests
+      properties:
+        guests:
+          type: array
+          items:
+            type: object
+            required:
+              - email
+              - name
+            properties:
+              email:
+                type: string
+                format: email
+              name:
+                type: string
+                maxLength: 200
+              phone:
+                type: string
+              group_name:
+                type: string
+          minItems: 1
+          maxItems: 500
+
+    AddGuestsResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            added:
+              type: integer
+            duplicates_skipped:
+              type: integer
+            guests:
+              type: array
+              items:
+                $ref: '#/components/schemas/Guest'
+
+    UpdateGuestRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        name:
+          type: string
+          maxLength: 200
+        phone:
+          type: string
+        group_name:
+          type: string
+        notes:
+          type: string
+          maxLength: 1000
+
+    ImportGuestsResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            imported:
+              type: integer
+            duplicates_skipped:
+              type: integer
+            errors:
+              type: array
+              items:
+                type: object
+                properties:
+                  row:
+                    type: integer
+                  error:
+                    type: string
+
+    SubmitRsvpRequest:
+      type: object
+      required:
+        - token
+        - status
+      properties:
+        token:
+          type: string
+        status:
+          type: string
+          enum: [attending, declined, maybe]
+        plus_ones:
+          type: integer
+          minimum: 0
+        plus_one_names:
+          type: array
+          items:
+            type: string
+        dietary_requirements:
+          type: array
+          items:
+            type: string
+        custom_answers:
+          type: object
+        message:
+          type: string
+          maxLength: 1000
+          description: Optional message to host
+
+    RsvpPageResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            invitation:
+              type: object
+              properties:
+                title:
+                  type: string
+                event_type:
+                  type: string
+                event_date:
+                  type: string
+                  format: date-time
+                event_end_date:
+                  type: string
+                  format: date-time
+                  nullable: true
+                venue_name:
+                  type: string
+                venue_address:
+                  type: string
+                venue_map_url:
+                  type: string
+                  format: uri
+                description:
+                  type: string
+                cover_image_url:
+                  type: string
+                  format: uri
+                rsvp_deadline:
+                  type: string
+                  format: date-time
+                  nullable: true
+                allow_plus_ones:
+                  type: boolean
+                max_plus_ones:
+                  type: integer
+                dietary_options:
+                  type: array
+                  items:
+                    type: string
+                custom_questions:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/CustomQuestion'
+            guest:
+              type: object
+              properties:
+                name:
+                  type: string
+                current_status:
+                  type: string
+                  enum: [pending, attending, declined, maybe]
+            host:
+              type: object
+              properties:
+                name:
+                  type: string
+                business_name:
+                  type: string
+            is_closed:
+              type: boolean
+              description: True if past RSVP deadline
+
+    RsvpResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            status:
+              type: string
+              enum: [attending, declined, maybe]
+            message:
+              type: string
+
+    RsvpStatsResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            total_guests:
+              type: integer
+            pending:
+              type: integer
+            attending:
+              type: integer
+            declined:
+              type: integer
+            maybe:
+              type: integer
+            total_plus_ones:
+              type: integer
+            dietary_breakdown:
+              type: object
+              additionalProperties:
+                type: integer
+            response_rate:
+              type: number
+              format: float
+              description: Percentage of guests who responded
+
+    PreviewResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            html:
+              type: string
+            subject:
+              type: string
+
+    InvitationResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Invitation'
+
+    InvitationListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Invitation'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    GuestResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Guest'
+
+    GuestListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Guest'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    TemplateResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/InvitationTemplate'
+
+    TemplateListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/InvitationTemplate'
+
+    Pagination:
+      type: object
+      properties:
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        total_pages:
+          type: integer
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+
+    ValidationErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          enum: [VALIDATION_ERROR]
+        message:
+          type: string
+        details:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+              message:
+                type: string
+
+security:
+  - bearerAuth: []

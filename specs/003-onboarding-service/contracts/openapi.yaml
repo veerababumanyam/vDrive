@@ -1,0 +1,835 @@
+openapi: 3.1.0
+info:
+  title: vDrive Onboarding Service API
+  description: |
+    API for user registration, email verification, and workspace initialization.
+
+    ## Authentication
+    - Public endpoints: Registration, OAuth, email verification
+    - Protected endpoints: Workspace creation, onboarding state (require JWT Bearer token)
+
+    ## Rate Limiting
+    - Registration: 5 attempts per IP per 15 minutes
+    - Verification resend: 3 per hour
+  version: 1.0.0
+  contact:
+    name: vDrive Engineering
+    email: engineering@vdrive.io
+
+servers:
+  - url: http://localhost:8006
+    description: Local development
+  - url: https://app.vdrive.io
+    description: Production
+
+tags:
+  - name: Registration
+    description: User registration endpoints
+  - name: OAuth
+    description: Google OAuth authentication
+  - name: Verification
+    description: Email verification endpoints
+  - name: Workspace
+    description: Workspace creation and management
+  - name: Onboarding
+    description: Onboarding progress tracking
+  - name: Health
+    description: Service health and metrics
+
+paths:
+  # ============================================
+  # Registration Endpoints
+  # ============================================
+  /api/v1/onboarding/register:
+    post:
+      tags:
+        - Registration
+      summary: Register new user
+      description: |
+        Create a new user account with email/password.
+        Sends verification email upon successful registration.
+      operationId: registerUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegistrationRequest'
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegistrationResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Email already registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/onboarding/check-email:
+    post:
+      tags:
+        - Registration
+      summary: Check email availability
+      description: Check if an email address is available for registration.
+      operationId: checkEmailAvailability
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: photographer@example.com
+      responses:
+        '200':
+          description: Email availability status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  available:
+                    type: boolean
+                  message:
+                    type: string
+
+  # ============================================
+  # OAuth Endpoints
+  # ============================================
+  /api/v1/onboarding/oauth/google:
+    get:
+      tags:
+        - OAuth
+      summary: Initiate Google OAuth
+      description: Redirect to Google OAuth authorization page.
+      operationId: initiateGoogleOAuth
+      parameters:
+        - name: redirect_uri
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uri
+          description: Override default redirect URI
+      responses:
+        '302':
+          description: Redirect to Google OAuth
+          headers:
+            Location:
+              schema:
+                type: string
+                format: uri
+
+  /api/v1/onboarding/oauth/google/callback:
+    get:
+      tags:
+        - OAuth
+      summary: Google OAuth callback
+      description: Handle OAuth callback from Google.
+      operationId: googleOAuthCallback
+      parameters:
+        - name: code
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Authorization code from Google
+        - name: state
+          in: query
+          required: true
+          schema:
+            type: string
+          description: CSRF state token
+      responses:
+        '200':
+          description: OAuth successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuthResponse'
+        '400':
+          description: OAuth error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  # ============================================
+  # Verification Endpoints
+  # ============================================
+  /api/v1/onboarding/verify-email:
+    get:
+      tags:
+        - Verification
+      summary: Verify email address
+      description: Verify user email using token from verification email.
+      operationId: verifyEmail
+      parameters:
+        - name: token
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Verification token from email
+      responses:
+        '200':
+          description: Email verified successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationResponse'
+        '400':
+          description: Invalid or expired token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/onboarding/resend-verification:
+    post:
+      tags:
+        - Verification
+      summary: Resend verification email
+      description: Request a new verification email. Rate limited to 3 per hour.
+      operationId: resendVerification
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+              properties:
+                email:
+                  type: string
+                  format: email
+      responses:
+        '200':
+          description: Verification email sent
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Verification email sent
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  # ============================================
+  # Workspace Endpoints
+  # ============================================
+  /api/v1/onboarding/workspaces:
+    post:
+      tags:
+        - Workspace
+      summary: Create workspace
+      description: Create a new workspace for the authenticated user.
+      operationId: createWorkspace
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkspaceCreateRequest'
+      responses:
+        '201':
+          description: Workspace created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkspaceResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Slug already taken
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/onboarding/workspaces/check-slug:
+    post:
+      tags:
+        - Workspace
+      summary: Check slug availability
+      description: Check if a workspace slug is available.
+      operationId: checkSlugAvailability
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - slug
+              properties:
+                slug:
+                  type: string
+                  pattern: '^[a-z0-9][a-z0-9-]*[a-z0-9]$'
+                  minLength: 3
+                  maxLength: 100
+                  example: lumina-photography
+      responses:
+        '200':
+          description: Slug availability status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  available:
+                    type: boolean
+                  suggestions:
+                    type: array
+                    items:
+                      type: string
+                    description: Alternative suggestions if unavailable
+
+  /api/v1/onboarding/workspaces/suggest-slug:
+    post:
+      tags:
+        - Workspace
+      summary: Generate slug suggestion
+      description: Generate a URL-safe slug from business name.
+      operationId: suggestSlug
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                  example: Lumina Photography Studios
+      responses:
+        '200':
+          description: Slug suggestion
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  slug:
+                    type: string
+                    example: lumina-photography-studios
+                  available:
+                    type: boolean
+
+  # ============================================
+  # Onboarding State Endpoints
+  # ============================================
+  /api/v1/onboarding/state:
+    get:
+      tags:
+        - Onboarding
+      summary: Get onboarding state
+      description: Retrieve current onboarding progress for the authenticated user.
+      operationId: getOnboardingState
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Current onboarding state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OnboardingStateResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    patch:
+      tags:
+        - Onboarding
+      summary: Update onboarding state
+      description: Update onboarding progress (step completion, form data).
+      operationId: updateOnboardingState
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OnboardingStateUpdateRequest'
+      responses:
+        '200':
+          description: State updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OnboardingStateResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/onboarding/state/reset:
+    post:
+      tags:
+        - Onboarding
+      summary: Reset onboarding state
+      description: Clear onboarding progress and start fresh.
+      operationId: resetOnboardingState
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: State reset successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Onboarding state reset
+
+  # ============================================
+  # User Preferences Endpoints
+  # ============================================
+  /api/v1/onboarding/preferences/theme:
+    patch:
+      tags:
+        - Onboarding
+      summary: Update theme preference
+      description: Update user's theme preference (light/dark/system).
+      operationId: updateThemePreference
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - theme
+              properties:
+                theme:
+                  type: string
+                  enum: [light, dark, system]
+      responses:
+        '200':
+          description: Theme preference updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  theme:
+                    type: string
+                    enum: [light, dark, system]
+
+  # ============================================
+  # Health Endpoints
+  # ============================================
+  /health:
+    get:
+      tags:
+        - Health
+      summary: Health check
+      description: Basic health check endpoint for liveness probe.
+      operationId: healthCheck
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: healthy
+                  service:
+                    type: string
+                    example: onboarding-service
+
+  /ready:
+    get:
+      tags:
+        - Health
+      summary: Readiness check
+      description: Readiness check for Kubernetes readiness probe.
+      operationId: readinessCheck
+      responses:
+        '200':
+          description: Service is ready
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ready:
+                    type: boolean
+                  checks:
+                    type: object
+                    properties:
+                      database:
+                        type: boolean
+                      redis:
+                        type: boolean
+                      kafka:
+                        type: boolean
+        '503':
+          description: Service not ready
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ready:
+                    type: boolean
+                    example: false
+                  checks:
+                    type: object
+
+  /metrics:
+    get:
+      tags:
+        - Health
+      summary: Prometheus metrics
+      description: Expose Prometheus metrics for KEDA autoscaling.
+      operationId: getMetrics
+      responses:
+        '200':
+          description: Prometheus metrics
+          content:
+            text/plain:
+              schema:
+                type: string
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT access token from registration or login
+
+  schemas:
+    # ============================================
+    # Request Schemas
+    # ============================================
+    RegistrationRequest:
+      type: object
+      required:
+        - email
+        - password
+        - first_name
+        - last_name
+        - business_name
+        - turnstile_token
+        - agree_to_terms
+        - agree_to_privacy
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 255
+          example: photographer@example.com
+        password:
+          type: string
+          minLength: 8
+          maxLength: 128
+          description: |
+            Must contain: uppercase, lowercase, number, special character
+          example: SecureP@ss123
+        first_name:
+          type: string
+          minLength: 1
+          maxLength: 100
+          example: John
+        last_name:
+          type: string
+          minLength: 1
+          maxLength: 100
+          example: Smith
+        business_name:
+          type: string
+          minLength: 1
+          maxLength: 255
+          example: Lumina Photography
+        turnstile_token:
+          type: string
+          description: Cloudflare Turnstile verification token
+        agree_to_terms:
+          type: boolean
+          description: Must be true
+        agree_to_privacy:
+          type: boolean
+          description: Must be true
+
+    WorkspaceCreateRequest:
+      type: object
+      required:
+        - name
+        - slug
+        - business_type
+        - timezone
+        - currency
+        - date_format
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+          example: Lumina Photography
+        slug:
+          type: string
+          pattern: '^[a-z0-9][a-z0-9-]*[a-z0-9]$'
+          minLength: 3
+          maxLength: 100
+          example: lumina-photography
+        business_type:
+          type: string
+          enum: [WEDDING, PORTRAIT, EVENT, CORPORATE, OTHER]
+        timezone:
+          type: string
+          example: America/New_York
+        currency:
+          type: string
+          pattern: '^[A-Z]{3}$'
+          example: USD
+        date_format:
+          type: string
+          enum: [MDY, DMY, YMD]
+        logo_url:
+          type: string
+          format: uri
+          nullable: true
+        brand_color:
+          type: string
+          pattern: '^#[0-9A-Fa-f]{6}$'
+          nullable: true
+          example: '#3B82F6'
+
+    OnboardingStateUpdateRequest:
+      type: object
+      properties:
+        current_step:
+          type: string
+          enum:
+            - registration
+            - email_verification
+            - workspace_basics
+            - workspace_settings
+            - workspace_branding
+            - completed
+        completed_steps:
+          type: array
+          items:
+            type: string
+        form_data:
+          type: object
+          additionalProperties: true
+
+    # ============================================
+    # Response Schemas
+    # ============================================
+    RegistrationResponse:
+      type: object
+      properties:
+        user_id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        email_verified:
+          type: boolean
+          default: false
+        message:
+          type: string
+          example: Registration successful. Please verify your email.
+        access_token:
+          type: string
+        refresh_token:
+          type: string
+        token_type:
+          type: string
+          default: bearer
+        expires_in:
+          type: integer
+          description: Token expiration in seconds
+
+    OAuthResponse:
+      type: object
+      properties:
+        user_id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        email_verified:
+          type: boolean
+          default: true
+        is_new_user:
+          type: boolean
+        access_token:
+          type: string
+        refresh_token:
+          type: string
+        token_type:
+          type: string
+          default: bearer
+        expires_in:
+          type: integer
+
+    VerificationResponse:
+      type: object
+      properties:
+        user_id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        email_verified:
+          type: boolean
+          default: true
+        message:
+          type: string
+          example: Email verified successfully
+        access_token:
+          type: string
+        refresh_token:
+          type: string
+
+    WorkspaceResponse:
+      type: object
+      properties:
+        workspace_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        slug:
+          type: string
+        business_type:
+          type: string
+        timezone:
+          type: string
+        currency:
+          type: string
+        date_format:
+          type: string
+        subscription_tier:
+          type: string
+          example: PRO_TRIAL
+        trial_expires_at:
+          type: string
+          format: date-time
+        storage_limit_bytes:
+          type: integer
+          format: int64
+        ai_credits:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+
+    OnboardingStateResponse:
+      type: object
+      properties:
+        user_id:
+          type: string
+          format: uuid
+        current_step:
+          type: string
+        completed_steps:
+          type: array
+          items:
+            type: string
+        form_data:
+          type: object
+          additionalProperties: true
+        started_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        completion_percentage:
+          type: integer
+          minimum: 0
+          maximum: 100
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+        - message
+      properties:
+        error:
+          type: string
+          example: ValidationError
+        message:
+          type: string
+          example: Invalid email format
+        status_code:
+          type: integer
+          example: 400
+        details:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+              message:
+                type: string

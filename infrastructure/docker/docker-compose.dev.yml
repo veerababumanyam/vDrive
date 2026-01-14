@@ -1,0 +1,454 @@
+# vDrive ULTIMATE Development Stack
+# Usage: docker compose -f infrastructure/docker/docker-compose.dev.yml up -d
+#
+# This stack includes EVERYTHING:
+# - Core: Postgres, Redis, Kafka, Zookeeper, Traefik
+# - Observability: Prometheus, Grafana, Loki, Promtail, Alertmanager
+# - Vector DB: Milvus, Etcd, Minio
+# - Tools: Kafka-UI, Flower, Exporters
+# - Apps: Website, Frontend, Backend, Onboarding
+#
+# SINGLE NODE CONFIGURATION (No HA Duplicates)
+
+name: vDrive-dev
+
+services:
+  # ===================
+  # PostgreSQL 16
+  # ===================
+  postgres:
+    image: timescale/timescaledb-ha:pg16
+    container_name: vDrive-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-vDrive}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-vDrive_dev_password}
+      POSTGRES_DB: ${POSTGRES_DB:-vDrive}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/home/postgres/pgdata/data
+      - ../scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-vDrive} -d ${POSTGRES_DB:-vDrive}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - vDrive-network
+
+  # ===================
+  # Redis 7
+  # ===================
+  redis:
+    image: redis:7-alpine
+    container_name: vDrive-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --maxmemory 512mb --maxmemory-policy allkeys-lru
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - vDrive-network
+
+  # ===================
+  # Zookeeper
+  # ===================
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: vDrive-zookeeper
+    restart: unless-stopped
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+    volumes:
+      - zookeeper_data:/var/lib/zookeeper/data
+      - zookeeper_log:/var/lib/zookeeper/log
+    healthcheck:
+      test: [ "CMD-SHELL", "echo ruok | nc localhost 2181 || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - vDrive-network
+
+  # ===================
+  # Kafka
+  # ===================
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: vDrive-kafka
+    restart: unless-stopped
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+    ports:
+      - "9092:9092"
+      - "9093:9093"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      # Explicitly listen on all interfaces
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:29092,PLAINTEXT_HOST://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    volumes:
+      - kafka_data:/var/lib/kafka/data
+    healthcheck:
+      test: [ "CMD-SHELL", "kafka-topics --bootstrap-server localhost:9092 --list" ]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    networks:
+      - vDrive-network
+
+  # ===================
+  # Kafka UI
+  # ===================
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: vDrive-kafka-ui
+    restart: unless-stopped
+    environment:
+      KAFKA_CLUSTERS_0_NAME: vDrive
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
+      KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
+      DYNAMIC_CONFIG_ENABLED: "true"
+    ports:
+      - "8081:8080"
+    networks:
+      - vDrive-network
+
+  # ===================
+  # Minio (S3 Compatible Storage)
+  # ===================
+  minio:
+    image: minio/minio:latest
+    container_name: vDrive-minio
+    restart: unless-stopped
+    environment:
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    command: minio server /data --console-address ":9001"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    networks:
+      - vDrive-network
+
+  # ===================
+  # Milvus (Vector DB) Dependencies: Etcd
+  # ===================
+  etcd:
+    image: quay.io/coreos/etcd:v3.5.5
+    container_name: vDrive-etcd
+    restart: unless-stopped
+    environment:
+      - ETCD_AUTO_COMPACTION_MODE=revision
+      - ETCD_AUTO_COMPACTION_RETENTION=1000
+      - ETCD_QUOTA_BACKEND_BYTES=4294967296
+    volumes:
+      - etcd_data:/etcd
+    command: etcd -advertise-client-urls=http://127.0.0.1:2379 -listen-client-urls=http://0.0.0.0:2379 --data-dir /etcd
+    networks:
+      - vDrive-network
+
+  # ===================
+  # Milvus (Vector DB)
+  # ===================
+  milvus:
+    image: milvusdb/milvus:v2.3.0
+    container_name: vDrive-milvus
+    restart: unless-stopped
+    command: [ "milvus", "run", "standalone" ]
+    environment:
+      ETCD_ENDPOINTS: etcd:2379
+      MINIO_ADDRESS: minio:9000
+    volumes:
+      - milvus_data:/var/lib/milvus
+    ports:
+      - "19530:19530"
+      - "9091:9091"
+    depends_on:
+      - etcd
+      - minio
+    networks:
+      - vDrive-network
+
+  # ===================
+  # Traefik (API Gateway)
+  # ===================
+  traefik:
+    image: traefik:v3.0
+    container_name: vDrive-traefik
+    restart: unless-stopped
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--metrics.prometheus=true"
+    ports:
+      - "80:80"
+      - "8080:8080"
+      - "8082:8082"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - vDrive-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # ===================
+  # Observability
+  # ===================
+  prometheus:
+    image: prom/prometheus:v2.47.0
+    container_name: vDrive-prometheus
+    restart: unless-stopped
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yaml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.enable-lifecycle"
+      - "--web.enable-admin-api"
+    ports:
+      - "9090:9090"
+    volumes:
+      - ../monitoring/prometheus/prometheus.yaml:/etc/prometheus/prometheus.yaml:ro
+      - prometheus_data:/prometheus
+    networks:
+      - vDrive-network
+
+  grafana:
+    image: grafana/grafana:10.2.0
+    container_name: vDrive-grafana
+    restart: unless-stopped
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
+      GF_SERVER_ROOT_URL: "http://localhost:3001"
+      GF_INSTALL_PLUGINS: grafana-clock-panel,grafana-simple-json-datasource
+    ports:
+      - "3001:3000"
+    volumes:
+      - ../monitoring/grafana/datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml:ro
+      - ../monitoring/grafana/dashboards.yaml:/etc/grafana/provisioning/dashboards/dashboards.yaml:ro
+      - ../monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - grafana_data:/var/lib/grafana
+    networks:
+      - vDrive-network
+
+  loki:
+    image: grafana/loki:3.0.0
+    container_name: vDrive-loki
+    restart: unless-stopped
+    command: -config.file=/etc/loki/loki-config.yaml
+    ports:
+      - "3100:3100"
+    volumes:
+      - ../monitoring/loki/loki-config.yaml:/etc/loki/loki-config.yaml:ro
+      - loki_data:/loki
+    networks:
+      - vDrive-network
+
+  promtail:
+    image: grafana/promtail:3.0.0
+    container_name: vDrive-promtail
+    restart: unless-stopped
+    command: -config.file=/etc/promtail/promtail-config.yaml
+    volumes:
+      - ../monitoring/promtail/promtail-config.yaml:/etc/promtail/promtail-config.yaml:ro
+      - /var/log:/var/log:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - vDrive-network
+
+  alertmanager:
+    image: prom/alertmanager:v0.27.0
+    container_name: vDrive-alertmanager
+    restart: unless-stopped
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yaml'
+    ports:
+      - "9094:9093"
+    volumes:
+      - ../monitoring/alertmanager/alertmanager.yaml:/etc/alertmanager/alertmanager.yaml:ro
+      - alertmanager_data:/alertmanager
+    networks:
+      - vDrive-network
+
+  # ===================
+  # Exporters & Tools
+  # ===================
+  redis-exporter:
+    image: oliver006/redis_exporter:latest
+    container_name: vDrive-redis-exporter
+    environment:
+      REDIS_ADDR: redis://redis:6379
+    ports:
+      - "9121:9121"
+    networks:
+      - vDrive-network
+
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter:latest
+    container_name: vDrive-postgres-exporter
+    environment:
+      DATA_SOURCE_NAME: "postgresql://${POSTGRES_USER:-vDrive}:${POSTGRES_PASSWORD:-vDrive_dev_password}@postgres:5432/${POSTGRES_DB:-vDrive}?sslmode=disable"
+    ports:
+      - "9187:9187"
+    networks:
+      - vDrive-network
+
+  kafka-exporter:
+    image: danielqsj/kafka-exporter:latest
+    container_name: vDrive-kafka-exporter
+    command:
+      - "--kafka.server=kafka:29092"
+    ports:
+      - "9308:9308"
+    networks:
+      - vDrive-network
+
+  flower:
+    image: mher/flower:latest
+    container_name: vDrive-flower
+    environment:
+      CELERY_BROKER_URL: redis://redis:6379/1
+      FLOWER_PORT: 5555
+    ports:
+      - "5555:5555"
+    networks:
+      - vDrive-network
+  # ===================
+  # Apps (Single Node)
+  # ===================
+  # Website service disabled (Build error)
+  # website:
+  #   build:
+  #     context: ../../services/website
+  #     dockerfile: Dockerfile
+  #     args:
+  #       SITE_URL: ${WEBSITE_URL:-https://www.vdrive.io}
+  #   image: ghcr.io/vdrive/website:${VERSION:-latest}
+  #   container_name: vDrive-website
+  #   ports:
+  #     - "${WEBSITE_PORT:-8020}:8020"
+  #   networks:
+  #     - vDrive-network
+
+  # Frontend service disabled (Directory missing)
+  # frontend:
+  #   build:
+  #     context: ../../frontend
+  #     dockerfile: Dockerfile
+  #     args:
+  #       VITE_API_URL: ${API_URL:-https://app.vdrive.io/api}
+  #   image: ghcr.io/vdrive/frontend:${VERSION:-latest}
+  #   container_name: vDrive-frontend
+  #   ports:
+  #     - "${FRONTEND_PORT:-3000}:80"
+  #   networks:
+  #     - vDrive-network
+
+  # Backend service disabled (Build error)
+  # backend:
+  #   build:
+  #     context: ../../backend
+  #     dockerfile: Dockerfile
+  #   image: ghcr.io/vdrive/backend:${VERSION:-latest}
+  #   container_name: vDrive-backend
+  #   ports:
+  #     - "${BACKEND_PORT:-8000}:8000"
+  #   environment:
+  #     SERVICE_NAME: backend
+  #     PORT: "8000"
+  #     DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-vDrive}:${POSTGRES_PASSWORD:-vDrive_dev_password}@postgres:5432/${POSTGRES_DB:-vDrive}
+  #     REDIS_URL: redis://redis:6379/0
+  #     KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+  #     JWT_PRIVATE_KEY: ${JWT_PRIVATE_KEY}
+  #     JWT_PUBLIC_KEY: ${JWT_PUBLIC_KEY}
+  #     JWT_ALGORITHM: EdDSA
+  #     MILVUS_URI: http://milvus:19530
+  #   networks:
+  #     - vDrive-network
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #     redis:
+  #       condition: service_healthy
+  #     kafka:
+  #       condition: service_healthy # Wait for Kafka but not strict healthy if we removed healthcheck? No we didn't.
+
+  # Onboarding service disabled (Build error)
+  # onboarding-service:
+  #   build:
+  #     context: ../../services/onboarding-service
+  #     dockerfile: Dockerfile
+  #   image: ghcr.io/vdrive/onboarding-service:${VERSION:-latest}
+  #   container_name: vDrive-onboarding
+  #   ports:
+  #     - "${ONBOARDING_SERVICE_PORT:-8006}:8006"
+  #   environment:
+  #     SERVICE_NAME: onboarding-service
+  #     PORT: "8006"
+  #     DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-vDrive}:${POSTGRES_PASSWORD:-vDrive_dev_password}@postgres:5432/${POSTGRES_DB:-vDrive}
+  #     REDIS_URL: redis://redis:6379/0
+  #     KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+  #   networks:
+  #     - vDrive-network
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+
+networks:
+  vDrive-network:
+    driver: bridge
+    name: vDrive-network
+
+volumes:
+  postgres_data:
+    name: vDrive-postgres-data
+  redis_data:
+    name: vDrive-redis-data
+  zookeeper_data:
+    name: vDrive-zookeeper-data
+  zookeeper_log:
+    name: vDrive-zookeeper-log
+  kafka_data:
+    name: vDrive-kafka-data
+  prometheus_data:
+    name: vDrive-prometheus-data
+  grafana_data:
+    name: vDrive-grafana-data
+  alertmanager_data:
+    name: vDrive-alertmanager-data
+  loki_data:
+    name: vDrive-loki-data
+  minio_data:
+    name: vDrive-minio-data
+  etcd_data:
+    name: vDrive-etcd-data
+  milvus_data:
+    name: vDrive-milvus-data

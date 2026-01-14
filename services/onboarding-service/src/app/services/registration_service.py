@@ -147,7 +147,14 @@ class RegistrationService:
             )
             await self.kafka_producer.publish_user_registered(event)
 
-        # 9. Create access token
+        # 9. Send verification email (non-blocking, best-effort)
+        await self._send_verification_email(
+            email=user.email,
+            token=plain_token,
+            first_name=user.first_name,
+        )
+
+        # 10. Create access token
         access_token = create_access_token(
             data={
                 "sub": user.id,
@@ -155,9 +162,6 @@ class RegistrationService:
                 "email_verified": False,
             }
         )
-
-        # Note: Verification email is sent by the calling endpoint after registration
-        # The endpoint uses VerificationService.send_verification_email for this
 
         return RegistrationResponse(
             user_id=user.id,
@@ -190,3 +194,58 @@ class RegistrationService:
             available=True,
             message="Email is available",
         )
+
+    async def _send_verification_email(
+        self,
+        email: str,
+        token: str,
+        first_name: str,
+    ) -> bool:
+        """
+        Send verification email via notification service.
+
+        This is a best-effort operation - failures are logged but don't
+        block registration. Users can request resend if needed.
+
+        Args:
+            email: Email address to send to
+            token: Plain text verification token
+            first_name: User's first name for personalization
+
+        Returns:
+            True if sent successfully, False otherwise
+        """
+        verification_url = f"{settings.APP_URL}/verify-email?token={token}"
+
+        try:
+            async with httpx.AsyncClient(timeout=10.0) as client:
+                response = await client.post(
+                    f"{settings.NOTIFICATION_SERVICE_URL}/api/v1/email/send",
+                    json={
+                        "to": email,
+                        "template": "email_verification",
+                        "data": {
+                            "first_name": first_name,
+                            "verification_url": verification_url,
+                            "expires_in_hours": settings.EMAIL_VERIFICATION_EXPIRE_HOURS,
+                        },
+                    },
+                )
+                if response.status_code != 200:
+                    logger.warning(
+                        "Failed to send verification email",
+                        extra={
+                            "email": email,
+                            "status_code": response.status_code,
+                            "response": response.text[:200],
+                        },
+                    )
+                return response.status_code == 200
+        except Exception as e:
+            # Log error but don't fail registration - email delivery is best-effort
+            logger.error(
+                "Error sending verification email",
+                extra={"email": email, "error": str(e)},
+                exc_info=True,
+            )
+            return False

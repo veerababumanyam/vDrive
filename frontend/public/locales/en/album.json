@@ -1,0 +1,137 @@
+{
+  "viewer": {
+    "title": "Album Proof",
+    "loading": "Loading album...",
+    "error": "Failed to load album",
+    "retry": "Retry",
+    "spread": "Spread {{number}}",
+    "spreadsCount": "{{count}} spreads",
+    "zoom": {
+      "in": "Zoom in",
+      "out": "Zoom out",
+      "reset": "Reset zoom",
+      "fit": "Fit to screen"
+    },
+    "navigation": {
+      "previous": "Previous spread",
+      "next": "Next spread",
+      "first": "Go to first spread",
+      "last": "Go to last spread",
+      "goTo": "Go to spread"
+    },
+    "viewMode": {
+      "single": "Single view",
+      "flipbook": "Flipbook view",
+      "thumbnails": "Show thumbnails"
+    },
+    "fullscreen": {
+      "enter": "Enter fullscreen",
+      "exit": "Exit fullscreen"
+    }
+  },
+  "comments": {
+    "title": "Comments",
+    "empty": "No comments yet",
+    "addComment": "Add comment",
+    "placeholder": "Type your comment...",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "reply": "Reply",
+    "resolve": "Mark as resolved",
+    "reopen": "Reopen",
+    "delete": "Delete comment",
+    "deleteConfirm": "Are you sure you want to delete this comment?",
+    "filter": {
+      "all": "All comments",
+      "unresolved": "Unresolved only",
+      "resolved": "Resolved"
+    },
+    "status": {
+      "open": "Open",
+      "in_progress": "In Progress",
+      "resolved": "Resolved"
+    },
+    "form": {
+      "name": "Your name",
+      "namePlaceholder": "Enter your name",
+      "email": "Email (optional)",
+      "emailPlaceholder": "Enter your email",
+      "message": "Comment",
+      "messagePlaceholder": "Click anywhere on the spread to place a comment pin, then type your feedback here..."
+    },
+    "pin": {
+      "click": "Click to view comment",
+      "number": "Comment #{{number}}"
+    },
+    "count": "{{count}} comment",
+    "count_plural": "{{count}} comments",
+    "unresolvedCount": "{{count}} unresolved"
+  },
+  "approval": {
+    "title": "Approve Album",
+    "badge": {
+      "approved": "Approved by {{name}} on {{date}}",
+      "pending": "Pending Approval"
+    },
+    "button": "Approve to Print",
+    "dialog": {
+      "title": "Approve Album for Print",
+      "description": "By approving this album, you confirm that all spreads are correct and ready for printing. This action cannot be undone.",
+      "warningUnresolved": "Warning: There are {{count}} unresolved comments. Are you sure you want to approve?",
+      "acknowledgeUnresolved": "I acknowledge the unresolved comments and still want to approve",
+      "nameLabel": "Your name",
+      "namePlaceholder": "Enter your full name",
+      "emailLabel": "Your email",
+      "emailPlaceholder": "Enter your email",
+      "confirm": "Approve Album",
+      "cancel": "Cancel"
+    },
+    "success": "Album approved successfully",
+    "error": "Failed to approve album"
+  },
+  "versions": {
+    "title": "Version History",
+    "current": "Current version",
+    "create": "Create Snapshot",
+    "createLabel": "Version label (optional)",
+    "createPlaceholder": "e.g., 'After client feedback'",
+    "rollback": "Restore this version",
+    "rollbackConfirm": "Are you sure you want to restore this version? Current changes will be lost.",
+    "compare": "Compare versions",
+    "comparing": "Comparing versions",
+    "changes": {
+      "spreadsAdded": "{{count}} spread added",
+      "spreadsAdded_plural": "{{count}} spreads added",
+      "spreadsRemoved": "{{count}} spread removed",
+      "spreadsRemoved_plural": "{{count}} spreads removed",
+      "spreadsModified": "{{count}} spread modified",
+      "spreadsModified_plural": "{{count}} spreads modified",
+      "noChanges": "No changes"
+    },
+    "version": "Version {{number}}",
+    "autoSaved": "Auto-saved on proof send"
+  },
+  "download": {
+    "button": "Download Preview",
+    "generating": "Generating PDF...",
+    "ready": "PDF ready",
+    "error": "Failed to generate PDF",
+    "retry": "Retry download",
+    "watermarked": "This preview is watermarked for review purposes only"
+  },
+  "status": {
+    "draft": "Draft",
+    "proof_sent": "Proof Sent",
+    "changes_requested": "Changes Requested",
+    "approved": "Approved",
+    "exported": "Exported"
+  },
+  "accessibility": {
+    "spreadViewer": "Album spread viewer",
+    "currentSpread": "Currently viewing spread {{number}} of {{total}}",
+    "commentPin": "Comment pin at position {{x}}%, {{y}}%",
+    "zoomLevel": "Current zoom level: {{level}}%",
+    "skipToSpreads": "Skip to spreads",
+    "skipToComments": "Skip to comments"
+  }
+}

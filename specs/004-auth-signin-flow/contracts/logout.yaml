@@ -1,0 +1,143 @@
+# API Contract: Logout Endpoint
+# POST /api/v1/onboarding/logout
+# Invalidate session and clear tokens
+
+openapi: 3.1.0
+info:
+  title: Logout API
+  version: 1.0.0
+
+paths:
+  /api/v1/onboarding/logout:
+    post:
+      operationId: logout
+      summary: End user session
+      description: |
+        Invalidates the current session, clears the refresh token cookie,
+        and logs the logout event for audit.
+
+        The session is removed from Redis, preventing future token refreshes.
+        Frontend should also clear any in-memory access token.
+
+        Can be called with or without valid access token (idempotent).
+      tags:
+        - authentication
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Logout successful
+          headers:
+            Set-Cookie:
+              description: Refresh token cookie cleared
+              schema:
+                type: string
+                example: "refresh_token=; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=0"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogoutResponse'
+              example:
+                message: "Successfully logged out"
+        '401':
+          description: Invalid access token (still clears cookie)
+          headers:
+            Set-Cookie:
+              description: Refresh token cookie cleared
+              schema:
+                type: string
+                example: "refresh_token=; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=0"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogoutResponse'
+              example:
+                message: "Session already ended"
+
+  /api/v1/onboarding/logout/all:
+    post:
+      operationId: logoutAll
+      summary: End all user sessions
+      description: |
+        Invalidates ALL sessions for the authenticated user across all devices.
+        Useful for security incidents or password changes.
+
+        Requires valid access token to identify the user.
+      tags:
+        - authentication
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: All sessions terminated
+          headers:
+            Set-Cookie:
+              description: Current refresh token cookie cleared
+              schema:
+                type: string
+                example: "refresh_token=; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=0"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogoutAllResponse'
+              example:
+                message: "All sessions terminated"
+                sessions_terminated: 3
+        '401':
+          description: Invalid or missing access token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "unauthorized"
+                message: "Valid access token required"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT access token in Authorization header
+
+  schemas:
+    LogoutResponse:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          description: Confirmation message
+          example: "Successfully logged out"
+
+    LogoutAllResponse:
+      type: object
+      required:
+        - message
+        - sessions_terminated
+      properties:
+        message:
+          type: string
+          description: Confirmation message
+          example: "All sessions terminated"
+        sessions_terminated:
+          type: integer
+          description: Number of sessions that were terminated
+          example: 3
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+        - message
+      properties:
+        error:
+          type: string
+          description: Error code
+          example: "unauthorized"
+        message:
+          type: string
+          description: Human-readable error message
+          example: "Valid access token required"

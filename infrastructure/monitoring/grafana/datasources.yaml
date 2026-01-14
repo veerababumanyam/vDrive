@@ -1,0 +1,76 @@
+# ===========================================
+# Grafana Data Sources Configuration
+# ===========================================
+# vDrive Monitoring Data Sources
+
+apiVersion: 1
+
+datasources:
+  # ===========================================
+  # Prometheus - Metrics
+  # ===========================================
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+    editable: false
+    jsonData:
+      httpMethod: POST
+      manageAlerts: true
+      prometheusType: Prometheus
+      prometheusVersion: ">=2.40.0"
+      cacheLevel: 'High'
+      disableRecordingRules: false
+      incrementalQueryOverlapWindow: 10m
+
+  # ===========================================
+  # Loki - Logs
+  # ===========================================
+  - name: Loki
+    type: loki
+    access: proxy
+    url: http://loki:3100
+    editable: false
+    jsonData:
+      maxLines: 1000
+      derivedFields:
+        - datasourceUid: Prometheus
+          matcherRegex: "trace_id=(\\w+)"
+          name: TraceID
+          url: "$${__value.raw}"
+
+  # ===========================================
+  # PostgreSQL - Direct Queries (optional)
+  # ===========================================
+  # - name: PostgreSQL
+  #   type: postgres
+  #   url: postgres:5432
+  #   database: vDrive
+  #   user: grafana_readonly
+  #   secureJsonData:
+  #     password: ${GRAFANA_POSTGRES_PASSWORD}
+  #   jsonData:
+  #     sslmode: disable
+  #     maxOpenConns: 5
+  #     maxIdleConns: 2
+  #     connMaxLifetime: 14400
+
+  # ===========================================
+  # Tempo - Tracing (optional)
+  # ===========================================
+  # - name: Tempo
+  #   type: tempo
+  #   access: proxy
+  #   url: http://tempo:3200
+  #   editable: false
+  #   jsonData:
+  #     httpMethod: GET
+  #     tracesToLogs:
+  #       datasourceUid: Loki
+  #       filterByTraceID: true
+  #       filterBySpanID: false
+  #     nodeGraph:
+  #       enabled: true
+  #     lokiSearch:
+  #       datasourceUid: Loki

@@ -1,0 +1,234 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom Base Styles */
+@layer base {
+  :root {
+    /* Brand Colors */
+    --color-primary: 14 165 233; /* sky-500 */
+    --color-accent: 217 70 239; /* fuchsia-500 */
+
+    /* Background */
+    --color-bg: 255 255 255;
+    --color-bg-secondary: 250 250 250;
+    --color-bg-tertiary: 245 245 245;
+
+    /* Text */
+    --color-text: 23 23 23;
+    --color-text-secondary: 115 115 115;
+    --color-text-muted: 163 163 163;
+
+    /* Border */
+    --color-border: 229 229 229;
+    --color-border-secondary: 212 212 212;
+  }
+
+  .dark {
+    --color-bg: 10 10 10;
+    --color-bg-secondary: 23 23 23;
+    --color-bg-tertiary: 38 38 38;
+
+    --color-text: 250 250 250;
+    --color-text-secondary: 163 163 163;
+    --color-text-muted: 115 115 115;
+
+    --color-border: 38 38 38;
+    --color-border-secondary: 64 64 64;
+  }
+
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply bg-white text-neutral-900 antialiased;
+    @apply dark:bg-neutral-950 dark:text-neutral-50;
+    font-feature-settings: 'rlig' 1, 'calt' 1;
+  }
+
+  /* Headings */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display font-semibold tracking-tight;
+  }
+
+  h1 {
+    @apply text-4xl sm:text-5xl lg:text-6xl;
+  }
+
+  h2 {
+    @apply text-3xl sm:text-4xl;
+  }
+
+  h3 {
+    @apply text-2xl sm:text-3xl;
+  }
+
+  /* Links */
+  a {
+    @apply transition-colors duration-200;
+  }
+
+  /* Selection */
+  ::selection {
+    @apply bg-primary-500/20 text-primary-900;
+  }
+
+  .dark ::selection {
+    @apply bg-primary-400/30 text-primary-100;
+  }
+
+  /* Focus Styles */
+  :focus-visible {
+    @apply outline-none ring-2 ring-primary-500 ring-offset-2;
+    @apply dark:ring-offset-neutral-950;
+  }
+}
+
+/* Custom Component Styles */
+@layer components {
+  /* Container */
+  .container-lg {
+    @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+
+  .container-md {
+    @apply mx-auto max-w-5xl px-4 sm:px-6 lg:px-8;
+  }
+
+  .container-sm {
+    @apply mx-auto max-w-3xl px-4 sm:px-6;
+  }
+
+  /* Section Spacing */
+  .section {
+    @apply py-16 sm:py-20 lg:py-24;
+  }
+
+  .section-lg {
+    @apply py-20 sm:py-28 lg:py-32;
+  }
+
+  /* Buttons */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2;
+    @apply px-5 py-2.5 rounded-lg font-medium;
+    @apply transition-all duration-200;
+    @apply focus-visible:ring-2 focus-visible:ring-offset-2;
+  }
+
+  .btn-primary {
+    @apply bg-primary-500 text-white;
+    @apply hover:bg-primary-600 active:bg-primary-700;
+    @apply focus-visible:ring-primary-500;
+  }
+
+  .btn-secondary {
+    @apply bg-neutral-100 text-neutral-900;
+    @apply hover:bg-neutral-200 active:bg-neutral-300;
+    @apply dark:bg-neutral-800 dark:text-neutral-100;
+    @apply dark:hover:bg-neutral-700;
+    @apply focus-visible:ring-neutral-400;
+  }
+
+  .btn-outline {
+    @apply border border-neutral-300 bg-transparent text-neutral-700;
+    @apply hover:bg-neutral-50 active:bg-neutral-100;
+    @apply dark:border-neutral-700 dark:text-neutral-300;
+    @apply dark:hover:bg-neutral-800;
+    @apply focus-visible:ring-neutral-400;
+  }
+
+  .btn-ghost {
+    @apply bg-transparent text-neutral-600;
+    @apply hover:bg-neutral-100 hover:text-neutral-900;
+    @apply dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-neutral-100;
+  }
+
+  .btn-lg {
+    @apply px-6 py-3 text-base;
+  }
+
+  .btn-sm {
+    @apply px-3 py-1.5 text-sm;
+  }
+
+  /* Cards */
+  .card {
+    @apply rounded-xl border border-neutral-200 bg-white p-6;
+    @apply dark:border-neutral-800 dark:bg-neutral-900;
+  }
+
+  .card-hover {
+    @apply card transition-all duration-200;
+    @apply hover:border-neutral-300 hover:shadow-lg;
+    @apply dark:hover:border-neutral-700;
+  }
+
+  /* Badge */
+  .badge {
+    @apply inline-flex items-center gap-1 px-2.5 py-0.5;
+    @apply rounded-full text-xs font-medium;
+  }
+
+  .badge-primary {
+    @apply bg-primary-100 text-primary-700;
+    @apply dark:bg-primary-900/30 dark:text-primary-400;
+  }
+
+  .badge-success {
+    @apply bg-green-100 text-green-700;
+    @apply dark:bg-green-900/30 dark:text-green-400;
+  }
+
+  /* Gradient Text */
+  .gradient-text {
+    @apply bg-gradient-to-r from-primary-500 to-accent-500 bg-clip-text text-transparent;
+  }
+
+  /* Gradient Background */
+  .gradient-bg {
+    @apply bg-gradient-to-br from-primary-500/10 via-transparent to-accent-500/10;
+  }
+
+  /* Prose for Blog/Docs */
+  .prose-custom {
+    @apply prose prose-neutral max-w-none;
+    @apply prose-headings:font-display prose-headings:font-semibold;
+    @apply prose-a:text-primary-500 prose-a:no-underline hover:prose-a:underline;
+    @apply prose-code:rounded prose-code:bg-neutral-100 prose-code:px-1 prose-code:py-0.5;
+    @apply prose-pre:bg-neutral-900 prose-pre:text-neutral-100;
+    @apply dark:prose-invert;
+    @apply dark:prose-code:bg-neutral-800;
+  }
+}
+
+/* Utility Classes */
+@layer utilities {
+  /* Text Balance */
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Hide Scrollbar */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Glass Effect */
+  .glass {
+    @apply backdrop-blur-md bg-white/70;
+    @apply dark:bg-neutral-950/70;
+  }
+
+  /* Animation Delays */
+  .animation-delay-100 { animation-delay: 100ms; }
+  .animation-delay-200 { animation-delay: 200ms; }
+  .animation-delay-300 { animation-delay: 300ms; }
+  .animation-delay-400 { animation-delay: 400ms; }
+  .animation-delay-500 { animation-delay: 500ms; }
+}

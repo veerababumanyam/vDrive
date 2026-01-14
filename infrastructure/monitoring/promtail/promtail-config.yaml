@@ -1,0 +1,149 @@
+# ===========================================
+# Promtail Configuration
+# ===========================================
+# vDrive Log Collection Agent
+
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+    tenant_id: vDrive
+    batchwait: 1s
+    batchsize: 1048576
+    timeout: 10s
+
+scrape_configs:
+  # ===========================================
+  # Docker Container Logs
+  # ===========================================
+  - job_name: containers
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: containerlogs
+          __path__: /var/lib/docker/containers/*/*log
+
+    pipeline_stages:
+      - json:
+          expressions:
+            output: log
+            stream: stream
+            attrs:
+
+      - json:
+          expressions:
+            tag:
+          source: attrs
+
+      - regex:
+          expression: (?P<container_name>(?:[a-zA-Z0-9][a-zA-Z0-9_.-]+))
+          source: tag
+
+      - labels:
+          stream:
+          container_name:
+
+      - output:
+          source: output
+
+  # ===========================================
+  # Docker Compose Service Logs
+  # ===========================================
+  - job_name: docker
+    docker_sd_configs:
+      - host: unix:///var/run/docker.sock
+        refresh_interval: 5s
+    relabel_configs:
+      - source_labels: ['__meta_docker_container_name']
+        regex: '/(.*)'
+        target_label: 'container'
+      - source_labels: ['__meta_docker_container_log_stream']
+        target_label: 'logstream'
+      - source_labels: ['__meta_docker_container_label_com_docker_compose_service']
+        target_label: 'service'
+      - source_labels: ['__meta_docker_container_label_com_docker_compose_project']
+        target_label: 'project'
+
+    pipeline_stages:
+      # Parse JSON logs from FastAPI/Python services
+      - match:
+          selector: '{service=~"backend|gallery-service|billing-service|upload-service|face-service|webhooks-service|onboarding-service|invitations-service|notifications-service"}'
+          stages:
+            - json:
+                expressions:
+                  level: level
+                  message: message
+                  timestamp: timestamp
+                  trace_id: trace_id
+                  span_id: span_id
+                  request_id: request_id
+            - labels:
+                level:
+                trace_id:
+                request_id:
+            - timestamp:
+                source: timestamp
+                format: RFC3339Nano
+
+      # Parse Traefik access logs
+      - match:
+          selector: '{service="traefik"}'
+          stages:
+            - json:
+                expressions:
+                  level: level
+                  msg: msg
+                  request_path: RequestPath
+                  status_code: DownstreamStatus
+                  duration: Duration
+                  client_ip: ClientAddr
+                  service_name: ServiceName
+            - labels:
+                level:
+                status_code:
+                service_name:
+
+      # Parse Kafka logs
+      - match:
+          selector: '{service="kafka"}'
+          stages:
+            - regex:
+                expression: '\[(?P<timestamp>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3})\] (?P<level>\w+) (?P<message>.*)'
+            - labels:
+                level:
+
+      # Add severity labels
+      - match:
+          selector: '{level=~"error|ERROR|Error"}'
+          stages:
+            - labels:
+                severity: error
+
+      - match:
+          selector: '{level=~"warn|WARNING|Warning"}'
+          stages:
+            - labels:
+                severity: warning
+
+      - match:
+          selector: '{level=~"info|INFO|Info"}'
+          stages:
+            - labels:
+                severity: info
+
+  # ===========================================
+  # System Logs (optional)
+  # ===========================================
+  # - job_name: system
+  #   static_configs:
+  #     - targets:
+  #         - localhost
+  #       labels:
+  #         job: varlogs
+  #         __path__: /var/log/*log

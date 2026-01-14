@@ -1,0 +1,879 @@
+openapi: 3.1.0
+info:
+  title: vDrive Gallery API
+  description: Gallery management and publishing endpoints
+  version: 1.0.0
+  contact:
+    name: vDrive API Support
+    email: api@vdrive.io
+
+servers:
+  - url: https://app.vdrive.io/api/v1
+    description: Production
+  - url: http://localhost:8004/api/v1
+    description: Gallery service (local)
+
+tags:
+  - name: Galleries
+    description: Gallery CRUD operations
+  - name: Publishing
+    description: Gallery publishing and sharing
+  - name: Magic Links
+    description: Secure gallery sharing links
+
+paths:
+  /galleries:
+    get:
+      tags:
+        - Galleries
+      summary: List galleries
+      description: Get paginated list of galleries in the workspace
+      operationId: listGalleries
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/SortParam'
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [draft, published, archived]
+        - name: search
+          in: query
+          schema:
+            type: string
+          description: Search by name or description
+      responses:
+        '200':
+          description: List of galleries
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GalleryListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    post:
+      tags:
+        - Galleries
+      summary: Create gallery
+      description: Create a new gallery
+      operationId: createGallery
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GalleryCreateRequest'
+      responses:
+        '201':
+          description: Gallery created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GalleryResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /galleries/{galleryId}:
+    get:
+      tags:
+        - Galleries
+      summary: Get gallery
+      description: Get gallery details by ID
+      operationId: getGallery
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/GalleryIdParam'
+      responses:
+        '200':
+          description: Gallery details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GalleryResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    patch:
+      tags:
+        - Galleries
+      summary: Update gallery
+      description: Update gallery details
+      operationId: updateGallery
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/GalleryIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GalleryUpdateRequest'
+      responses:
+        '200':
+          description: Gallery updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GalleryResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+    delete:
+      tags:
+        - Galleries
+      summary: Delete gallery
+      description: Soft delete a gallery
+      operationId: deleteGallery
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/GalleryIdParam'
+      responses:
+        '204':
+          description: Gallery deleted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /galleries/{galleryId}/assets:
+    get:
+      tags:
+        - Galleries
+      summary: List gallery assets
+      description: Get paginated list of assets in a gallery
+      operationId: listGalleryAssets
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/GalleryIdParam'
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [uploading, processing, ready, failed]
+        - name: selected
+          in: query
+          schema:
+            type: boolean
+          description: Filter by selection status
+      responses:
+        '200':
+          description: List of assets
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssetListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /galleries/{galleryId}/publish:
+    post:
+      tags:
+        - Publishing
+      summary: Publish gallery
+      description: Publish a gallery to make it accessible via magic links
+      operationId: publishGallery
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/GalleryIdParam'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PublishRequest'
+      responses:
+        '200':
+          description: Gallery published
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GalleryResponse'
+        '400':
+          description: Gallery has no assets
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /galleries/{galleryId}/unpublish:
+    post:
+      tags:
+        - Publishing
+      summary: Unpublish gallery
+      description: Unpublish a gallery and revoke all magic links
+      operationId: unpublishGallery
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/GalleryIdParam'
+      responses:
+        '200':
+          description: Gallery unpublished
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GalleryResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /galleries/{galleryId}/magic-links:
+    get:
+      tags:
+        - Magic Links
+      summary: List magic links
+      description: Get all magic links for a gallery
+      operationId: listMagicLinks
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/GalleryIdParam'
+      responses:
+        '200':
+          description: List of magic links
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MagicLinkListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    post:
+      tags:
+        - Magic Links
+      summary: Create magic link
+      description: Generate a new magic link for gallery access
+      operationId: createMagicLink
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/GalleryIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MagicLinkCreateRequest'
+      responses:
+        '201':
+          description: Magic link created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MagicLinkResponse'
+        '400':
+          description: Gallery not published
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /galleries/{galleryId}/magic-links/{linkId}:
+    delete:
+      tags:
+        - Magic Links
+      summary: Revoke magic link
+      description: Revoke a magic link
+      operationId: revokeMagicLink
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/GalleryIdParam'
+        - name: linkId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Magic link revoked
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /galleries/{galleryId}/stats:
+    get:
+      tags:
+        - Galleries
+      summary: Get gallery stats
+      description: Get gallery statistics (views, selections, etc.)
+      operationId: getGalleryStats
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/GalleryIdParam'
+        - name: period
+          in: query
+          schema:
+            type: string
+            enum: [7d, 30d, 90d, all]
+            default: 30d
+      responses:
+        '200':
+          description: Gallery statistics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GalleryStatsResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /galleries/{galleryId}/duplicate:
+    post:
+      tags:
+        - Galleries
+      summary: Duplicate gallery
+      description: Create a copy of the gallery structure (without assets)
+      operationId: duplicateGallery
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/GalleryIdParam'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Name for the duplicated gallery
+                include_settings:
+                  type: boolean
+                  default: true
+      responses:
+        '201':
+          description: Gallery duplicated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GalleryResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /g/{token}:
+    get:
+      tags:
+        - Magic Links
+      summary: Access gallery via magic link
+      description: Public endpoint to access gallery via magic link token
+      operationId: accessGalleryByToken
+      security: []
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: password
+          in: query
+          schema:
+            type: string
+          description: Password if link is password-protected
+      responses:
+        '200':
+          description: Gallery access granted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicGalleryResponse'
+        '401':
+          description: Password required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Invalid or expired link
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    GalleryIdParam:
+      name: galleryId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+    PageParam:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+
+    LimitParam:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+
+    SortParam:
+      name: sort
+      in: query
+      schema:
+        type: string
+        default: -created_at
+      description: Field to sort by (prefix with - for descending)
+
+  responses:
+    Unauthorized:
+      description: Authentication required
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    ValidationError:
+      description: Validation error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ValidationErrorResponse'
+
+  schemas:
+    Gallery:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        slug:
+          type: string
+        description:
+          type: string
+          nullable: true
+        status:
+          type: string
+          enum: [draft, published, archived]
+        is_public:
+          type: boolean
+        cover_asset:
+          $ref: '#/components/schemas/AssetSummary'
+        event_date:
+          type: string
+          format: date-time
+          nullable: true
+        event_type:
+          type: string
+          nullable: true
+        location:
+          type: string
+          nullable: true
+        settings:
+          $ref: '#/components/schemas/GallerySettings'
+        asset_count:
+          type: integer
+        view_count:
+          type: integer
+        published_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    GallerySettings:
+      type: object
+      properties:
+        download_enabled:
+          type: boolean
+          default: true
+        selection_enabled:
+          type: boolean
+          default: true
+        watermark_enabled:
+          type: boolean
+          default: false
+        password_protected:
+          type: boolean
+          default: false
+        max_selections:
+          type: integer
+          nullable: true
+        expiration_date:
+          type: string
+          format: date-time
+          nullable: true
+
+    GalleryCreateRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        description:
+          type: string
+          maxLength: 2000
+        event_date:
+          type: string
+          format: date-time
+        event_type:
+          type: string
+          maxLength: 100
+        location:
+          type: string
+          maxLength: 500
+        settings:
+          $ref: '#/components/schemas/GallerySettings'
+
+    GalleryUpdateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        description:
+          type: string
+          maxLength: 2000
+        event_date:
+          type: string
+          format: date-time
+        event_type:
+          type: string
+          maxLength: 100
+        location:
+          type: string
+          maxLength: 500
+        settings:
+          $ref: '#/components/schemas/GallerySettings'
+        cover_asset_id:
+          type: string
+          format: uuid
+
+    GalleryResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Gallery'
+
+    GalleryListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Gallery'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    PublishRequest:
+      type: object
+      properties:
+        notify_clients:
+          type: boolean
+          default: false
+          description: Send notification to invited clients
+
+    MagicLink:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        url:
+          type: string
+          format: uri
+        access_level:
+          type: string
+          enum: [view, select, download]
+        password_protected:
+          type: boolean
+        expires_at:
+          type: string
+          format: date-time
+          nullable: true
+        max_views:
+          type: integer
+          nullable: true
+        view_count:
+          type: integer
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+
+    MagicLinkCreateRequest:
+      type: object
+      properties:
+        access_level:
+          type: string
+          enum: [view, select, download]
+          default: view
+        password:
+          type: string
+          minLength: 4
+          description: Optional password protection
+        expires_hours:
+          type: integer
+          minimum: 1
+          maximum: 8760
+          default: 168
+          description: Hours until link expires (default 7 days)
+        max_views:
+          type: integer
+          minimum: 1
+          description: Maximum number of views (null for unlimited)
+
+    MagicLinkResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/MagicLink'
+
+    MagicLinkListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/MagicLink'
+
+    PublicGalleryResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            gallery:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                event_date:
+                  type: string
+                  format: date-time
+                cover_url:
+                  type: string
+                  format: uri
+                asset_count:
+                  type: integer
+            access_level:
+              type: string
+              enum: [view, select, download]
+            assets:
+              type: array
+              items:
+                $ref: '#/components/schemas/PublicAsset'
+            photographer:
+              type: object
+              properties:
+                name:
+                  type: string
+                logo_url:
+                  type: string
+                  format: uri
+
+    PublicAsset:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        thumbnail_url:
+          type: string
+          format: uri
+        preview_url:
+          type: string
+          format: uri
+        width:
+          type: integer
+        height:
+          type: integer
+        is_selected:
+          type: boolean
+
+    AssetSummary:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        thumbnail_url:
+          type: string
+          format: uri
+
+    AssetListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Asset'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    Asset:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        file_name:
+          type: string
+        file_size:
+          type: integer
+        mime_type:
+          type: string
+        asset_type:
+          type: string
+          enum: [image, video, raw]
+        thumbnail_url:
+          type: string
+          format: uri
+        width:
+          type: integer
+        height:
+          type: integer
+        status:
+          type: string
+          enum: [uploading, processing, ready, failed]
+        is_selected:
+          type: boolean
+        is_favorite:
+          type: boolean
+        sort_order:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+
+    GalleryStatsResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            total_views:
+              type: integer
+            unique_viewers:
+              type: integer
+            total_selections:
+              type: integer
+            total_downloads:
+              type: integer
+            views_by_day:
+              type: array
+              items:
+                type: object
+                properties:
+                  date:
+                    type: string
+                    format: date
+                  views:
+                    type: integer
+
+    Pagination:
+      type: object
+      properties:
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        total_pages:
+          type: integer
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+
+    ValidationErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          enum: [VALIDATION_ERROR]
+        message:
+          type: string
+        details:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+              message:
+                type: string
+
+security:
+  - bearerAuth: []

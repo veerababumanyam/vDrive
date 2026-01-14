@@ -1,0 +1,25 @@
+---
+/**
+ * JSON-LD Schema injection component
+ * Renders structured data for SEO
+ */
+
+interface Props {
+  schema: object | object[];
+}
+
+const { schema } = Astro.props;
+
+// Handle single schema or array of schemas
+const schemas = Array.isArray(schema) ? schema : [schema];
+---
+
+{
+  schemas.map((s) => (
+    <script
+      is:inline
+      type="application/ld+json"
+      set:html={JSON.stringify(s, null, 0)}
+    />
+  ))
+}
