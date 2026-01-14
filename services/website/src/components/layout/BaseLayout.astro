@@ -82,9 +82,18 @@ const fullTitle = title ? `${title} | vDrive` : 'vDrive - Professional Photograp
     <meta property="twitter:site" content="@vdriveio" />
     <meta property="twitter:creator" content="@vdriveio" />
 
-    <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <!-- Favicons with Theme Support -->
+    <link rel="icon" type="image/png" sizes="16x16" href="/logo-light-16x16.png" media="(prefers-color-scheme: light)" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/logo-light-32x32.png" media="(prefers-color-scheme: light)" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/logo-dark-16x16.png" media="(prefers-color-scheme: dark)" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/logo-dark-32x32.png" media="(prefers-color-scheme: dark)" />
+    
+    <!-- Apple Touch Icon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/logo-light-180x180.png" media="(prefers-color-scheme: light)" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/logo-dark-180x180.png" media="(prefers-color-scheme: dark)" />
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json" />
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -132,5 +141,10 @@ const fullTitle = title ? `${title} | vDrive` : 'vDrive - Professional Photograp
       <slot />
     </main>
     <Footer />
+
+    <!-- Professional-Grade Animation Controllers -->
+    <script>
+      import '@/scripts/animations.js';
+    </script>
   </body>
 </html>

@@ -4,6 +4,7 @@ import HeroSection from '@/components/landing/HeroSection.astro';
 import FeaturesSection from '@/components/landing/FeaturesSection.astro';
 import PricingSection from '@/components/landing/PricingSection.astro';
 import FAQSection from '@/components/landing/FAQSection.astro';
+import TestimonialsSection from '@/components/landing/TestimonialsSection.astro';
 import CTASection from '@/components/landing/CTASection.astro';
 import JsonLd from '@/components/seo/JsonLd.astro';
 import {
@@ -11,8 +12,11 @@ import {
   generateWebSiteSchema,
   generateSoftwareApplicationSchema,
   generateFAQSchema,
+  generateProductSchema,
+  generateBreadcrumbSchema,
 } from '@/utils/schema';
 import { faqData } from '@/data/faq';
+import { pricingPlans } from '@/data/pricing';
 
 // Generate JSON-LD schemas for homepage
 const schemas = [
@@ -20,6 +24,14 @@ const schemas = [
   generateWebSiteSchema(),
   generateSoftwareApplicationSchema(),
   generateFAQSchema(faqData),
+  // Product schemas for each pricing plan
+  ...pricingPlans
+    .filter(plan => plan.priceINR !== null) // Only paid plans
+    .map(plan => generateProductSchema(plan)),
+  // Breadcrumb navigation
+  generateBreadcrumbSchema([
+    { name: 'Home', url: '/' },
+  ]),
 ];
 ---
 
@@ -30,6 +42,7 @@ const schemas = [
   <JsonLd slot="head" schema={schemas} />
   <HeroSection />
   <FeaturesSection />
+  <TestimonialsSection />
   <PricingSection />
   <FAQSection />
   <CTASection />

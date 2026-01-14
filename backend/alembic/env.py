@@ -15,8 +15,15 @@ from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
 # Import all models for autogenerate support
-from src.app.models import Base
-from src.app.core.config import settings
+# For running migrations only (not autogenerate), we can skip model imports
+try:
+    from src.app.models import Base
+    from src.app.core.config import settings
+    target_metadata = Base.metadata
+except ImportError:
+    # Running without app context (migrations only)
+    target_metadata = None
+    settings = None
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -27,13 +34,16 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-# Model's MetaData object for 'autogenerate' support
-target_metadata = Base.metadata
-
 # Override sqlalchemy.url from environment variable
 def get_url() -> str:
     """Get database URL from environment or settings."""
-    return os.getenv("DATABASE_URL", settings.DATABASE_URL)
+    env_url = os.getenv("DATABASE_URL")
+    if env_url:
+        return env_url
+    if settings:
+        return settings.DATABASE_URL
+    # Fallback for local development
+    return "postgresql://vDrive:vDrive_dev_password@localhost:5432/vDrive"
 
 
 def run_migrations_offline() -> None:

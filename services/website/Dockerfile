@@ -4,7 +4,7 @@
 # ===========================================
 # Stage 1: Dependencies
 # ===========================================
-FROM node:20-alpine AS deps
+FROM public.ecr.aws/docker/library/node:20-alpine AS deps
 
 WORKDIR /app
 
@@ -15,7 +15,7 @@ RUN npm ci --only=production=false
 # ===========================================
 # Stage 2: Builder
 # ===========================================
-FROM node:20-alpine AS builder
+FROM public.ecr.aws/docker/library/node:20-alpine AS builder
 
 WORKDIR /app
 
@@ -35,7 +35,7 @@ RUN npm run build
 # ===========================================
 # Stage 3: Runner (Production) - Nginx for static files
 # ===========================================
-FROM nginx:alpine AS runner
+FROM public.ecr.aws/nginx/nginx:alpine AS runner
 
 # Copy built static files
 COPY --from=builder /app/dist /usr/share/nginx/html

@@ -1,6 +1,12 @@
 ﻿# CLAUDE.md - vDrive
 vDrive is an enterprise SaaS photography platform with microservices architecture.
 
+Website (vdrive.io) - Public marketing pages for visitors, SEO, conversions
+Frontend (app.vdrive.io) - Private application for registered users only
+Backend (api.vdrive.io) - API endpoints for frontend and microservices
+Website (services/website/) → Microservice running in Docker on port 8020
+Frontend (frontend/) → Local development with Vite on port 5173
+
 ## Things to Remember Before writing any code:
 1. State how you will verify this change works (test, bash command, browser check, etc.)
 2. Write the test verification step first
@@ -220,6 +226,25 @@ Example: "Use the Frontend Design agent to build a gallery component"
 | Shared types | `packages/shared-types/src/` |
 | Docker (dev) | `infrastructure/docker/docker-compose.yml` |
 | Kubernetes (prod) | `infrastructure/kubernetes/` |
+
+## Logo & Favicon System
+
+| Asset Type | Light Mode | Dark Mode | Usage |
+|------------|------------|-----------|-------|
+| Browser Favicon | `logo-light-16x16.png`, `logo-light-32x32.png` | `logo-dark-16x16.png`, `logo-dark-32x32.png` | Browser tabs, bookmarks |
+| Apple Touch Icon | `logo-light-180x180.png` | `logo-dark-180x180.png` | iOS home screen |
+| PWA Icons | `logo-light-192x192.png`, `logo-light-512x512.png` | `logo-dark-192x192.png`, `logo-dark-512x512.png` | Android PWA, splash screens |
+| React Component | `<AppLogo size="md" />` | (automatic) | UI components needing logo |
+
+**Location**: All logo files in `frontend/public/`
+
+**Theme Switching**: Automatic via `prefers-color-scheme` media query in `<link>` tags. React components use `useTheme()` hook via the `AppLogo` component.
+
+**PWA Manifest**: `frontend/public/manifest.json` defines app metadata and icon references.
+
+**DO NOT** reference `vite.svg` or default template assets - use branded logos only.
+
+**Regenerate logos**: Run `scripts/generate-logos.sh` after updating source logo files.
 
 ## Environment Variables
 

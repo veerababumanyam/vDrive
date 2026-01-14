@@ -14,6 +14,8 @@ export interface AppInputProps
   helperText?: string;
   /** Error message - shows error state when provided */
   error?: string;
+  /** Success message - shows success state when provided */
+  success?: string;
   /** Icon to display on the left */
   leftIcon?: ReactNode;
   /** Icon to display on the right */
@@ -22,12 +24,14 @@ export interface AppInputProps
   size?: 'sm' | 'md' | 'lg';
   /** Full width input */
   fullWidth?: boolean;
+  /** Enable neon glow effect on focus */
+  glowOnFocus?: boolean;
 }
 
 const sizes = {
-  sm: 'px-3 py-2 text-sm',
-  md: 'px-4 py-3 text-base',
-  lg: 'px-5 py-4 text-lg',
+  sm: 'px-3 py-2 text-sm min-h-[40px]',
+  md: 'px-4 py-3 text-base min-h-[48px]', // 48px for comfortable touch target
+  lg: 'px-5 py-4 text-lg min-h-[56px]',
 };
 
 const iconSizes = {
@@ -38,6 +42,7 @@ const iconSizes = {
 
 /**
  * Glass-styled input component with floating label support
+ * Enhanced with mobile-first design and touch-friendly sizing
  *
  * @example
  * ```tsx
@@ -57,10 +62,12 @@ export const AppInput = forwardRef<HTMLInputElement, AppInputProps>(
       label,
       helperText,
       error,
+      success,
       leftIcon,
       rightIcon,
       size = 'md',
       fullWidth = true,
+      glowOnFocus = false,
       type = 'text',
       id,
       ...props
@@ -70,6 +77,7 @@ export const AppInput = forwardRef<HTMLInputElement, AppInputProps>(
     const [isFocused, setIsFocused] = useState(false);
     const inputId = id || `input-${Math.random().toString(36).substring(2, 9)}`;
     const hasError = Boolean(error);
+    const hasSuccess = Boolean(success);
     const hasValue = Boolean(props.value || props.defaultValue);
 
     return (
@@ -104,19 +112,24 @@ export const AppInput = forwardRef<HTMLInputElement, AppInputProps>(
             type={type}
             className={cn(
               // Base styles
-              'w-full rounded-xl border transition-all duration-200',
+              'w-full rounded-xl sm:rounded-2xl border transition-all duration-200',
+              // Touch-friendly
+              'touch-manipulation',
               // Light mode
               'bg-white text-neutral-900 placeholder-neutral-400',
               'border-neutral-300',
               // Dark mode - Apple iOS glass effect
-              'dark:bg-white/[0.08] dark:backdrop-blur-xl',
-              'dark:text-white dark:placeholder-white/50',
-              'dark:border-white/25',
-              'dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]',
+              'dark:bg-white/[0.06] dark:backdrop-blur-xl',
+              'dark:text-white dark:placeholder-white/40',
+              'dark:border-white/20',
+              'dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]',
               // Focus styles
               'focus:outline-none focus:ring-2',
               // Focus state (theme-aware)
-              !hasError && 'focus:border-primary-500 focus:ring-primary-500/20',
+              !hasError && !hasSuccess && 'focus:border-primary-500 focus:ring-primary-500/20',
+              !hasError && !hasSuccess && glowOnFocus && 'dark:focus:shadow-glow-sm',
+              // Success state
+              hasSuccess && !hasError && 'border-success-500 focus:border-success-500 focus:ring-success-500/20',
               // Error state
               hasError && 'border-error-500 focus:border-error-500 focus:ring-error-500/20',
               // Size
@@ -195,15 +208,25 @@ export const AppInput = forwardRef<HTMLInputElement, AppInputProps>(
           <p
             id={`${inputId}-error`}
             role="alert"
-            className="mt-2 text-sm text-error-400 flex items-center gap-1.5"
+            className="mt-2 text-sm text-error-500 dark:text-error-400 flex items-center gap-1.5 animate-fade-in"
           >
             <ErrorIcon className="w-4 h-4 shrink-0" />
             {error}
           </p>
         )}
 
+        {/* Success message */}
+        {hasSuccess && !hasError && (
+          <p
+            className="mt-2 text-sm text-success-500 dark:text-success-400 flex items-center gap-1.5 animate-fade-in"
+          >
+            <SuccessIcon className="w-4 h-4 shrink-0" />
+            {success}
+          </p>
+        )}
+
         {/* Helper text */}
-        {helperText && !hasError && (
+        {helperText && !hasError && !hasSuccess && (
           <p
             id={`${inputId}-helper`}
             className="mt-2 text-sm text-neutral-500 dark:text-white/50"
@@ -231,6 +254,25 @@ function ErrorIcon({ className }: { className?: string }) {
       <path
         fillRule="evenodd"
         d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0110 5zm0 10a1 1 0 100-2 1 1 0 000 2z"
+        clipRule="evenodd"
+      />
+    </svg>
+  );
+}
+
+/** Success icon SVG */
+function SuccessIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 20 20"
+      fill="currentColor"
+      aria-hidden="true"
+    >
+      <path
+        fillRule="evenodd"
+        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
         clipRule="evenodd"
       />
     </svg>

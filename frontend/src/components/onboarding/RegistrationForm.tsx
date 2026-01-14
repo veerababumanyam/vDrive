@@ -177,7 +177,6 @@ export function RegistrationForm({
     errors,
     isValid,
     validateField,
-    passwordStrength,
     isCheckingEmail,
     emailAvailable,
     setTurnstileToken,

@@ -23,7 +23,7 @@ export interface LoginErrors {
 }
 
 export interface UseLoginOptions {
-  onSuccess?: () => void;
+  onSuccess?: (response: import('../types/onboarding').LoginResponse) => void;
   onError?: (error: string) => void;
 }
 
@@ -134,12 +134,12 @@ export function useLogin(options: UseLoginOptions = {}): UseLoginReturn {
     setErrors({});
 
     try {
-      await loginApi({
+      const response = await loginApi({
         email: formData.email.trim().toLowerCase(),
         password: formData.password,
       });
 
-      onSuccess?.();
+      onSuccess?.(response);
       return true;
     } catch (err) {
       const apiError = err as ApiError;

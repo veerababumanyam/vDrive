@@ -8,7 +8,7 @@ import logging
 from typing import Any, Dict, List, Optional
 
 from fastapi import FastAPI, Request, status
-from fastapi.exceptions import RequestValidationError
+from fastapi.exceptions import HTTPException, RequestValidationError
 from fastapi.responses import JSONResponse
 from pydantic import ValidationError as PydanticValidationError
 
@@ -54,11 +54,41 @@ class ValidationError(ServiceError):
 class AuthenticationError(ServiceError):
     """Raised for authentication failures."""
 
-    def __init__(self, message: str = "Authentication required"):
+    def __init__(self, message: str = "Authentication required", error_code: str = "AuthenticationError"):
         super().__init__(
             message=message,
-            error_code="AuthenticationError",
+            error_code=error_code,
             status_code=status.HTTP_401_UNAUTHORIZED,
+        )
+
+
+class InvalidCredentialsError(AuthenticationError):
+    """Raised when email or password is invalid."""
+
+    def __init__(self, message: str = "Invalid email or password"):
+        super().__init__(
+            message=message,
+            error_code="InvalidCredentials",
+        )
+
+
+class AccountDisabledError(AuthenticationError):
+    """Raised when account is disabled."""
+
+    def __init__(self, message: str = "Account is disabled"):
+        super().__init__(
+            message=message,
+            error_code="AccountDisabled",
+        )
+
+
+class EmailNotVerifiedError(AuthenticationError):
+    """Raised when email is not verified."""
+
+    def __init__(self, message: str = "Please verify your email before signing in"):
+        super().__init__(
+            message=message,
+            error_code="EmailNotVerified",
         )
 
 
@@ -220,6 +250,32 @@ async def pydantic_error_handler(
     )
 
 
+async def http_exception_handler(request: Request, exc: HTTPException) -> JSONResponse:
+    """
+    Handle FastAPI HTTPException to ensure consistent error format.
+
+    Converts HTTPException.detail (which can be string or dict) to our standard format.
+    """
+    # If detail is already a dict with error/message, use it
+    if isinstance(exc.detail, dict):
+        error_code = exc.detail.get("error", "UnknownError")
+        message = exc.detail.get("message", str(exc.detail))
+        details = exc.detail.get("details")
+    else:
+        # detail is a string - create standard format
+        error_code = "UnknownError"
+        message = str(exc.detail) if exc.detail else "An error occurred"
+
+    return JSONResponse(
+        status_code=exc.status_code,
+        content=create_error_response(
+            error_code=error_code,
+            message=message,
+            details=details if 'details' in locals() else None,
+        ),
+    )
+
+
 async def generic_error_handler(request: Request, exc: Exception) -> JSONResponse:
     """Handle unexpected errors."""
     # Log the full error with structured logging
@@ -250,7 +306,13 @@ def register_error_handlers(app: FastAPI) -> None:
     Args:
         app: FastAPI application instance
     """
+    # Register custom exceptions first (most specific)
     app.add_exception_handler(ServiceError, service_error_handler)
+
+    # Register FastAPI built-in exceptions
+    app.add_exception_handler(HTTPException, http_exception_handler)
     app.add_exception_handler(RequestValidationError, validation_error_handler)
     app.add_exception_handler(PydanticValidationError, pydantic_error_handler)
+
+    # Generic exception handler (catch-all, least specific)
     app.add_exception_handler(Exception, generic_error_handler)

@@ -9,27 +9,11 @@ import { ThemeToggle } from '../components/onboarding/ThemeToggle';
 import { handleGoogleCallback } from '../components/onboarding/GoogleOAuthButton';
 import { useEffect, useState } from 'react';
 import { cn } from '../lib/utils';
+import { AppLogo } from '../components/ui/AppLogo';
 
 // ============================================
 // Icons
 // ============================================
-
-function CameraIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z" />
-      <circle cx="12" cy="13" r="3" />
-    </svg>
-  );
-}
 
 function ShieldCheckIcon({ className }: { className?: string }) {
   return (
@@ -139,6 +123,8 @@ export function LoginPage() {
   }, [searchParams, navigate]);
 
   const handleLoginSuccess = () => {
+    // Always navigate to dashboard after successful login
+    // The backend will handle workspace creation if needed
     navigate('/dashboard');
   };
 
@@ -185,10 +171,8 @@ export function LoginPage() {
         {/* Content */}
         <div className="relative z-10 flex flex-col justify-center px-12 xl:px-20 max-w-2xl">
           {/* Logo - with entrance animation */}
-          <a href="/" className="inline-flex items-center gap-2 mb-12 animate-fade-in-scale">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center">
-              <CameraIcon className="w-6 h-6 text-white" />
-            </div>
+          <a href="/" className="inline-flex items-center gap-3 mb-12 animate-fade-in-scale">
+            <AppLogo size="md" />
             <span className="text-2xl font-bold text-neutral-900 dark:text-white">vDrive</span>
           </a>
 
@@ -231,10 +215,8 @@ export function LoginPage() {
       <div className="w-full lg:w-1/2 xl:w-[45%] flex items-center justify-center p-6 sm:p-8 lg:p-12">
         <div className="w-full max-w-md animate-slide-in-right lg:animate-fade-in-scale" style={{ animationDelay: '150ms' }}>
           {/* Mobile Logo */}
-          <div className="lg:hidden flex items-center justify-center gap-2 mb-8">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center">
-              <CameraIcon className="w-6 h-6 text-white" />
-            </div>
+          <div className="lg:hidden flex items-center justify-center gap-3 mb-8">
+            <AppLogo size="md" />
             <span className="text-2xl font-bold text-neutral-900 dark:text-white">vDrive</span>
           </div>
 

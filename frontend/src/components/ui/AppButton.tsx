@@ -3,9 +3,9 @@ import { cn } from '../../lib/utils';
 
 export interface AppButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   /** Button visual variant */
-  variant?: 'primary' | 'accent' | 'outline' | 'ghost' | 'destructive';
+  variant?: 'primary' | 'accent' | 'outline' | 'ghost' | 'destructive' | 'neon';
   /** Button size */
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'sm' | 'md' | 'lg' | 'xl';
   /** Icon to display before text */
   leftIcon?: ReactNode;
   /** Icon to display after text */
@@ -14,41 +14,67 @@ export interface AppButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> 
   isLoading?: boolean;
   /** Full width button */
   fullWidth?: boolean;
+  /** Enable neon glow effect on hover */
+  glowOnHover?: boolean;
 }
 
 const variants = {
   primary: cn(
+    // Light mode
     'bg-primary-500 text-white hover:bg-primary-600',
-    'focus-visible:ring-primary-500 focus-visible:ring-offset-neutral-950',
-    'shadow-glow hover:shadow-glow-lg'
+    // Dark mode
+    'dark:bg-primary-500 dark:hover:bg-primary-600',
+    'focus-visible:ring-primary-500 focus-visible:ring-offset-neutral-50 dark:focus-visible:ring-offset-warm-950',
+    'shadow-lg shadow-primary-500/20 hover:shadow-primary-500/30 dark:shadow-glow dark:hover:shadow-glow-lg'
   ),
   accent: cn(
+    // Light mode
     'bg-accent-500 text-white hover:bg-accent-600',
-    'focus-visible:ring-accent-500 focus-visible:ring-offset-neutral-950',
-    'shadow-lg shadow-accent-500/30 hover:shadow-accent-500/50'
+    // Dark mode
+    'dark:bg-accent-500 dark:hover:bg-accent-600',
+    'focus-visible:ring-accent-500 focus-visible:ring-offset-neutral-50 dark:focus-visible:ring-offset-warm-950',
+    'shadow-lg shadow-accent-500/20 hover:shadow-accent-500/40'
   ),
   outline: cn(
-    'bg-transparent border border-white/20 text-white',
-    'hover:bg-white/10 hover:border-white/30',
-    'focus-visible:ring-white/50'
+    // Light mode
+    'bg-transparent border border-neutral-300 text-neutral-700',
+    'hover:bg-neutral-100 hover:border-neutral-400',
+    // Dark mode
+    'dark:border-white/20 dark:text-white',
+    'dark:hover:bg-white/10 dark:hover:border-white/30',
+    'focus-visible:ring-neutral-500 dark:focus-visible:ring-white/50'
   ),
   ghost: cn(
-    'bg-transparent text-white/70 hover:text-white hover:bg-white/10'
+    // Light mode
+    'bg-transparent text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100',
+    // Dark mode
+    'dark:text-white/70 dark:hover:text-white dark:hover:bg-white/10'
   ),
   destructive: cn(
     'bg-error-500 text-white hover:bg-error-600',
-    'focus-visible:ring-error-500 focus-visible:ring-offset-neutral-950'
+    'focus-visible:ring-error-500 focus-visible:ring-offset-neutral-50 dark:focus-visible:ring-offset-warm-950',
+    'shadow-lg shadow-error-500/20 hover:shadow-error-500/40'
+  ),
+  neon: cn(
+    // Light mode - gradient
+    'bg-gradient-to-r from-primary-500 to-accent-500 text-white',
+    'hover:from-primary-600 hover:to-accent-600',
+    // Shadow and glow
+    'shadow-neon-primary hover:shadow-neon-accent',
+    'focus-visible:ring-primary-500 focus-visible:ring-offset-neutral-50 dark:focus-visible:ring-offset-warm-950'
   ),
 };
 
 const sizes = {
-  sm: 'px-3 py-1.5 text-sm gap-1.5',
-  md: 'px-4 py-2.5 text-base gap-2',
-  lg: 'px-6 py-3 text-lg gap-2.5',
+  sm: 'px-3 py-1.5 text-sm gap-1.5 min-h-[36px]',
+  md: 'px-4 py-2.5 text-base gap-2 min-h-[44px]', // 44px for touch target
+  lg: 'px-6 py-3 text-lg gap-2.5 min-h-[48px]',
+  xl: 'px-8 py-4 text-lg gap-3 min-h-[56px]',
 };
 
 /**
  * Primary button component with Futuristic Glass styling
+ * Enhanced with mobile-first design, touch targets, and haptic-ready states
  *
  * @example
  * ```tsx
@@ -67,6 +93,7 @@ export const AppButton = forwardRef<HTMLButtonElement, AppButtonProps>(
       rightIcon,
       isLoading = false,
       fullWidth = false,
+      glowOnHover = false,
       disabled,
       children,
       ...props
@@ -82,14 +109,19 @@ export const AppButton = forwardRef<HTMLButtonElement, AppButtonProps>(
           'transition-all duration-200 ease-out',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
           'disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none',
-          // Active state
-          'active:scale-[0.98]',
+          // Active state with haptic-ready feedback
+          'active:scale-[0.97]',
+          // Touch-friendly - prevent text selection and highlight
+          'select-none touch-manipulation',
+          '-webkit-tap-highlight-color-transparent',
           // Variant
           variants[variant],
           // Size
           sizes[size],
           // Full width
           fullWidth && 'w-full',
+          // Glow on hover effect
+          glowOnHover && 'hover:shadow-neon-primary',
           className
         )}
         disabled={disabled || isLoading}
@@ -97,8 +129,8 @@ export const AppButton = forwardRef<HTMLButtonElement, AppButtonProps>(
       >
         {isLoading ? (
           <>
-            <LoadingSpinner className="w-4 h-4 animate-spin" />
-            <span>Loading...</span>
+            <LoadingSpinner className="w-5 h-5 animate-spin" />
+            <span className="ml-2">Loading...</span>
           </>
         ) : (
           <>

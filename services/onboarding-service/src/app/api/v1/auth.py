@@ -8,7 +8,7 @@ from fastapi import APIRouter, Depends, HTTPException, Response, status
 from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import BaseModel, EmailStr
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select, func
 
 from src.app.core.database import get_db
 from src.app.core.security import (
@@ -18,6 +18,12 @@ from src.app.core.security import (
     verify_token,
 )
 from src.app.models.user import User
+from src.app.models.workspace_member import WorkspaceMember
+from src.app.middleware.error_handler import (
+    InvalidCredentialsError,
+    AccountDisabledError,
+    EmailNotVerifiedError,
+)
 
 
 router = APIRouter(tags=["auth"])
@@ -40,6 +46,7 @@ class LoginResponse(BaseModel):
     email: str
     full_name: str
     email_verified: bool
+    has_workspace: bool
 
 
 class RefreshResponse(BaseModel):
@@ -81,22 +88,25 @@ async def login(
 
     # Validate credentials
     if not user or not user.password_hash:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid email or password",
-        )
+        raise InvalidCredentialsError()
 
     if not verify_password(request.password, user.password_hash):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid email or password",
-        )
+        raise InvalidCredentialsError()
 
     if not user.is_active:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Account is disabled",
-        )
+        raise AccountDisabledError()
+
+    # Check email verification (optional - can be enabled based on requirements)
+    # Uncomment to require email verification before login
+    # if not user.email_verified:
+    #     raise EmailNotVerifiedError()
+
+    # Check workspace membership
+    workspace_result = await db.execute(
+        select(func.count()).select_from(WorkspaceMember).where(WorkspaceMember.user_id == user.id)
+    )
+    workspace_count = workspace_result.scalar()
+    has_workspace = workspace_count > 0
 
     # Create tokens
     access_token = create_access_token({"sub": user.id, "email": user.email})
@@ -118,6 +128,7 @@ async def login(
         email=user.email,
         full_name=user.full_name,
         email_verified=user.email_verified,
+        has_workspace=has_workspace,
     )
 
 

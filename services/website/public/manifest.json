@@ -1,0 +1,67 @@
+{
+  "name": "vDrive - Professional Photography Client Galleries",
+  "short_name": "vDrive",
+  "description": "Professional photography client gallery platform with AI-powered organization and beautiful client portals.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f0d0c",
+  "theme_color": "#0ea5e9",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/logo-light-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo-light-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo-dark-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "monochrome"
+    },
+    {
+      "src": "/logo-dark-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "monochrome"
+    }
+  ],
+  "categories": ["productivity", "photo"],
+  "screenshots": [
+    {
+      "src": "/screenshots/dashboard.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Dashboard view"
+    },
+    {
+      "src": "/screenshots/gallery.png",
+      "sizes": "750x1334",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Gallery view"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Create Gallery",
+      "short_name": "New Gallery",
+      "description": "Create a new photo gallery",
+      "url": "/app/galleries/new",
+      "icons": [
+        {
+          "src": "/logo-light-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
+}

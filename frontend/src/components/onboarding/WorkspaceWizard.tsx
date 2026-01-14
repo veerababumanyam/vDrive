@@ -208,10 +208,6 @@ export function WorkspaceWizard({ onComplete, className }: WorkspaceWizardProps)
   });
 
   // Navigation
-  const goToStep = useCallback((newStep: WizardStep) => {
-    setStep(newStep);
-  }, []);
-
   const goNext = useCallback(() => {
     const currentIndex = wizardSteps.findIndex((s) => s.id === step);
     if (currentIndex < wizardSteps.length - 1) {

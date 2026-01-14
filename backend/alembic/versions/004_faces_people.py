@@ -112,25 +112,20 @@ def upgrade() -> None:
 
     # Face embeddings table (pgvector)
     # Using 512-dimensional ArcFace embeddings
-    op.create_table(
-        "face_embeddings",
-        sa.Column("id", postgresql.UUID(as_uuid=True), primary_key=True),
-        sa.Column("face_detection_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("face_detections.id", ondelete="CASCADE"), nullable=False, unique=True),
-        sa.Column("workspace_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("workspaces.id", ondelete="CASCADE"), nullable=False),
-        # 512-dimensional embedding vector
-        sa.Column("embedding", sa.Column("vector(512)"), nullable=False),
-        # Model info
-        sa.Column("model_name", sa.String(100), nullable=False, server_default="arcface"),
-        sa.Column("model_version", sa.String(50), nullable=False, server_default="1.0"),
-        # Timestamps
-        sa.Column("created_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now()),
-    )
+    # First ensure pgvector extension exists
+    op.execute("CREATE EXTENSION IF NOT EXISTS vector")
 
-    # Use raw SQL for vector column since SQLAlchemy might not support it directly
+    # Create face_embeddings table with vector column using raw SQL
     op.execute("""
-        ALTER TABLE face_embeddings
-        ALTER COLUMN embedding TYPE vector(512)
-        USING embedding::vector(512)
+        CREATE TABLE face_embeddings (
+            id UUID PRIMARY KEY,
+            face_detection_id UUID NOT NULL UNIQUE REFERENCES face_detections(id) ON DELETE CASCADE,
+            workspace_id UUID NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,
+            embedding vector(512) NOT NULL,
+            model_name VARCHAR(100) NOT NULL DEFAULT 'arcface',
+            model_version VARCHAR(50) NOT NULL DEFAULT '1.0',
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
     """)
 
     # Create IVFFlat index for approximate nearest neighbor search

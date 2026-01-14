@@ -61,9 +61,20 @@ function createApiClient(): AxiosInstance {
     (response) => response,
     async (error: AxiosError<ApiError>) => {
       const originalRequest = error.config as typeof error.config & { _retry?: boolean };
+      const requestUrl = originalRequest?.url || '';
+
+      // Don't try to refresh token for login/register endpoints - let them fail normally
+      const isAuthEndpoint = requestUrl.includes('/auth/login') ||
+                            requestUrl.includes('/auth/register') ||
+                            requestUrl.includes('/register') ||
+                            requestUrl.includes('/verify-email');
 
       // Handle 401 - try to refresh token (only once to prevent infinite loop)
-      if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {
+      // Skip token refresh for auth endpoints (login, register, etc.)
+      if (error.response?.status === 401 &&
+          originalRequest &&
+          !originalRequest._retry &&
+          !isAuthEndpoint) {
         originalRequest._retry = true;
 
         try {
@@ -80,17 +91,49 @@ function createApiClient(): AxiosInstance {
           originalRequest.headers.Authorization = `Bearer ${access_token}`;
           return client(originalRequest);
         } catch {
-          // Refresh failed - clear tokens and redirect to login
+          // Refresh failed - clear tokens and redirect to sign-in
           localStorage.removeItem('access_token');
-          window.location.href = '/login';
+          window.location.href = '/sign-in';
+          return Promise.reject(error);
         }
       }
 
       // Transform error for consistent handling
-      const apiError: ApiError = error.response?.data || {
-        error: 'NetworkError',
-        message: error.message || 'An unexpected error occurred',
-      };
+      const responseData = error.response?.data;
+
+      // Handle FastAPI's detail field (can be string or object)
+      let apiError: ApiError;
+
+      if (responseData) {
+        if (typeof responseData.detail === 'object' && responseData.detail !== null) {
+          // Backend returns { detail: { error: "...", message: "..." } }
+          apiError = {
+            error: responseData.detail.error || 'UnknownError',
+            message: responseData.detail.message || 'An unexpected error occurred',
+          };
+        } else if (typeof responseData.detail === 'string') {
+          // Backend returns { detail: "Error message" }
+          apiError = {
+            error: 'UnknownError',
+            message: responseData.detail,
+          };
+        } else if (responseData.error && responseData.message) {
+          // Backend already returns correct format
+          apiError = responseData as ApiError;
+        } else {
+          // Fallback
+          apiError = {
+            error: 'UnknownError',
+            message: responseData.message || JSON.stringify(responseData),
+          };
+        }
+      } else {
+        // Network error or no response
+        apiError = {
+          error: 'NetworkError',
+          message: error.message || 'Network error occurred. Please check your connection.',
+        };
+      }
 
       return Promise.reject(apiError);
     }

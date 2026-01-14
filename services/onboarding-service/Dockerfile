@@ -3,7 +3,7 @@
 # ===========================================
 # User registration and email verification on port 8006
 
-FROM python:3.11-slim
+FROM public.ecr.aws/docker/library/python:3.11-slim
 
 WORKDIR /app
 

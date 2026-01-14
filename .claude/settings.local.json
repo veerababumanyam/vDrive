@@ -223,7 +223,14 @@
       "Bash(powershell.exe -Command \"docker run -d --name vDrive-gallery-service --network docker_default -p 127.0.0.1:8004:8004 --env-file .env -e DATABASE_URL=''postgresql://vDrive:vDrive@postgres:5432/vDrive'' -e REDIS_URL=''redis://redis:6379/0'' vDrive-gallery-service:latest 2>&1\")",
       "Bash(powershell.exe -Command \"docker run -d --name vDrive-gallery-service --network vDrive_default -p 127.0.0.1:8004:8004 --env-file .env -e DATABASE_URL=''postgresql://vDrive:vDrive@postgres:5432/vDrive'' -e REDIS_URL=''redis://redis:6379/0'' vDrive-gallery-service:latest 2>&1\")",
       "Bash(npm run:*)",
-      "mcp__plugin_context7_context7__resolve-library-id"
+      "mcp__plugin_context7_context7__resolve-library-id",
+      "Bash(magick:*)",
+      "Bash(export DATABASE_URL=\"postgresql://vDrive:vDrive_dev_password@localhost:5432/vDrive\")",
+      "Bash(alembic upgrade:*)",
+      "Bash(export DATABASE_URL:*)",
+      "mcp__plugin_serena_serena__list_dir",
+      "Bash(pip3 install:*)",
+      "Bash(/opt/homebrew/opt/python@3.11/bin/python3.11:*)"
     ]
   }
 }

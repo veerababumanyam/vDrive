@@ -25,6 +25,7 @@ This directory contains specialized skills that Claude Code auto-loads based on 
 |-------|---------|---------|
 | [frontend-design](frontend-design/SKILL.md) | `ui-design`, `frontend`, `react-components`, `pages`, `premium-ui`, `cinematic`, `landing-page` | Premium UI aesthetics, page layouts, design thinking |
 | [design-system](design-system/SKILL.md) | `ui`, `styling`, `tokens`, `theme`, `colors`, `components`, `tailwind`, `css` | Color tokens, typography, UI component patterns |
+| [logo-assets](logo-assets/skill.md) | `logo`, `favicon`, `icon`, `branding`, `assets` | Logo and favicon management, theme-aware images, PWA icons |
 | [accessibility](accessibility/SKILL.md) | `a11y`, `wcag`, `aria`, `keyboard-nav`, `screen-reader` | WCAG 2.1 AA compliance, ARIA patterns |
 | [webapp-testing](webapp-testing/SKILL.md) | `e2e`, `playwright`, `browser-testing`, `screenshots`, `ui-testing` | Playwright MCP testing, browser automation |
 | [web-artifacts-builder](web-artifacts-builder/SKILL.md) | `prototype`, `bundle`, `demo`, `standalone-html`, `component-demo` | Standalone prototypes, bundled HTML demos |
@@ -61,6 +62,7 @@ This directory contains specialized skills that Claude Code auto-loads based on 
 |---------------------|-----------|
 | Build a new page or component | `frontend-design` |
 | Style with design tokens | `design-system` |
+| Update logos or favicons | `logo-assets` |
 | Add keyboard/screen reader support | `accessibility` |
 | Write tests | `testing` |
 | Handle file uploads | `storage` |

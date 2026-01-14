@@ -33,7 +33,7 @@ def upgrade() -> None:
         sa.Column("workspace_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("workspaces.id", ondelete="CASCADE"), nullable=False),
         # Embedding vector (1536 dimensions for OpenAI CLIP / text-embedding-3-large)
         # Note: Use raw SQL for vector type
-        sa.Column("embedding", sa.LargeBinary(), nullable=False),  # Placeholder, replaced with vector
+        sa.Column("embedding", sa.TEXT(), nullable=False),  # Placeholder, replaced with vector
         # Model information
         sa.Column("model_name", sa.String(100), nullable=False, server_default="clip"),
         sa.Column("model_version", sa.String(50), nullable=False, server_default="ViT-L/14"),
@@ -58,11 +58,31 @@ def upgrade() -> None:
         sa.Column("updated_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now(), onupdate=sa.func.now()),
     )
 
-    # Alter column to vector type
+    # Alter column to vector type - drop and recreate the table with vector column
+    op.execute("DROP TABLE IF EXISTS photo_embeddings")
     op.execute("""
-        ALTER TABLE photo_embeddings
-        ALTER COLUMN embedding TYPE vector(1536)
-        USING embedding::vector(1536)
+        CREATE TABLE photo_embeddings (
+            id UUID PRIMARY KEY,
+            asset_id UUID NOT NULL UNIQUE REFERENCES assets(id) ON DELETE CASCADE,
+            workspace_id UUID NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,
+            embedding vector(1536) NOT NULL,
+            model_name VARCHAR(100) NOT NULL DEFAULT 'clip',
+            model_version VARCHAR(50) NOT NULL DEFAULT 'ViT-L/14',
+            embedding_dimension INTEGER NOT NULL DEFAULT 1536,
+            detected_objects TEXT[],
+            detected_scenes TEXT[],
+            detected_activities TEXT[],
+            color_palette TEXT[],
+            aesthetic_score FLOAT,
+            technical_score FLOAT,
+            generated_caption TEXT,
+            generated_tags TEXT[],
+            processing_status VARCHAR(20) NOT NULL DEFAULT 'pending',
+            processing_error TEXT,
+            processed_at TIMESTAMPTZ,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+            updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
     """)
 
     # Create HNSW index for approximate nearest neighbor search
