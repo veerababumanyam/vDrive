@@ -186,6 +186,11 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+# Register API routers
+from .api import v1_router
+
+app.include_router(v1_router)
+
 
 @app.get("/health")
 async def health():
