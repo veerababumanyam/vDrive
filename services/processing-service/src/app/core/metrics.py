@@ -97,3 +97,39 @@ face_embeddings_generated_total = Counter(
     "face_embeddings_generated_total",
     "Total face embeddings generated",
 )
+
+# Idempotency metrics
+idempotency_check_total = Counter(
+    "idempotency_check_total",
+    "Total idempotency checks",
+    ["result"],  # hit, miss
+)
+
+idempotency_check_duration_seconds = Histogram(
+    "idempotency_check_duration_seconds",
+    "Idempotency check duration in seconds",
+    buckets=[0.001, 0.005, 0.01, 0.025, 0.05, 0.1],
+)
+
+idempotency_redis_errors_total = Counter(
+    "idempotency_redis_errors_total",
+    "Total Redis errors during idempotency checks",
+)
+
+# Dead Letter Queue metrics
+dlq_messages_sent_total = Counter(
+    "dlq_messages_sent_total",
+    "Total messages sent to DLQ",
+    ["topic", "error_type"],
+)
+
+dlq_send_duration_seconds = Histogram(
+    "dlq_send_duration_seconds",
+    "DLQ message send duration in seconds",
+    buckets=[0.01, 0.05, 0.1, 0.25, 0.5, 1.0],
+)
+
+dlq_send_errors_total = Counter(
+    "dlq_send_errors_total",
+    "Total errors sending to DLQ",
+)

@@ -6,7 +6,8 @@ pydantic-settings==2.1.0
 
 # Events
 aiokafka==0.10.0
-redis==5.0.1
+redis[hiredis]==5.0.1
+lz4==4.3.2
 
 # Image Processing
 Pillow==10.1.0
