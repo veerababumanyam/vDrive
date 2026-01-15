@@ -1,5 +1,13 @@
 """Pydantic schemas for AI Search service API."""
 
+from .caption import (
+    CaptionRequest,
+    CaptionResponse,
+    CaptionSuggestion,
+    DetectedContext,
+    RegenerateCaptionRequest,
+    SelectCaptionRequest,
+)
 from .chat import (
     ChatMessage,
     ChatRequest,
@@ -22,6 +30,13 @@ from .search import (
 )
 
 __all__ = [
+    # Caption schemas
+    "CaptionRequest",
+    "CaptionResponse",
+    "CaptionSuggestion",
+    "DetectedContext",
+    "RegenerateCaptionRequest",
+    "SelectCaptionRequest",
     # Chat schemas
     "ChatMessage",
     "ChatRequest",
