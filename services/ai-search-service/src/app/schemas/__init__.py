@@ -1,5 +1,16 @@
 """Pydantic schemas for AI Search service API."""
 
+from .chat import (
+    ChatMessage,
+    ChatRequest,
+    ChatResponse,
+    ConversationDetail,
+    ConversationListResponse,
+    ConversationSummary,
+    CreateConversationRequest,
+    CreateConversationResponse,
+    PhotoReference,
+)
 from .search import (
     EmbeddingStatus,
     SearchQuery,
@@ -11,6 +22,17 @@ from .search import (
 )
 
 __all__ = [
+    # Chat schemas
+    "ChatMessage",
+    "ChatRequest",
+    "ChatResponse",
+    "ConversationDetail",
+    "ConversationListResponse",
+    "ConversationSummary",
+    "CreateConversationRequest",
+    "CreateConversationResponse",
+    "PhotoReference",
+    # Search schemas
     "EmbeddingStatus",
     "SearchQuery",
     "SearchResponse",
