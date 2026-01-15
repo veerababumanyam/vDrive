@@ -818,6 +818,115 @@ services:
           memory: 2G
           cpus: '2.0'
 
+  # ===========================================
+  # Face Service
+  # Port 8002 - Face Detection, Embedding & Clustering
+  # ===========================================
+  face-service:
+    build:
+      context: ../../services/face-service
+      dockerfile: Dockerfile
+    image: ghcr.io/vdrive/face-service:${VERSION:-latest}
+    container_name: vDrive-face
+    restart: unless-stopped
+    ports:
+      - "${FACE_SERVICE_PORT:-8002}:8002"
+    environment:
+      SERVICE_NAME: face-service
+      SERVICE_VERSION: "1.0.0"
+      APP_ENV: ${APP_ENV:-development}
+      PORT: "8002"
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-vDrive}:${POSTGRES_PASSWORD:-vDrive_dev_password}@postgres:5432/${POSTGRES_DB:-vDrive}
+      REDIS_URL: redis://redis:6379/0
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      KAFKA_CONSUMER_GROUP_ID: face-service-group
+      GOOGLE_CLOUD_VISION_CREDENTIALS: ${GOOGLE_CLOUD_VISION_CREDENTIALS}
+      GOOGLE_CLOUD_VISION_PROJECT_ID: ${GOOGLE_CLOUD_VISION_PROJECT_ID}
+      FACE_DETECTION_RATE_LIMIT_PER_MINUTE: ${FACE_DETECTION_RATE_LIMIT_PER_MINUTE:-60}
+      SENTRY_DSN: ${FACE_SERVICE_SENTRY_DSN:-}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8002/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    networks:
+      - vDrive-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.face.rule=PathPrefix(`/api/v1/faces`) || PathPrefix(`/api/v1/people`) || PathPrefix(`/api/v1/find-me`)"
+      - "traefik.http.routers.face.priority=145"
+      - "traefik.http.services.face.loadbalancer.server.port=8002"
+      - "traefik.http.services.face.loadbalancer.healthcheck.path=/health"
+      - "prometheus.io/scrape=true"
+      - "prometheus.io/port=8002"
+      - "prometheus.io/path=/metrics"
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+          cpus: '2.0'
+
+  # ===========================================
+  # AI Search Service
+  # Port 8009 - Semantic Search, RAG Chat, Captions
+  # ===========================================
+  ai-search-service:
+    build:
+      context: ../../services/ai-search-service
+      dockerfile: Dockerfile
+    image: ghcr.io/vdrive/ai-search-service:${VERSION:-latest}
+    container_name: vDrive-ai-search
+    restart: unless-stopped
+    ports:
+      - "${AI_SEARCH_SERVICE_PORT:-8009}:8009"
+    environment:
+      SERVICE_NAME: ai-search-service
+      SERVICE_VERSION: "1.0.0"
+      APP_ENV: ${APP_ENV:-development}
+      PORT: "8009"
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-vDrive}:${POSTGRES_PASSWORD:-vDrive_dev_password}@postgres:5432/${POSTGRES_DB:-vDrive}
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      KAFKA_CONSUMER_GROUP_ID: ai-search-service-group
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.0-flash}
+      CLIP_MODEL: ${CLIP_MODEL:-clip-ViT-L-14}
+      SENTRY_DSN: ${AI_SEARCH_SERVICE_SENTRY_DSN:-}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8009/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 90s
+    networks:
+      - vDrive-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.ai-search.rule=PathPrefix(`/api/v1/search`) || PathPrefix(`/api/v1/similar`) || PathPrefix(`/api/v1/chat`) || PathPrefix(`/api/v1/captions`)"
+      - "traefik.http.routers.ai-search.priority=146"
+      - "traefik.http.services.ai-search.loadbalancer.server.port=8009"
+      - "traefik.http.services.ai-search.loadbalancer.healthcheck.path=/health"
+      - "prometheus.io/scrape=true"
+      - "prometheus.io/port=8009"
+      - "prometheus.io/path=/metrics"
+    deploy:
+      resources:
+        limits:
+          memory: 8G
+          cpus: '4.0'
+
 networks:
   vDrive-network:
     driver: bridge
