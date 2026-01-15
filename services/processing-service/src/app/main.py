@@ -1,31 +1,171 @@
 """
 FastAPI application for Processing Service.
 
-Runs Kafka consumers for async task processing.
+Runs Kafka consumers for async task processing with graceful shutdown,
+comprehensive health checks, and observability.
 """
 
 import asyncio
+import signal
+import time
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
 import structlog
 from fastapi import FastAPI
-from fastapi.responses import Response
-from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
+from fastapi.responses import JSONResponse, Response
+from prometheus_client import CONTENT_TYPE_LATEST, Gauge, generate_latest
 
-from .core import settings, close_db, configure_logging
+from .core import close_db, configure_logging, settings
+from .core.redis import redis_manager
 
 # Configure logging
 configure_logging()
 logger = structlog.get_logger()
 
-# Track running consumers
+# Track running consumers and startup time
 _consumer_tasks: list[asyncio.Task] = []
+_startup_time: float = 0.0
+_shutdown_in_progress: bool = False
+
+# Startup/shutdown metrics
+service_startup_duration_seconds = Gauge(
+    "service_startup_duration_seconds",
+    "Time taken for service to start",
+)
+
+service_shutdown_duration_seconds = Gauge(
+    "service_shutdown_duration_seconds",
+    "Time taken for service to shutdown",
+)
+
+service_uptime_seconds = Gauge(
+    "service_uptime_seconds",
+    "Service uptime in seconds",
+)
+
+
+async def _validate_dependencies() -> dict[str, str]:
+    """
+    Validate all external dependencies on startup.
+
+    Returns:
+        Dict mapping dependency name to status (ok or error message)
+    """
+    results = {}
+
+    # Check PostgreSQL
+    try:
+        from .core.database import engine
+        import sqlalchemy
+
+        async with engine.connect() as conn:
+            await conn.execute(sqlalchemy.text("SELECT 1"))
+        results["postgresql"] = "ok"
+    except Exception as e:
+        results["postgresql"] = f"error: {str(e)}"
+        logger.error("PostgreSQL health check failed", error=str(e))
+
+    # Check Redis
+    try:
+        await redis_manager.initialize()
+        if redis_manager.is_healthy:
+            results["redis"] = "ok"
+        else:
+            results["redis"] = "unhealthy"
+    except Exception as e:
+        results["redis"] = f"error: {str(e)}"
+        logger.warning("Redis health check failed (graceful degradation enabled)", error=str(e))
+
+    # Check Kafka connectivity
+    try:
+        from aiokafka import AIOKafkaConsumer
+
+        test_consumer = AIOKafkaConsumer(
+            bootstrap_servers=settings.KAFKA_BOOTSTRAP_SERVERS,
+        )
+        await asyncio.wait_for(test_consumer.start(), timeout=5.0)
+        await test_consumer.stop()
+        results["kafka"] = "ok"
+    except asyncio.TimeoutError:
+        results["kafka"] = "timeout"
+        logger.warning("Kafka connectivity timeout")
+    except Exception as e:
+        results["kafka"] = f"error: {str(e)}"
+        logger.error("Kafka health check failed", error=str(e))
+
+    # Check R2 storage connectivity
+    try:
+        import boto3
+        from botocore.config import Config
+
+        s3_client = boto3.client(
+            "s3",
+            endpoint_url=settings.R2_ENDPOINT,
+            aws_access_key_id=settings.R2_ACCESS_KEY_ID,
+            aws_secret_access_key=settings.R2_SECRET_ACCESS_KEY,
+            config=Config(
+                signature_version="s3v4",
+                connect_timeout=5,
+                read_timeout=5,
+            ),
+        )
+        # Just check we can list the bucket
+        s3_client.head_bucket(Bucket=settings.R2_BUCKET_NAME)
+        results["r2_storage"] = "ok"
+    except Exception as e:
+        results["r2_storage"] = f"error: {str(e)}"
+        logger.warning("R2 storage health check failed", error=str(e))
+
+    # Check Google Cloud Vision (if enabled)
+    if settings.GOOGLE_CLOUD_VISION_ENABLED:
+        try:
+            from google.cloud import vision
+
+            client = vision.ImageAnnotatorClient()
+            # Dry run - just verify client can be created
+            results["gcv"] = "ok"
+        except Exception as e:
+            results["gcv"] = f"error: {str(e)}"
+            logger.warning("Google Cloud Vision check failed", error=str(e))
+    else:
+        results["gcv"] = "disabled"
+
+    return results
+
+
+def _setup_signal_handlers(loop: asyncio.AbstractEventLoop):
+    """Setup signal handlers for graceful shutdown."""
+    global _shutdown_in_progress
+
+    def signal_handler(sig):
+        if _shutdown_in_progress:
+            logger.warning("Shutdown already in progress, ignoring signal", signal=sig)
+            return
+
+        logger.info("Received shutdown signal", signal=sig)
+        _shutdown_in_progress = True
+
+        # Cancel all consumer tasks
+        for task in _consumer_tasks:
+            if not task.done():
+                task.cancel()
+
+    # Register signal handlers
+    for sig in (signal.SIGTERM, signal.SIGINT):
+        loop.add_signal_handler(sig, lambda s=sig: signal_handler(s))
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator:
     """Application lifespan manager for startup and shutdown."""
+    global _startup_time
+    startup_start = time.time()
+
+    # Setup signal handlers
+    loop = asyncio.get_running_loop()
+    _setup_signal_handlers(loop)
+
     # Startup
     logger.info(
         "Starting Processing Service",
@@ -33,8 +173,21 @@ async def lifespan(app: FastAPI) -> AsyncGenerator:
         env=settings.APP_ENV,
     )
 
+    # Validate dependencies
+    dep_status = await _validate_dependencies()
+    failed_deps = [k for k, v in dep_status.items() if v not in ("ok", "disabled")]
+
+    if failed_deps:
+        logger.warning(
+            "Some dependencies are unavailable",
+            failed=failed_deps,
+            status=dep_status,
+        )
+    else:
+        logger.info("All dependencies validated", status=dep_status)
+
     # Initialize event service for publishing
-    from .services.event_service import init_event_service, close_event_service
+    from .services.event_service import close_event_service, init_event_service
 
     await init_event_service()
 
@@ -45,24 +198,50 @@ async def lifespan(app: FastAPI) -> AsyncGenerator:
 
     _consumer_tasks.append(asyncio.create_task(asset_consumer.run()))
 
-    logger.info("Kafka consumers started", consumer_count=len(_consumer_tasks))
+    # Record startup metrics
+    _startup_time = time.time()
+    startup_duration = _startup_time - startup_start
+    service_startup_duration_seconds.set(startup_duration)
+
+    logger.info(
+        "Kafka consumers started",
+        consumer_count=len(_consumer_tasks),
+        startup_duration_ms=round(startup_duration * 1000, 2),
+    )
 
     yield
 
     # Shutdown
+    shutdown_start = time.time()
     logger.info("Shutting down Processing Service")
 
-    # Stop all consumers
+    # Stop all consumers gracefully with timeout
     for task in _consumer_tasks:
         task.cancel()
-        try:
-            await task
-        except asyncio.CancelledError:
-            pass
 
+    # Wait for tasks to complete with timeout
+    if _consumer_tasks:
+        try:
+            await asyncio.wait_for(
+                asyncio.gather(*_consumer_tasks, return_exceptions=True),
+                timeout=30.0,  # 30 second timeout for graceful shutdown
+            )
+        except asyncio.TimeoutError:
+            logger.warning("Consumer shutdown timed out after 30s")
+
+    # Cleanup resources
     await close_event_service()
+    await redis_manager.close()
     await close_db()
-    logger.info("Processing Service shutdown complete")
+
+    # Record shutdown metrics
+    shutdown_duration = time.time() - shutdown_start
+    service_shutdown_duration_seconds.set(shutdown_duration)
+
+    logger.info(
+        "Processing Service shutdown complete",
+        shutdown_duration_ms=round(shutdown_duration * 1000, 2),
+    )
 
 
 # Create FastAPI application
@@ -78,21 +257,34 @@ app = FastAPI(
 
 @app.get("/health")
 async def health():
-    """Liveness probe endpoint."""
+    """
+    Liveness probe endpoint.
+
+    Returns 200 if service is alive. Does not check dependencies.
+    """
+    uptime = time.time() - _startup_time if _startup_time > 0 else 0
+    service_uptime_seconds.set(uptime)
+
     return {
         "status": "healthy",
         "service": settings.SERVICE_NAME,
         "version": settings.SERVICE_VERSION,
+        "uptime_seconds": round(uptime, 2),
     }
 
 
 @app.get("/ready")
 async def ready():
-    """Readiness probe endpoint."""
+    """
+    Readiness probe endpoint with comprehensive dependency checks.
+
+    Returns 200 if all critical dependencies are healthy.
+    Returns 503 if any critical dependency is unhealthy.
+    """
     checks = {}
     all_healthy = True
 
-    # Check database
+    # Check database (critical)
     try:
         from .core.database import engine
         import sqlalchemy
@@ -101,10 +293,20 @@ async def ready():
             await conn.execute(sqlalchemy.text("SELECT 1"))
         checks["database"] = "ok"
     except Exception as e:
-        checks["database"] = f"error: {str(e)}"
+        checks["database"] = f"error: {str(e)[:100]}"
         all_healthy = False
 
-    # Check consumer count
+    # Check Redis (non-critical, graceful degradation)
+    try:
+        if await redis_manager.health_check():
+            checks["redis"] = "ok"
+        else:
+            checks["redis"] = "unhealthy"
+            # Redis is non-critical due to graceful degradation
+    except Exception as e:
+        checks["redis"] = f"error: {str(e)[:100]}"
+
+    # Check consumer status (critical)
     active_consumers = len([t for t in _consumer_tasks if not t.done()])
     checks["consumers"] = {
         "total": len(_consumer_tasks),
@@ -116,14 +318,28 @@ async def ready():
         all_healthy = False
 
     status_code = 200 if all_healthy else 503
-    return {
-        "status": "ready" if all_healthy else "degraded",
-        "service": settings.SERVICE_NAME,
-        "checks": checks,
-    }, status_code
+    return JSONResponse(
+        content={
+            "status": "ready" if all_healthy else "degraded",
+            "service": settings.SERVICE_NAME,
+            "checks": checks,
+        },
+        status_code=status_code,
+    )
 
 
 @app.get("/metrics")
 async def metrics():
     """Prometheus metrics endpoint."""
     return Response(content=generate_latest(), media_type=CONTENT_TYPE_LATEST)
+
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run(
+        "src.app.main:app",
+        host="0.0.0.0",
+        port=settings.PROMETHEUS_PORT,
+        reload=settings.APP_ENV == "development",
+    )
