@@ -20,6 +20,17 @@ from src.app.schemas.gallery_asset import (
     VerifyPinRequest,
     VerifyPinResponse,
 )
+from src.app.schemas.websocket import (
+    ConnectionInfo,
+    ErrorData,
+    GalleryUpdatedData,
+    MagicLinkAuth,
+    PhotoAddedData,
+    PhotoRemovedData,
+    WebSocketAuthResponse,
+    WebSocketMessage,
+    WebSocketMessageType,
+)
 
 __all__ = [
     # Gallery schemas
@@ -40,4 +51,14 @@ __all__ = [
     "AssetInteractionRequest",
     "AssetInteractionResponse",
     "PaginatedGalleryAssetResponse",
+    # WebSocket schemas
+    "ConnectionInfo",
+    "ErrorData",
+    "GalleryUpdatedData",
+    "MagicLinkAuth",
+    "PhotoAddedData",
+    "PhotoRemovedData",
+    "WebSocketAuthResponse",
+    "WebSocketMessage",
+    "WebSocketMessageType",
 ]
