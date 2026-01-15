@@ -1,5 +1,14 @@
 """Pydantic schemas for Gallery Service API."""
 
+from src.app.schemas.batch import (
+    BATCH_OPERATIONS,
+    BatchError,
+    BatchOperationSummary,
+    BatchOperationType,
+    BatchRequest,
+    BatchResponse,
+    BatchStatusResponse,
+)
 from src.app.schemas.gallery import (
     GalleryResponse,
     GallerySettings,
@@ -20,6 +29,14 @@ from src.app.schemas.gallery_asset import (
     VerifyPinRequest,
     VerifyPinResponse,
 )
+from src.app.schemas.preview import (
+    PreviewRequest,
+    PreviewSessionResponse,
+    PreviewStatusResponse,
+    PreviewToggleResponse,
+    ValidatePreviewTokenRequest,
+    ValidatePreviewTokenResponse,
+)
 from src.app.schemas.websocket import (
     ConnectionInfo,
     ErrorData,
@@ -33,6 +50,14 @@ from src.app.schemas.websocket import (
 )
 
 __all__ = [
+    # Batch schemas
+    "BATCH_OPERATIONS",
+    "BatchError",
+    "BatchOperationSummary",
+    "BatchOperationType",
+    "BatchRequest",
+    "BatchResponse",
+    "BatchStatusResponse",
     # Gallery schemas
     "GalleryResponse",
     "GallerySettings",
@@ -51,6 +76,13 @@ __all__ = [
     "AssetInteractionRequest",
     "AssetInteractionResponse",
     "PaginatedGalleryAssetResponse",
+    # Preview schemas
+    "PreviewRequest",
+    "PreviewSessionResponse",
+    "PreviewStatusResponse",
+    "PreviewToggleResponse",
+    "ValidatePreviewTokenRequest",
+    "ValidatePreviewTokenResponse",
     # WebSocket schemas
     "ConnectionInfo",
     "ErrorData",

@@ -32,7 +32,7 @@ spec:
         query: histogram_quantile(0.95, sum(rate(traefik_service_request_duration_seconds_bucket{service="backend@kubernetes"}[5m])) by (le))
         threshold: "0.5"
 ---
-# Gallery Service Autoscaling (High Traffic)
+# Gallery Service Autoscaling (High Traffic + WebSocket)
 apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
 metadata:
@@ -44,7 +44,7 @@ spec:
   pollingInterval: 15
   cooldownPeriod: 60
   minReplicaCount: 5
-  maxReplicaCount: 50
+  maxReplicaCount: 100
   triggers:
     # Scale based on HTTP request rate
     - type: prometheus
@@ -53,13 +53,27 @@ spec:
         metricName: traefik_service_requests_total
         query: sum(rate(traefik_service_requests_total{service="gallery-service@kubernetes"}[1m]))
         threshold: "100"
-    # Scale based on WebSocket connections (if exposed as metric)
+    # Scale based on active WebSocket connections
     - type: prometheus
       metadata:
         serverAddress: http://prometheus:9090
-        metricName: gallery_websocket_connections
-        query: sum(gallery_websocket_connections_active)
+        metricName: websocket_active_connections
+        query: sum(websocket_active_connections)
         threshold: "500"
+    # Scale based on WebSocket messages sent (activity)
+    - type: prometheus
+      metadata:
+        serverAddress: http://prometheus:9090
+        metricName: websocket_messages_sent
+        query: sum(rate(websocket_messages_sent[5m]))
+        threshold: "1000"
+    # Scale based on Kafka gallery update events
+    - type: kafka
+      metadata:
+        bootstrapServers: kafka:9092
+        consumerGroup: gallery-updates
+        topic: gallery.updated
+        lagThreshold: "100"
 ---
 # Upload Service Autoscaling (Kafka-based)
 apiVersion: keda.sh/v1alpha1
@@ -204,6 +218,42 @@ spec:
         metricName: traefik_service_requests_total
         query: sum(rate(traefik_service_requests_total{service="onboarding-service@kubernetes"}[1m]))
         threshold: "50"
+---
+# AI Search Service Autoscaling
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: ai-search-service-scaledobject
+  namespace: vDrive
+spec:
+  scaleTargetRef:
+    name: ai-search-service
+  pollingInterval: 15
+  cooldownPeriod: 120  # Longer cooldown for AI workloads
+  minReplicaCount: 2
+  maxReplicaCount: 50
+  triggers:
+    # Scale based on Kafka consumer lag for embedding generation
+    - type: kafka
+      metadata:
+        bootstrapServers: kafka:9092
+        consumerGroup: embedding-processor
+        topic: asset.embedding.generated
+        lagThreshold: "50"
+    # Scale based on HTTP request rate (semantic search queries)
+    - type: prometheus
+      metadata:
+        serverAddress: http://prometheus:9090
+        metricName: traefik_service_requests_total
+        query: sum(rate(traefik_service_requests_total{service="ai-search-service@kubernetes"}[1m]))
+        threshold: "30"
+    # Scale based on RAG chat requests
+    - type: prometheus
+      metadata:
+        serverAddress: http://prometheus:9090
+        metricName: ai_chat_messages_total
+        query: sum(rate(ai_chat_messages_total[5m]))
+        threshold: "10"
 ---
 # Celery Worker Autoscaling (Redis-based)
 apiVersion: keda.sh/v1alpha1

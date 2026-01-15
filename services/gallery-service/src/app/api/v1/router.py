@@ -2,7 +2,7 @@
 
 from fastapi import APIRouter
 
-from src.app.api.v1 import public_access, websocket
+from src.app.api.v1 import batch, preview, public_access, websocket
 
 # Create main router
 api_router = APIRouter()
@@ -20,5 +20,14 @@ api_router.include_router(
     tags=["WebSocket"],
 )
 
-# TODO: Add more routers as they are implemented
-# from src.app.api.v1 import gallery_viewing, batch_operations
+# Preview mode router
+api_router.include_router(
+    preview.router,
+    tags=["Preview"],
+)
+
+# Batch operations router
+api_router.include_router(
+    batch.router,
+    tags=["Batch Operations"],
+)

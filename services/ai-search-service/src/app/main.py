@@ -11,16 +11,35 @@ import time
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
+import sentry_sdk
 import structlog
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse, Response
 from prometheus_client import CONTENT_TYPE_LATEST, Gauge, generate_latest
+from sentry_sdk.integrations.fastapi import FastApiIntegration
+from sentry_sdk.integrations.sqlalchemy import SqlalchemyIntegration
 
 from .core import close_db, close_gemini, configure_logging, init_db, init_gemini, settings
 
 # Configure logging
 configure_logging()
 logger = structlog.get_logger()
+
+# Initialize Sentry
+if settings.SENTRY_DSN:
+    sentry_sdk.init(
+        dsn=settings.SENTRY_DSN,
+        environment=settings.APP_ENV,
+        release=f"ai-search-service@{settings.SERVICE_VERSION}",
+        traces_sample_rate=0.1 if settings.APP_ENV == "production" else 1.0,
+        profiles_sample_rate=0.1 if settings.APP_ENV == "production" else 1.0,
+        integrations=[
+            FastApiIntegration(transaction_style="endpoint"),
+            SqlalchemyIntegration(),
+        ],
+        send_default_pii=False,
+    )
+    logger.info("Sentry initialized", environment=settings.APP_ENV)
 
 # Track running consumers and startup time
 _consumer_tasks: list[asyncio.Task] = []
