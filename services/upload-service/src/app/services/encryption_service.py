@@ -59,22 +59,20 @@ class EncryptionService:
     ) -> tuple[bytes, bytes, bytes]:
         """
         Encrypt stream with AES-256-GCM.
+        Reads all data then encrypts as single blob for integrity.
         Returns: (encrypted_data, iv, auth_tag)
         """
-        iv = os.urandom(12)
-        encrypted_chunks = []
-
+        # Read all chunks
+        chunks = []
         while True:
             chunk = input_stream.read(CHUNK_SIZE)
             if not chunk:
                 break
-            encrypted_chunk, _, _ = self.encrypt_data(chunk, key)
-            encrypted_chunks.append(encrypted_chunk)
+            chunks.append(chunk)
 
-        encrypted_data = b"".join(encrypted_chunks)
-        # For streaming, we use a single IV/tag for the entire file
-        _, final_iv, final_tag = self.encrypt_data(encrypted_data, key)
-        return encrypted_data, final_iv, final_tag
+        # Encrypt entire data as single blob
+        full_data = b"".join(chunks)
+        return self.encrypt_data(full_data, key)
 
     def encrypt_chunk(
         self, chunk: bytes, key: bytes, iv: Optional[bytes] = None

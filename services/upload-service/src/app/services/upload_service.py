@@ -4,14 +4,12 @@ from datetime import datetime, timedelta
 from typing import Optional
 from uuid import uuid4
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
 import structlog
 
 from ..core.config import settings
 from ..models import Upload, Asset, UploadStatus, ProcessingStatus
 from ..schemas.events import UploadInitiatedEvent, UploadCompletedEvent
 from .encryption_service import get_encryption_service
-from .storage_service import get_storage_service
 from .event_service import get_event_service
 
 logger = structlog.get_logger()
@@ -76,12 +74,9 @@ class UploadService:
         if upload.checksum_client and upload.checksum_client != checksum_server:
             raise ValueError("Checksum mismatch")
 
-        # Create Asset
+        # Create Asset with encryption metadata
         asset_id = str(uuid4())
         encryption_service = get_encryption_service()
-        
-        # Derive encryption key
-        workspace_key = encryption_service.derive_workspace_key(upload.workspace_id)
         encryption_metadata = encryption_service.generate_encryption_metadata()
 
         asset = Asset(
