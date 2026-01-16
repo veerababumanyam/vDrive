@@ -21,23 +21,6 @@ import { useAuth } from '../contexts/AuthContext';
 // Icons
 // ============================================
 
-function CameraIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z" />
-      <circle cx="12" cy="13" r="3" />
-    </svg>
-  );
-}
-
 function ImageIcon({ className }: { className?: string }) {
   return (
     <svg
@@ -181,6 +164,15 @@ function MorphingBlob({ className }: { className?: string }) {
   );
 }
 
+// Pre-generated particle data - generated once at module load to avoid impure render
+const DASHBOARD_PARTICLES = [...Array(15)].map((_, i) => ({
+  id: i,
+  left: `${Math.random() * 100}%`,
+  top: `${Math.random() * 100}%`,
+  animationDuration: `${8 + Math.random() * 4}s`,
+  animationDelay: `${Math.random() * 5}s`,
+}));
+
 function ParticleEffect() {
   const prefersReducedMotion = usePrefersReducedMotion();
 
@@ -188,15 +180,15 @@ function ParticleEffect() {
 
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {[...Array(15)].map((_, i) => (
+      {DASHBOARD_PARTICLES.map((particle) => (
         <div
-          key={i}
+          key={particle.id}
           className="absolute w-1 h-1 rounded-full bg-primary-400/30 dark:bg-primary-300/25"
           style={{
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
-            animation: `float ${8 + Math.random() * 4}s ease-in-out infinite`,
-            animationDelay: `${Math.random() * 5}s`,
+            left: particle.left,
+            top: particle.top,
+            animation: `float ${particle.animationDuration} ease-in-out infinite`,
+            animationDelay: particle.animationDelay,
           }}
         />
       ))}
@@ -351,7 +343,7 @@ export function DashboardPage() {
           {/* Logo */}
           <a href="/" className="flex items-center gap-2.5 group touch-target">
             <AppLogo size="sm" className="transition-transform group-hover:scale-110" />
-            <span className="text-lg font-bold text-neutral-900 dark:text-white hidden sm:block">vDrive</span>
+            <span className="text-lg font-bold text-neutral-900 dark:text-white hidden sm:block">RawDrive</span>
           </a>
 
           {/* Right side */}

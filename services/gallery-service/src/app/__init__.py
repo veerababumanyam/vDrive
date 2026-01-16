@@ -1,3 +1,3 @@
-"""vDrive Gallery Service - FastAPI Application"""
+"""RawDrive Gallery Service - FastAPI Application"""
 
 __version__ = "1.0.0"

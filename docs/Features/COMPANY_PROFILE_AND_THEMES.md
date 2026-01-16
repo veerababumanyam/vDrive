@@ -301,15 +301,15 @@ cd frontend && npm test -- --coverage
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `PUBLIC_URL` | Base URL for public profiles | `https://vDrive.ai` |
-| `VITE_PUBLIC_URL` | Frontend public URL | `https://vDrive.ai` |
+| `PUBLIC_URL` | Base URL for public profiles | `https://RawDrive.ai` |
+| `VITE_PUBLIC_URL` | Frontend public URL | `https://RawDrive.ai` |
 
 ### Backend Configuration
 
 ```python
 # settings.py
 class Settings(BaseSettings):
-    public_url: str = "https://vDrive.ai"
+    public_url: str = "https://RawDrive.ai"
     qr_code_error_correction: str = "H"
     qr_code_box_size: int = 10
     qr_code_border: int = 4
@@ -336,7 +336,7 @@ class Settings(BaseSettings):
 
 2. **Environment Variables**: Add `PUBLIC_URL` to `.env`
    ```env
-   PUBLIC_URL=https://vDrive.ai
+   PUBLIC_URL=https://RawDrive.ai
    ```
 
 3. **Frontend Update**: Theme components auto-load

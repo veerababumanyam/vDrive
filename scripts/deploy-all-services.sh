@@ -1,7 +1,7 @@
 #!/bin/bash
-# vDrive Complete Deployment Script
+# RawDrive Complete Deployment Script
 # Deploys ALL 23 Docker services without exception
-# Location: /Users/v13478/Desktop/vDrive/scripts/deploy-all-services.sh
+# Location: /Users/v13478/Desktop/RawDrive/scripts/deploy-all-services.sh
 # Usage: bash scripts/deploy-all-services.sh
 
 set -e  # Exit on error
@@ -10,7 +10,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 echo "=========================================================="
-echo "vDrive Complete Deployment - ALL 23 Services"
+echo "RawDrive Complete Deployment - ALL 23 Services"
 echo "=========================================================="
 echo ""
 
@@ -65,7 +65,7 @@ print_success ".env file found"
 if [ ! -f "$PROJECT_ROOT/backend/secrets/jwt_private_key" ]; then
     print_warning "JWT keys not found. Generating now..."
     mkdir -p "$PROJECT_ROOT/backend/secrets"
-    ssh-keygen -t ed25519 -f "$PROJECT_ROOT/backend/secrets/jwt_key" -N "" -C "vDrive-jwt-signing-key"
+    ssh-keygen -t ed25519 -f "$PROJECT_ROOT/backend/secrets/jwt_key" -N "" -C "RawDrive-jwt-signing-key"
     openssl pkey -in "$PROJECT_ROOT/backend/secrets/jwt_key" -out "$PROJECT_ROOT/backend/secrets/jwt_private_key" 2>/dev/null || cp "$PROJECT_ROOT/backend/secrets/jwt_key" "$PROJECT_ROOT/backend/secrets/jwt_private_key"
     cp "$PROJECT_ROOT/backend/secrets/jwt_key.pub" "$PROJECT_ROOT/backend/secrets/jwt_public_key"
     chmod 600 "$PROJECT_ROOT/backend/secrets/jwt_private_key"
@@ -86,9 +86,9 @@ print_info "Waiting for core infrastructure to be healthy (30 seconds)..."
 sleep 30
 
 # Verify core services are healthy
-POSTGRES_HEALTH=$(docker inspect --format='{{.State.Health.Status}}' vDrive-postgres 2>/dev/null || echo "unknown")
-REDIS_HEALTH=$(docker inspect --format='{{.State.Health.Status}}' vDrive-redis 2>/dev/null || echo "unknown")
-KAFKA_HEALTH=$(docker inspect --format='{{.State.Health.Status}}' vDrive-kafka 2>/dev/null || echo "unknown")
+POSTGRES_HEALTH=$(docker inspect --format='{{.State.Health.Status}}' RawDrive-postgres 2>/dev/null || echo "unknown")
+REDIS_HEALTH=$(docker inspect --format='{{.State.Health.Status}}' RawDrive-redis 2>/dev/null || echo "unknown")
+KAFKA_HEALTH=$(docker inspect --format='{{.State.Health.Status}}' RawDrive-kafka 2>/dev/null || echo "unknown")
 
 if [ "$POSTGRES_HEALTH" = "healthy" ]; then
     print_success "PostgreSQL is healthy"
@@ -205,7 +205,7 @@ fi
 
 # Verify migrations
 print_info "Verifying migrations..."
-MIGRATION_COUNT=$(docker compose exec postgres psql -U vDrive -d vDrive -t -c "SELECT COUNT(*) FROM alembic_version;" | tr -d ' ')
+MIGRATION_COUNT=$(docker compose exec postgres psql -U RawDrive -d RawDrive -t -c "SELECT COUNT(*) FROM alembic_version;" | tr -d ' ')
 if [ "$MIGRATION_COUNT" -ge "2" ]; then
     print_success "Migrations verified ($MIGRATION_COUNT version records found)"
 else
@@ -255,7 +255,7 @@ fi
 
 echo ""
 print_info "Step 7: Verifying database schema..."
-TABLE_COUNT=$(docker compose exec postgres psql -U vDrive -d vDrive -t -c "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'app';" | tr -d ' ')
+TABLE_COUNT=$(docker compose exec postgres psql -U RawDrive -d RawDrive -t -c "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'app';" | tr -d ' ')
 if [ "$TABLE_COUNT" -ge "30" ]; then
     print_success "Database schema verified ($TABLE_COUNT tables in 'app' schema)"
 else

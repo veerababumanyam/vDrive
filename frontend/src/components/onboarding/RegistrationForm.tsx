@@ -212,7 +212,7 @@ export function RegistrationForm({
       <div className="text-center mb-8">
         <h1 className="text-2xl font-bold text-neutral-900 dark:text-white mb-2">Create Account</h1>
         <p className="text-neutral-500 dark:text-white/60">
-          Start your photography journey with vDrive
+          Start your photography journey with RawDrive
         </p>
       </div>
 

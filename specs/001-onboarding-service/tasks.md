@@ -144,7 +144,7 @@
 
 - [x] [T062] [P1] [US2] Create `services/onboarding-service/src/app/services/oauth_service.py` with OAuthService class
 - [x] [T063] [P1] [US2] Add initiate_google_oauth method: generate state token, store in Redis with 10min TTL, return Google OAuth authorization URL with scope=email,profile
-- [x] [T064] [P1] [US2] Add handle_google_callback method: validate state token, exchange code for token via Google API, fetch user info, check if email exists in vDrive
+- [x] [T064] [P1] [US2] Add handle_google_callback method: validate state token, exchange code for token via Google API, fetch user info, check if email exists in RawDrive
 - [x] [T065] [P1] [US2] Add create_or_link_google_user method: if email exists -> link google_id and return user, else create new user with email_verified=true and google_id set
 
 ### 4.2 OAuth API Endpoints

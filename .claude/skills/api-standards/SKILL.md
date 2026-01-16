@@ -1,7 +1,7 @@
 ---
 name: api-standards
 aliases: [api, rest, endpoints, http, responses, pagination]
-description: API conventions for vDrive. Use when building API endpoints, designing response formats, implementing pagination, or handling HTTP methods.
+description: API conventions for RawDrive. Use when building API endpoints, designing response formats, implementing pagination, or handling HTTP methods.
 ---
 
 # API Standards
@@ -339,7 +339,7 @@ DELETE /galleries/{id}/assets/{asset_id}
 from fastapi import FastAPI
 
 app = FastAPI(
-    title="vDrive API",
+    title="RawDrive API",
     description="Professional photography management platform",
     version="1.0.0",
     docs_url="/api/docs",

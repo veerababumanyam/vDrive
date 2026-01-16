@@ -11,7 +11,7 @@
 **Decision**: Python 3.11 + FastAPI + SQLAlchemy 2.0 (async)
 
 **Rationale**:
-- Consistent with existing vDrive microservices architecture
+- Consistent with existing RawDrive microservices architecture
 - FastAPI provides automatic OpenAPI documentation, async support, and Pydantic validation
 - SQLAlchemy 2.0 async provides efficient database operations with type safety
 - Existing patterns for repositories, services, and API layers established
@@ -26,7 +26,7 @@
 **Decision**: PostgreSQL 16 with async driver (asyncpg)
 
 **Rationale**:
-- Existing vDrive database infrastructure
+- Existing RawDrive database infrastructure
 - UUID support for entity IDs (as_uuid=False string format)
 - ACID compliance for transactional integrity during registration
 - Existing connection pooling patterns via SQLAlchemy
@@ -42,7 +42,7 @@
 **Rationale**:
 - OWASP recommended algorithm for password hashing
 - Memory-hard algorithm resistant to GPU/ASIC attacks
-- Existing implementation pattern in vDrive codebase
+- Existing implementation pattern in RawDrive codebase
 - Configuration: time_cost=3, memory_cost=65536 (64KB), parallelism=4
 
 **Alternatives Considered**:
@@ -55,7 +55,7 @@
 **Decision**: HS256 with 15-minute access tokens, 7-day refresh tokens
 
 **Rationale**:
-- Consistent with existing vDrive authentication patterns
+- Consistent with existing RawDrive authentication patterns
 - Short-lived access tokens minimize exposure window
 - Refresh token pattern enables session management
 - JWT payload: user_id, workspace_ids, roles
@@ -72,7 +72,7 @@
 **Rationale**:
 - Privacy-focused alternative to reCAPTCHA
 - No user interaction required in most cases (invisible challenge)
-- Existing integration patterns in vDrive
+- Existing integration patterns in RawDrive
 - Server-side token verification via Cloudflare API
 
 **Alternatives Considered**:
@@ -85,7 +85,7 @@
 **Decision**: Redis 7
 
 **Rationale**:
-- Existing vDrive infrastructure component
+- Existing RawDrive infrastructure component
 - Supports rate limiting with atomic increment/expire
 - Session state persistence for onboarding progress
 - Pub/sub capability for future real-time features
@@ -99,7 +99,7 @@
 **Decision**: Integration with Notifications Service (SendGrid backend)
 
 **Rationale**:
-- Existing vDrive microservice handles email delivery
+- Existing RawDrive microservice handles email delivery
 - Centralized template management
 - Delivery tracking and bounce handling
 - Kafka event integration for async processing
@@ -114,10 +114,10 @@
 **Decision**: Kafka via AIOKafkaProducer
 
 **Rationale**:
-- Existing vDrive event bus infrastructure
+- Existing RawDrive event bus infrastructure
 - Async publishing with acknowledgment (acks=all)
 - Event schema with BaseEvent pattern (event_id, event_type, timestamp, source)
-- Topics: vdrive.user.registered, vdrive.workspace.created, vdrive.onboarding.completed
+- Topics: RawDrive.user.registered, RawDrive.workspace.created, RawDrive.onboarding.completed
 
 **Alternatives Considered**:
 - Redis pub/sub: Lacks persistence and delivery guarantees
@@ -144,7 +144,7 @@
 **Decision**: React 19 + TypeScript + Vite + TailwindCSS
 
 **Rationale**:
-- Consistent with existing vDrive frontend architecture
+- Consistent with existing RawDrive frontend architecture
 - React 19 concurrent features for responsive UI
 - TypeScript for type safety across stack
 - TailwindCSS for mobile-first responsive design
@@ -175,7 +175,7 @@
 **Decision**: Traefik v3 with existing routing patterns
 
 **Rationale**:
-- Existing vDrive infrastructure component
+- Existing RawDrive infrastructure component
 - Path-based routing: `/api/v1/onboarding/*`
 - Built-in rate limiting middleware
 - TLS termination via Let's Encrypt
@@ -190,7 +190,7 @@
 **Decision**: KEDA with Prometheus HTTP RPS trigger
 
 **Rationale**:
-- Existing vDrive KEDA infrastructure
+- Existing RawDrive KEDA infrastructure
 - Scale based on http_requests_total metric
 - Min replicas: 2 (high availability)
 - Max replicas: 20 (handle registration spikes)
@@ -247,17 +247,17 @@
 
 ```text
 Event: user.registered
-Topic: vdrive.user.registered
+Topic: RawDrive.user.registered
 Payload: { user_id, email, first_name, last_name, registration_method }
 Handler: Send verification email
 
 Event: user.verified
-Topic: vdrive.user.verified
+Topic: RawDrive.user.verified
 Payload: { user_id, email, verified_at }
 Handler: Send welcome email
 
 Event: workspace.created
-Topic: vdrive.workspace.created
+Topic: RawDrive.workspace.created
 Payload: { workspace_id, workspace_name, owner_id, trial_config }
 Handler: Send workspace setup confirmation
 ```
@@ -304,4 +304,4 @@ Response: { access_token, refresh_token, expires_in }
 
 ## Conclusion
 
-All technology decisions align with existing vDrive architecture patterns. No significant unknowns or clarifications needed. The implementation can proceed with confidence using established patterns from other vDrive microservices.
+All technology decisions align with existing RawDrive architecture patterns. No significant unknowns or clarifications needed. The implementation can proceed with confidence using established patterns from other RawDrive microservices.

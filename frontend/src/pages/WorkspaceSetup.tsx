@@ -18,6 +18,7 @@ import type { WorkspaceResponse } from '../types/onboarding';
 import { cn } from '../lib/utils';
 import { useHaptic, usePrefersReducedMotion, useSafeArea } from '../hooks/useMobile';
 import { AppLogo } from '../components/ui/AppLogo';
+import { useAuth } from '../contexts/AuthContext';
 
 // ============================================
 // Icons
@@ -77,6 +78,15 @@ function MorphingBlob({ className }: { className?: string }) {
   );
 }
 
+// Pre-generated particle data - generated once at module load to avoid impure render
+const PARTICLES = [...Array(15)].map((_, i) => ({
+  id: i,
+  left: `${Math.random() * 100}%`,
+  top: `${Math.random() * 100}%`,
+  animationDuration: `${6 + Math.random() * 4}s`,
+  animationDelay: `${Math.random() * 5}s`,
+}));
+
 function ParticleEffect() {
   const prefersReducedMotion = usePrefersReducedMotion();
 
@@ -84,15 +94,15 @@ function ParticleEffect() {
 
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {[...Array(15)].map((_, i) => (
+      {PARTICLES.map((particle) => (
         <div
-          key={i}
+          key={particle.id}
           className="absolute w-1 h-1 rounded-full bg-accent-400/25 dark:bg-accent-400/15"
           style={{
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
-            animation: `float ${6 + Math.random() * 4}s ease-in-out infinite`,
-            animationDelay: `${Math.random() * 5}s`,
+            left: particle.left,
+            top: particle.top,
+            animation: `float ${particle.animationDuration} ease-in-out infinite`,
+            animationDelay: particle.animationDelay,
           }}
         />
       ))}
@@ -106,6 +116,7 @@ function ParticleEffect() {
 
 export function WorkspaceSetupPage() {
   const navigate = useNavigate();
+  const { refreshToken } = useAuth();
   const {
     hasExistingProgress,
     workspaceData,
@@ -124,19 +135,31 @@ export function WorkspaceSetupPage() {
   // Show resume prompt if there's existing progress (T117)
   useEffect(() => {
     if (!isLoading && hasExistingProgress && workspaceData.name) {
-      setShowResumePrompt(true);
+      // Use requestAnimationFrame to avoid synchronous setState in effect
+      const frame = requestAnimationFrame(() => setShowResumePrompt(true));
+      return () => cancelAnimationFrame(frame);
     }
   }, [isLoading, hasExistingProgress, workspaceData.name]);
 
-  const handleComplete = useCallback((workspace: WorkspaceResponse) => {
+  const handleComplete = useCallback(async (workspace: WorkspaceResponse) => {
     haptic.success();
     // Store workspace info
     localStorage.setItem('current_workspace_id', workspace.id);
     localStorage.setItem('current_workspace_slug', workspace.slug);
 
+    // Refresh token to include workspace_id claim in JWT
+    // This is required for gallery-service and other workspace-scoped APIs
+    try {
+      await refreshToken();
+    } catch (error) {
+      // Token refresh failed, but workspace was created
+      // User may need to re-login if subsequent API calls fail with 403
+      console.warn('Token refresh failed after workspace creation:', error);
+    }
+
     // Navigate to dashboard
     navigate('/dashboard');
-  }, [haptic, navigate]);
+  }, [haptic, navigate, refreshToken]);
 
   const handleContinue = useCallback(() => {
     haptic.medium();
@@ -224,7 +247,7 @@ export function WorkspaceSetupPage() {
           )}
         >
           <AppLogo size="md" className="w-10 h-10 sm:w-11 sm:h-11" />
-          <span className="text-lg sm:text-xl font-bold text-neutral-900 dark:text-white hidden sm:block">vDrive</span>
+          <span className="text-lg sm:text-xl font-bold text-neutral-900 dark:text-white hidden sm:block">RawDrive</span>
         </a>
       </div>
 

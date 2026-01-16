@@ -1,5 +1,5 @@
 """
-vDrive Onboarding Service - FastAPI Application
+RawDrive Onboarding Service - FastAPI Application
 
 User registration, email verification, and workspace initialization
 on port 8006 with PostgreSQL, Redis, and Kafka integration.
@@ -74,7 +74,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator:
 
 # Create FastAPI application
 app = FastAPI(
-    title="vDrive Onboarding Service",
+    title="RawDrive Onboarding Service",
     description="User registration, email verification, and workspace initialization",
     version=settings.SERVICE_VERSION,
     docs_url="/docs" if settings.APP_ENV != "production" else None,

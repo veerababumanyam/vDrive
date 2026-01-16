@@ -197,7 +197,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator:
 
 # Create FastAPI application
 app = FastAPI(
-    title="vDrive Face Service",
+    title="RawDrive Face Service",
     description="Face detection, embedding, clustering, and people management API",
     version=settings.SERVICE_VERSION,
     docs_url="/docs" if settings.APP_ENV != "production" else None,

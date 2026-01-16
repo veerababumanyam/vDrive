@@ -1,16 +1,16 @@
 ---
 # Website Service Deployment
-# Public marketing website at www.vdrive.io
+# Public marketing website at www.RawDrive.io
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: website
-  namespace: vDrive
+  namespace: RawDrive
   labels:
     app: website
     app.kubernetes.io/name: website
     app.kubernetes.io/component: frontend
-    app.kubernetes.io/part-of: vDrive
+    app.kubernetes.io/part-of: RawDrive
 spec:
   replicas: 2
   selector:
@@ -29,7 +29,7 @@ spec:
       annotations:
         prometheus.io/scrape: "false"
     spec:
-      serviceAccountName: vDrive-service
+      serviceAccountName: RawDrive-service
       securityContext:
         runAsNonRoot: true
         runAsUser: 1001
@@ -37,7 +37,7 @@ spec:
         fsGroup: 1001
       containers:
         - name: website
-          image: ghcr.io/vDrive/website:latest
+          image: ghcr.io/RawDrive/website:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8011
@@ -51,9 +51,9 @@ spec:
             - name: PORT
               value: "8011"
             - name: SITE_URL
-              value: "https://www.vdrive.io"
+              value: "https://www.RawDrive.io"
             - name: APP_URL
-              value: "https://app.vdrive.io"
+              value: "https://app.RawDrive.io"
           resources:
             requests:
               cpu: "100m"
@@ -85,7 +85,7 @@ spec:
               drop:
                 - ALL
       imagePullSecrets:
-        - name: vDrive-registry
+        - name: RawDrive-registry
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -105,7 +105,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: website
-  namespace: vDrive
+  namespace: RawDrive
   labels:
     app: website
     app.kubernetes.io/name: website

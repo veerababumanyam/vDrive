@@ -4,7 +4,7 @@
 
 ## Overview
 
-This document provides sizing guidelines for deploying vDrive at various scales, from a Proof of Concept (POC) to a large Enterprise deployment. Estimates are based on typical usage patterns for professional photographers (high storage, bursty uploads, heavy image processing).
+This document provides sizing guidelines for deploying RawDrive at various scales, from a Proof of Concept (POC) to a large Enterprise deployment. Estimates are based on typical usage patterns for professional photographers (high storage, bursty uploads, heavy image processing).
 
 ## Sizing Tiers
 
@@ -54,7 +54,7 @@ This document provides sizing guidelines for deploying vDrive at various scales,
 
 ### 4. Object Storage (S3 / R2 / Minio)
 
-*   **vDrive recommends Cloudflare R2** for zero egress fees.
+*   **RawDrive recommends Cloudflare R2** for zero egress fees.
 *   **Estimation Strategy**:
     *   Average Raw Photo: 40MB
     *   Average Processed JPG: 5MB

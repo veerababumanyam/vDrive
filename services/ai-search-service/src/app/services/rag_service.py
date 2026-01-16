@@ -15,7 +15,7 @@ from .search_service import search_service
 logger = structlog.get_logger()
 
 # System prompt for photo-aware chat
-SYSTEM_PROMPT = """You are a helpful AI assistant for a photography platform called vDrive.
+SYSTEM_PROMPT = """You are a helpful AI assistant for a photography platform called RawDrive.
 You help photographers search, organize, and understand their photo libraries.
 
 When answering questions:

@@ -63,7 +63,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator:
 
 # Create FastAPI application
 app = FastAPI(
-    title="vDrive Upload Service",
+    title="RawDrive Upload Service",
     description="TUS resumable upload protocol with AES-256-GCM encryption",
     version=settings.SERVICE_VERSION,
     docs_url="/docs" if settings.APP_ENV != "production" else None,
@@ -171,6 +171,9 @@ async def metrics():
     return Response(content=generate_latest(), media_type=CONTENT_TYPE_LATEST)
 
 
-# TUS protocol endpoints will be added here
-# app.include_router(tus_router, prefix="/api/v1/files", tags=["TUS Protocol"])
-# app.include_router(uploads_router, prefix="/api/v1/uploads", tags=["Upload Management"])
+from .api.v1.tus import router as tus_router
+from .api.v1.uploads import router as uploads_router
+
+# TUS protocol endpoints
+app.include_router(tus_router, prefix="/api/v1/files", tags=["TUS Protocol"])
+app.include_router(uploads_router, prefix="/api/v1/uploads", tags=["Upload Management"])

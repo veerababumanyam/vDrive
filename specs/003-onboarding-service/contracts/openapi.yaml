@@ -1,6 +1,6 @@
 openapi: 3.1.0
 info:
-  title: vDrive Onboarding Service API
+  title: RawDrive Onboarding Service API
   description: |
     API for user registration, email verification, and workspace initialization.
 
@@ -13,13 +13,13 @@ info:
     - Verification resend: 3 per hour
   version: 1.0.0
   contact:
-    name: vDrive Engineering
-    email: engineering@vdrive.io
+    name: RawDrive Engineering
+    email: engineering@RawDrive.io
 
 servers:
   - url: http://localhost:8006
     description: Local development
-  - url: https://app.vdrive.io
+  - url: https://app.RawDrive.io
     description: Production
 
 tags:

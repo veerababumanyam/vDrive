@@ -80,7 +80,7 @@ function calculateStrength(password: string): PasswordStrength {
   }
 
   // Special character check
-  if (/[!@#$%^&*(),.?":{}|<>_\-+=\[\]\\;'`~]/.test(password)) {
+  if (/[!@#$%^&*(),.?":{}|<>_\-+=[\]\\;'`~]/.test(password)) {
     score += 1;
   } else {
     feedback.push('Add special character');
@@ -219,17 +219,6 @@ export function PasswordStrengthMeter({
       </div>
     </div>
   );
-}
-
-// ============================================
-// Standalone Hook
-// ============================================
-
-/**
- * Hook to get password strength without the component
- */
-export function usePasswordStrength(password: string): PasswordStrength {
-  return useMemo(() => calculateStrength(password), [password]);
 }
 
 export default PasswordStrengthMeter;

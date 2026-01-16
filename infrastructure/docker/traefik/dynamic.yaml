@@ -127,6 +127,17 @@ http:
       entryPoints:
         - websecure
 
+    # Priority 132: Export API
+    export-api:
+      rule: "PathPrefix(`/api/v1/export`)"
+      priority: 132
+      service: export-service
+      middlewares:
+        - rate-limit-standard
+        - cors-headers
+      entryPoints:
+        - websecure
+
     # Priority 130: Face API
     face-api:
       rule: "PathPrefix(`/api/v1/face`)"
@@ -303,6 +314,15 @@ http:
       loadBalancer:
         servers:
           - url: "http://notifications-service:8010"
+        healthCheck:
+          path: /health
+          interval: 10s
+          timeout: 3s
+
+    export-service:
+      loadBalancer:
+        servers:
+          - url: "http://export-service:8009"
         healthCheck:
           path: /health
           interval: 10s

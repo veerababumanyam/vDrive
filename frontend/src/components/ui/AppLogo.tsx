@@ -35,7 +35,7 @@ export function AppLogo({ size = 'md', className = '' }: AppLogoProps) {
   return (
     <img
       src={logoSrc}
-      alt="vDrive Logo"
+      alt="RawDrive Logo"
       width={dimensions}
       height={dimensions}
       className={className}

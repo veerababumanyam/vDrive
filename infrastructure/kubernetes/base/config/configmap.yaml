@@ -1,24 +1,24 @@
 # ===========================================
-# vDrive Shared Configuration
+# RawDrive Shared Configuration
 # ===========================================
 # Common configuration for all microservices
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: vDrive-config
-  namespace: vDrive
+  name: RawDrive-config
+  namespace: RawDrive
   labels:
-    app.kubernetes.io/part-of: vDrive-platform
+    app.kubernetes.io/part-of: RawDrive-platform
 data:
   # Application
-  APP_NAME: "vDrive"
+  APP_NAME: "RawDrive"
   APP_ENV: "production"
   LOG_LEVEL: "INFO"
 
   # Database
   DATABASE_HOST: "postgres"
   DATABASE_PORT: "5432"
-  DATABASE_NAME: "vDrive"
+  DATABASE_NAME: "RawDrive"
 
   # Redis
   REDIS_HOST: "redis"
@@ -49,7 +49,7 @@ data:
   JWT_REFRESH_TOKEN_EXPIRE_DAYS: "7"
 
   # CORS
-  CORS_ORIGINS: "https://app.vDrive.com,http://localhost:5173"
+  CORS_ORIGINS: "https://app.RawDrive.com,http://localhost:5173"
 
   # Rate Limiting
   RATE_LIMIT_PER_MINUTE: "100"

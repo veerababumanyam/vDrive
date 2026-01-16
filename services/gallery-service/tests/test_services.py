@@ -469,41 +469,40 @@ class TestGalleryService:
         )
         test_db_session.add(gallery)
         await test_db_session.commit()
+        await test_db_session.refresh(gallery)
 
         asset = GalleryAsset(
             gallery_id=gallery.id,
             asset_id="00000000-0000-0000-0000-000000000123",
             is_private=False,
-            view_count=0,
-            favorite_count=0,
-            download_count=0,
+            favorites_count=0,  # favorites_count is on GalleryAsset
         )
         test_db_session.add(asset)
         await test_db_session.commit()
 
-        # Test view increment
+        # Test view increment (increments gallery.view_count)
         new_count = await GalleryService.increment_asset_interaction(
             asset, "view", test_db_session
         )
         assert new_count == 1
-        await test_db_session.refresh(asset)
-        assert asset.view_count == 1
+        await test_db_session.refresh(gallery)
+        assert gallery.view_count == 1
 
-        # Test favorite increment
+        # Test favorite increment (increments asset.favorites_count)
         new_count = await GalleryService.increment_asset_interaction(
             asset, "favorite", test_db_session
         )
         assert new_count == 1
         await test_db_session.refresh(asset)
-        assert asset.favorite_count == 1
+        assert asset.favorites_count == 1
 
-        # Test download increment
+        # Test download increment (increments gallery.download_count)
         new_count = await GalleryService.increment_asset_interaction(
             asset, "download", test_db_session
         )
         assert new_count == 1
-        await test_db_session.refresh(asset)
-        assert asset.download_count == 1
+        await test_db_session.refresh(gallery)
+        assert gallery.download_count == 1
 
     async def test_get_by_id_with_sub_galleries(self, test_db_session):
         """Test getting gallery with sub-galleries joined."""

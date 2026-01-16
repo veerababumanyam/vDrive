@@ -7,7 +7,7 @@
 
 ## Business Value Proposition
 
-The Onboarding and Workspace Setup process is the critical "First Mile" of the vDrive experience. It converts a sign-up into an active, value-generating business workspace. This flow automates the provisioning of secure environments, configures initial branding, and guides the user to their "Aha!" moment (uploading their first gallery).
+The Onboarding and Workspace Setup process is the critical "First Mile" of the RawDrive experience. It converts a sign-up into an active, value-generating business workspace. This flow automates the provisioning of secure environments, configures initial branding, and guides the user to their "Aha!" moment (uploading their first gallery).
 
 ### Key Business Benefits
 - **Reduced Friction**: Streamlined wizard reduces drop-off rates during sign-up.
@@ -49,7 +49,7 @@ A multi-step, persistent form that guides the user through initial configuration
 
 #### Step 1: Business Identity
 *   **Studio Name**: Usage for invoices and public profile (e.g., "Lumina Studios").
-*   **Workspace Slug**: Unique URL identifier (e.g., `vDrive.com/lumina`).
+*   **Workspace Slug**: Unique URL identifier (e.g., `RawDrive.com/lumina`).
     *   *Auto-generated slug suggestion based on name.*
     *   *Real-time availability check.*
 *   **Business Type**: Wedding, Portrait, Corporate, Event, Other. (Used for template recommendations).
@@ -123,7 +123,7 @@ POST /api/v1/onboarding/complete
 | **Authentication** | User account creation precedes workspace setup. |
 | **Billing** | Trial subscription created immediately upon workspace setup. |
 | **Company Profile** | Wizard inputs populate the initial Company Profile. |
-| **Notifications** | Triggers "Welcome to vDrive" and "Tips" email series. |
+| **Notifications** | Triggers "Welcome to RawDrive" and "Tips" email series. |
 
 ---
 

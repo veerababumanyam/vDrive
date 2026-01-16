@@ -6,7 +6,7 @@
 
 ## Overview
 
-The Onboarding Service primarily interacts with existing vDrive tables (users, workspaces, workspace_members) and introduces one new table (onboarding_states) for wizard progress tracking.
+The Onboarding Service primarily interacts with existing RawDrive tables (users, workspaces, workspace_members) and introduces one new table (onboarding_states) for wizard progress tracking.
 
 ---
 

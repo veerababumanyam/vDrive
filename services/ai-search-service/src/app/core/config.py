@@ -23,7 +23,7 @@ class Settings(BaseSettings):
 
     # Database
     DATABASE_URL: str = Field(
-        default="postgresql+asyncpg://vdrive_user:vdrive_pass@postgres:5432/vdrive_db"
+        default="postgresql+asyncpg://RawDrive_user:RawDrive_pass@postgres:5432/RawDrive_db"
     )
 
     # Kafka

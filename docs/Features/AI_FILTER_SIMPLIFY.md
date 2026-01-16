@@ -87,7 +87,7 @@ All new endpoints are gated by the backend feature flag and return `403 FEATURE_
 - Useful for trial/demo accounts or system-level operations
 
 **Testing**:
-- Use `business@test.vDrive.in` test account (already has Gemini key configured)
+- Use `business@test.RawDrive.in` test account (already has Gemini key configured)
 - See `docs/TEST_USERS.md` for complete test account list
 - Password for all test users: `Test@123`
 

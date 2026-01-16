@@ -1,4 +1,4 @@
-# vDrive Architecture Guide
+# RawDrive Architecture Guide
 
 **Version:** 0.3.3 | **Last Updated:** January 2026
 
@@ -6,7 +6,7 @@
 
 ## System Overview
 
-vDrive is a multi-tenant SaaS platform built on a modern, scalable microservices architecture designed for 20,000+ photographers with high performance, reliability, and security.
+RawDrive is a multi-tenant SaaS platform built on a modern, scalable microservices architecture designed for 20,000+ photographers with high performance, reliability, and security.
 
 ---
 
@@ -89,12 +89,12 @@ flowchart TB
 ### 3. Frontend Layer
 - **Framework:** React 19 + TypeScript + Vite
 - **Styling:** Tailwind CSS + Framer Motion
-- **Shared Packages:** pnpm workspaces (`@vDrive/shared-*`)
+- **Shared Packages:** pnpm workspaces (`@RawDrive/shared-*`)
 - **PWA:** Service Worker with Workbox caching
 - **Caching Strategies:**
-  - `vDrive-thumbnails`: CacheFirst (500 entries, 7-day expiry)
-  - `vDrive-gallery-api`: StaleWhileRevalidate (100 entries, 5-min)
-  - `vDrive-auth`: NetworkFirst (20 entries, 10-min)
+  - `RawDrive-thumbnails`: CacheFirst (500 entries, 7-day expiry)
+  - `RawDrive-gallery-api`: StaleWhileRevalidate (100 entries, 5-min)
+  - `RawDrive-auth`: NetworkFirst (20 entries, 10-min)
 
 ### 4. API Gateway (Traefik v3)
 | Feature | Description |

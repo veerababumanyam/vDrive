@@ -1,12 +1,12 @@
 ---
 name: accessibility
 aliases: [a11y, wcag, aria, keyboard-nav, screen-reader, touch-targets, mobile-a11y]
-description: Accessibility guidelines for vDrive. Use when building UI components, handling keyboard navigation, implementing ARIA attributes, ensuring WCAG compliance, or optimizing for mobile accessibility.
+description: Accessibility guidelines for RawDrive. Use when building UI components, handling keyboard navigation, implementing ARIA attributes, ensuring WCAG compliance, or optimizing for mobile accessibility.
 ---
 
 # Accessibility Guidelines
 
-A **mobile-first accessibility** approach ensuring all users can interact with vDrive effectively.
+A **mobile-first accessibility** approach ensuring all users can interact with RawDrive effectively.
 
 ## WCAG 2.1 AA Compliance
 
@@ -132,7 +132,7 @@ html {
 
 ### Color Contrast Ratios
 
-| Text Type | Minimum Ratio | vDrive Implementation |
+| Text Type | Minimum Ratio | RawDrive Implementation |
 |-----------|---------------|----------------------|
 | Normal text (<18px) | 4.5:1 | `text-text-primary` (15.3:1) |
 | Large text (18px+ or 14px bold) | 3.0:1 | `text-text-secondary` (8.5:1) |

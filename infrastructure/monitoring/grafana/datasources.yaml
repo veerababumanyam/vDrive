@@ -1,7 +1,7 @@
 # ===========================================
 # Grafana Data Sources Configuration
 # ===========================================
-# vDrive Monitoring Data Sources
+# RawDrive Monitoring Data Sources
 
 apiVersion: 1
 
@@ -46,7 +46,7 @@ datasources:
   # - name: PostgreSQL
   #   type: postgres
   #   url: postgres:5432
-  #   database: vDrive
+  #   database: RawDrive
   #   user: grafana_readonly
   #   secureJsonData:
   #     password: ${GRAFANA_POSTGRES_PASSWORD}

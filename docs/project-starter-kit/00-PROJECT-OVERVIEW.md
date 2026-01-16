@@ -1,4 +1,4 @@
-# vDrive - Project Overview & Product Vision
+# RawDrive - Project Overview & Product Vision
 
 **Version:** 0.3.3 | **Last Updated:** January 2026 | **Owner:** SWAZ Consultants
 
@@ -6,7 +6,7 @@
 
 ## Executive Summary
 
-vDrive is a comprehensive enterprise-grade SaaS platform for professional photography management. Built for photographers, agencies, and enterprises who demand the highest standards in digital asset management, client collaboration, and AI-powered workflow automation.
+RawDrive is a comprehensive enterprise-grade SaaS platform for professional photography management. Built for photographers, agencies, and enterprises who demand the highest standards in digital asset management, client collaboration, and AI-powered workflow automation.
 
 ---
 
@@ -31,7 +31,7 @@ vDrive is a comprehensive enterprise-grade SaaS platform for professional photog
 | **Corporate Workspace Admin** | IT/HR/Communications team | SSO setup, user management, policies, compliance |
 | **Corporate Employee** | Internal viewer at enterprise | Secure portal access to internal galleries |
 | **External Guest/Agency** | Time-boxed access user | Scoped access with download rules |
-| **Platform Admin (vDrive Ops)** | Internal operations team | Workspace support, abuse prevention, monitoring |
+| **Platform Admin (RawDrive Ops)** | Internal operations team | Workspace support, abuse prevention, monitoring |
 
 ---
 
@@ -47,7 +47,7 @@ Galleries feel instant via progressive loading, caching, and derivatives. Target
 Sharing is explicit, auditable, and policy-driven. No accidental data leakage.
 
 ### 4. BYOS Without BYOS Pain
-Users keep their storage; vDrive provides the UX, metadata, search, and governance.
+Users keep their storage; RawDrive provides the UX, metadata, search, and governance.
 
 ### 5. AI That Saves Time
 Background jobs, quotas/credits, clear previews, and reversible actions. AI assists, humans approve.
@@ -94,7 +94,7 @@ Background jobs, quotas/credits, clear previews, and reversible actions. AI assi
 
 ## India-First Approach
 
-vDrive is built with India as the primary market:
+RawDrive is built with India as the primary market:
 
 | Feature | Implementation |
 |---------|---------------|

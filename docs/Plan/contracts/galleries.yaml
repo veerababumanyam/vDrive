@@ -1,14 +1,14 @@
 openapi: 3.1.0
 info:
-  title: vDrive Gallery API
+  title: RawDrive Gallery API
   description: Gallery management and publishing endpoints
   version: 1.0.0
   contact:
-    name: vDrive API Support
-    email: api@vdrive.io
+    name: RawDrive API Support
+    email: api@RawDrive.io
 
 servers:
-  - url: https://app.vdrive.io/api/v1
+  - url: https://app.RawDrive.io/api/v1
     description: Production
   - url: http://localhost:8004/api/v1
     description: Gallery service (local)

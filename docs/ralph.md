@@ -1,9 +1,10 @@
- /ralph-loop:ralph-loop PROMPT"
+ /ralph-loop:ralph-loop PROMPT" use /frontend-design agent, design, develop all frontend components for gallery service and wirframe/integrate with the backend. Check all pending taks and complete them
+
 # 1. Setup & Criteria
 
 **Feature Context**:
-*   **Target Feature**: `005-upload-media-processing` Microservice for gallery
-*   **Branch**: `git checkout 005-upload-media-processing`
+*   **Target Feature**: `008-face-service` Microservice for face service
+*   **Branch**: `git checkout 008-face-service`
 *   **Note**: Use appropriate skills and claude agents where necessary.
 *   **Context**: Context7 MCP
 
@@ -26,7 +27,7 @@ The workflow is complete ONLY when:
 
 ### Phase 1: Discovery & Planning
 **Goal**: Define the work and phases.
-*   Read `specs/005-upload-media-processing/tasks.md.
+*   Read 'specs/008-face-service/tasks.md'
 *   Identify constraints and unchecked tasks.
 *   **Plan**: Break task into clear phases if complex (e.g., Logic -> UI -> Refinement).
 
@@ -74,7 +75,7 @@ The workflow is complete ONLY when:
     4.  Write missing tests for edge cases.
 
 **[5] PROJECT MANAGER (Verification)**
-*   **Task**: Verify acceptance criteria against `specs/005-upload-media-processing/spec.md`.
+*   **Task**: Verify acceptance criteria against `specs/008-face-service/spec.md`.
 *   **Action**: Document implementation gaps and trigger fixes.
 
 **[6] BUSINESS ANALYST (User Flow)**

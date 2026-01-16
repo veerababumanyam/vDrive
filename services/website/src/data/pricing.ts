@@ -1,5 +1,5 @@
 /**
- * Pricing data for vDrive subscription tiers
+ * Pricing data for RawDrive subscription tiers
  * All prices in Indian Rupees (INR)
  */
 

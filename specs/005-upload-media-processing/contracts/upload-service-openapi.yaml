@@ -1,16 +1,16 @@
 openapi: 3.1.0
 info:
-  title: vDrive Upload Service API
+  title: RawDrive Upload Service API
   description: |
     TUS v1.0.0 compliant resumable upload service with AES-256 encryption.
     Supports large file uploads, progress tracking, and event publishing.
   version: 1.0.0
   contact:
-    name: vDrive Engineering
-    email: engineering@vdrive.io
+    name: RawDrive Engineering
+    email: engineering@RawDrive.io
 
 servers:
-  - url: https://api.vdrive.io/upload
+  - url: https://api.RawDrive.io/upload
     description: Production
   - url: http://localhost:8008
     description: Development

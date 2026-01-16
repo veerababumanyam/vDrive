@@ -100,7 +100,7 @@ class PreviewService:
             "started_at": datetime.now(timezone.utc).isoformat(),
             "expires_at": expires_at,
             "is_active": True,
-            "gallery_name": gallery.name,
+            "gallery_name": gallery.title,
             "photo_count": gallery.photo_count if hasattr(gallery, "photo_count") else 0,
         }
 

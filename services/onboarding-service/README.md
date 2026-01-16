@@ -1,4 +1,4 @@
-# vDrive Onboarding Service
+# RawDrive Onboarding Service
 
 User registration, email verification, and workspace initialization microservice.
 
@@ -112,7 +112,7 @@ PORT=8006
 APP_ENV=development
 
 # Database
-DATABASE_URL=postgresql+asyncpg://user:pass@localhost:5432/vDrive
+DATABASE_URL=postgresql+asyncpg://user:pass@localhost:5432/RawDrive
 
 # Redis
 REDIS_URL=redis://localhost:6379/0
@@ -137,8 +137,8 @@ NOTIFICATION_SERVICE_URL=http://localhost:8005
 BILLING_SERVICE_URL=http://localhost:8013
 
 # Application URLs
-APP_URL=https://app.vdrive.io
-WEBSITE_URL=https://www.vdrive.io
+APP_URL=https://app.RawDrive.io
+WEBSITE_URL=https://www.RawDrive.io
 ```
 
 ## Local Development
@@ -255,17 +255,17 @@ python scripts/seed_test_users.py
 ### Tier Users
 | Email | Name | User ID |
 |-------|------|---------|
-| free@test.vdrive.in | Free Tier | 11111111-1111-1111-1111-111111111001 |
-| starter@test.vdrive.in | Starter Tier | 11111111-1111-1111-1111-111111111002 |
-| professional@test.vdrive.in | Professional Tier | 11111111-1111-1111-1111-111111111003 |
-| business@test.vdrive.in | Business Tier | 11111111-1111-1111-1111-111111111004 |
-| enterprise@test.vdrive.in | Enterprise Tier | 11111111-1111-1111-1111-111111111005 |
+| free@test.RawDrive.in | Free Tier | 11111111-1111-1111-1111-111111111001 |
+| starter@test.RawDrive.in | Starter Tier | 11111111-1111-1111-1111-111111111002 |
+| professional@test.RawDrive.in | Professional Tier | 11111111-1111-1111-1111-111111111003 |
+| business@test.RawDrive.in | Business Tier | 11111111-1111-1111-1111-111111111004 |
+| enterprise@test.RawDrive.in | Enterprise Tier | 11111111-1111-1111-1111-111111111005 |
 
 ### Platform Admins
 | Email | Name | User ID |
 |-------|------|---------|
-| superadmin@test.vdrive.in | Super Admin | 22222222-2222-2222-2222-222222222001 |
-| platformadmin@test.vdrive.in | Platform Admin | 22222222-2222-2222-2222-222222222002 |
+| superadmin@test.RawDrive.in | Super Admin | 22222222-2222-2222-2222-222222222001 |
+| platformadmin@test.RawDrive.in | Platform Admin | 22222222-2222-2222-2222-222222222002 |
 
 ## Testing Login
 
@@ -275,14 +275,14 @@ python scripts/seed_test_users.py
 # Login
 curl -X POST http://localhost:8006/api/v1/onboarding/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email": "free@test.vdrive.in", "password": "Test@123"}'
+  -d '{"email": "free@test.RawDrive.in", "password": "Test@123"}'
 
 # Response
 {
   "access_token": "eyJhbG...",
   "token_type": "bearer",
   "user_id": "11111111-1111-1111-1111-111111111001",
-  "email": "free@test.vdrive.in",
+  "email": "free@test.RawDrive.in",
   "full_name": "Free Tier",
   "email_verified": true
 }
@@ -299,7 +299,7 @@ curl http://localhost:8006/api/v1/onboarding/state \
 .\scripts\test_login.ps1
 
 # With custom credentials
-.\scripts\test_login.ps1 -Email "superadmin@test.vdrive.in" -Password "Test@123"
+.\scripts\test_login.ps1 -Email "superadmin@test.RawDrive.in" -Password "Test@123"
 ```
 
 ## Autoscaling
@@ -320,4 +320,4 @@ KEDA scales 2-20 replicas based on:
 
 ## License
 
-Proprietary - vDrive, Inc.
+Proprietary - RawDrive, Inc.

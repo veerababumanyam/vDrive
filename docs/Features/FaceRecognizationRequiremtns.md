@@ -1,11 +1,11 @@
-# Face Recognition & Tagging Requirements for vDrive
+# Face Recognition & Tagging Requirements for RawDrive
 
 > Terminology: See [`GLOSSARY.md`](GLOSSARY.md) (canonical terms for Workspace, Asset, Share Link, Trial, etc.).
 
 ## 1. Introduction & Scope
 
 ### 1.1. Purpose
-This document outlines the requirements for a face recognition and tagging system within the vDrive application. This feature will enable photographers to automatically detect, group, and identify people across their photo galleries, enhancing organization and searchability.
+This document outlines the requirements for a face recognition and tagging system within the RawDrive application. This feature will enable photographers to automatically detect, group, and identify people across their photo galleries, enhancing organization and searchability.
 
 ### 1.2. Scope
 - The system will scan photos stored in the user's connected cloud storage (Google Drive/Dropbox).

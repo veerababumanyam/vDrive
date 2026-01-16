@@ -1,6 +1,6 @@
 # Digital Invitations
 
-> Terminology: See [`docs/vDrive_Project/GLOSSARY.md`](../vDrive_Project/GLOSSARY.md) (Workspace, Share Link, Preferred Language/Locale).
+> Terminology: See [`docs/RawDrive_Project/GLOSSARY.md`](../RawDrive_Project/GLOSSARY.md) (Workspace, Share Link, Preferred Language/Locale).
 
 ## Overview
 
@@ -19,7 +19,7 @@ Digital invitations serve to:
 
 **Key product alignment**
 
-- vDrive is **multi-tenant**: all invitations are scoped to a **Workspace** (`workspace_id`).
+- RawDrive is **multi-tenant**: all invitations are scoped to a **Workspace** (`workspace_id`).
 - Invitations distribute access using **Share Links** (capability-based access grants). Invitations are *not* the access primitive; they are the delivery mechanism.
 - UI and invitation content support **i18n** with per-user and per-client language preferences (India-first).
 
@@ -78,7 +78,7 @@ Subject: [Photographer Name] shared a gallery with you
 
 Hi [Client Name],
 
-[Photographer Name] shared a gallery with you on vDrive.
+[Photographer Name] shared a gallery with you on RawDrive.
 
 Gallery: [Gallery Name]
 Photos: [Photo Count]
@@ -93,7 +93,7 @@ If you don't have an account, create one:
 [Sign Up Link]
 
 Thanks,
-vDrive Team
+RawDrive Team
 ```
 
 **Note:** Invitations SHOULD allow access without account creation for typical client flows (Share Link). Account creation is optional (e.g., for persistent selections across devices).
@@ -135,7 +135,7 @@ interface SMSInvitation {
 
 **SMS Template:**
 ```
-Hi [Name], [Photographer] shared a gallery with you on vDrive. View: [Short Link] Expires: [Date]
+Hi [Name], [Photographer] shared a gallery with you on RawDrive. View: [Short Link] Expires: [Date]
 ```
 
 ### WhatsApp Invitations
@@ -178,7 +178,7 @@ interface WhatsAppInvitation {
 ```
 Hi [Name]! 📸
 
-[Photographer] shared a gallery with you on vDrive.
+[Photographer] shared a gallery with you on RawDrive.
 
 Gallery: [Gallery Name]
 Photos: [Photo Count]
@@ -190,7 +190,7 @@ View Gallery: [Link]
 Access expires: [Date]
 
 Thanks,
-vDrive Team
+RawDrive Team
 ```
 
 ---
@@ -232,7 +232,7 @@ Body: {
     accessLevel: 'view',
     status: 'sent',
     expiresAt: '2025-12-31T23:59:59Z',
-    invitationLink: 'https://vDrive.com/invite/inv_123456',
+    invitationLink: 'https://RawDrive.com/invite/inv_123456',
     sentAt: '2025-12-17T10:30:00Z',
   },
 }
@@ -327,7 +327,7 @@ Body: {
     galleryId: 'gal_123456',
     phoneNumber: '+1-555-123-4567',
     status: 'sent',
-    shortLink: 'https://vDrive.com/g/abc123',
+    shortLink: 'https://RawDrive.com/g/abc123',
     sentAt: '2025-12-17T10:30:00Z',
   },
 }
@@ -367,7 +367,7 @@ const createSMSInvitation = async (
 
   // Send SMS
   const smsMessage = message ||
-    `Hi! ${await resolveDisplayName(actorUserId)} shared a gallery with you on vDrive. View: ${shortLink}`;
+    `Hi! ${await resolveDisplayName(actorUserId)} shared a gallery with you on RawDrive. View: ${shortLink}`;
 
   await sendSMS({
     to: phoneNumber,
@@ -446,7 +446,7 @@ const createWhatsAppInvitation = async (
 
   // Send WhatsApp message
   const whatsappMessage = message ||
-    `Hi! 📸\n\n${await resolveDisplayName(actorUserId)} shared a gallery with you on vDrive.\n\nGallery: ${gallery.name}\nPhotos: ${gallery.photoCount}\n\nView: ${galleryLink}`;
+    `Hi! 📸\n\n${await resolveDisplayName(actorUserId)} shared a gallery with you on RawDrive.\n\nGallery: ${gallery.name}\nPhotos: ${gallery.photoCount}\n\nView: ${galleryLink}`;
 
   await sendWhatsApp({
     to: phoneNumber,
@@ -945,7 +945,7 @@ Subject: {photographer_name} shared "{gallery_name}" with you
 
 Hi {client_name},
 
-{photographer_name} shared a gallery with you on vDrive.
+{photographer_name} shared a gallery with you on RawDrive.
 
 Gallery: {gallery_name}
 Photos: {photo_count}
@@ -958,7 +958,7 @@ View Gallery: {invitation_link}
 This invitation expires on {expiration_date}.
 
 Thanks,
-vDrive Team
+RawDrive Team
 ```
 
 ---
@@ -1032,7 +1032,7 @@ Invitations and invite acceptance pages SHOULD be localized using the product i1
 
 ## Optional: AI-assisted invitation copy (AI-native)
 
-vDrive MAY use the AI Platform to suggest invitation text (tone, brevity, language) while keeping human review.
+RawDrive MAY use the AI Platform to suggest invitation text (tone, brevity, language) while keeping human review.
 
 **Requirements**
 - Generate copy in the selected locale (including Indian languages).
@@ -1044,9 +1044,9 @@ vDrive MAY use the AI Platform to suggest invitation text (tone, brevity, langua
 
 ## Related Files
 
-- `docs/vDrive_Project/CLIENT_FACING_FEATURES.md` - Client features
-- `docs/vDrive_Project/NOTIFICATIONS_AND_COMMUNICATION.md` - Communication
-- `docs/vDrive_Project/API_AND_INTEGRATIONS.md` - API documentation
+- `docs/RawDrive_Project/CLIENT_FACING_FEATURES.md` - Client features
+- `docs/RawDrive_Project/NOTIFICATIONS_AND_COMMUNICATION.md` - Communication
+- `docs/RawDrive_Project/API_AND_INTEGRATIONS.md` - API documentation
 - `backend/src/models/Invitation.ts` - Invitation model
 - `backend/src/services/invitationService.ts` - Invitation service
 

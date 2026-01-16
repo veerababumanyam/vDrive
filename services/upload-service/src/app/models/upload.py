@@ -9,7 +9,6 @@ from sqlalchemy import (
     BigInteger,
     CheckConstraint,
     DateTime,
-    ForeignKey,
     Index,
     String,
     text,
@@ -45,10 +44,9 @@ class Upload(Base):
         server_default=text("gen_random_uuid()"),
     )
 
-    # Multi-tenancy
+    # Multi-tenancy (FK enforced at database level, not ORM level)
     workspace_id: Mapped[str] = mapped_column(
         UUID(as_uuid=False),
-        ForeignKey("workspaces.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )

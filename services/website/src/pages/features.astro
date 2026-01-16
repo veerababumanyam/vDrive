@@ -4,7 +4,7 @@ import CTASection from '@/components/landing/CTASection.astro';
 import JsonLd from '@/components/seo/JsonLd.astro';
 import { generateSoftwareApplicationSchema, generateBreadcrumbSchema } from '@/utils/schema';
 
-const APP_URL = import.meta.env.APP_URL || 'https://app.vdrive.io';
+const APP_URL = import.meta.env.APP_URL || 'https://app.RawDrive.io';
 
 // JSON-LD schemas for features page
 const schemas = [
@@ -99,7 +99,7 @@ const featureCategories = [
 
 <BaseLayout
   title="Features"
-  description="Explore all the powerful features that make vDrive the best photography platform for professionals. AI-powered tagging, face recognition, client galleries, and more."
+  description="Explore all the powerful features that make RawDrive the best photography platform for professionals. AI-powered tagging, face recognition, client galleries, and more."
 >
   <JsonLd slot="head" schema={schemas} />
   <!-- Hero -->
@@ -111,7 +111,7 @@ const featureCategories = [
           Everything you need to run your photography business
         </h1>
         <p class="mt-6 text-lg text-neutral-600 dark:text-warm-400">
-          From intelligent photo management to stunning client galleries, vDrive has all the tools
+          From intelligent photo management to stunning client galleries, RawDrive has all the tools
           professional photographers need to save time and impress clients.
         </p>
         <div class="mt-10">

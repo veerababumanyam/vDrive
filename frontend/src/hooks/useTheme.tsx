@@ -41,7 +41,7 @@ export interface ThemeContextValue {
 
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
-const STORAGE_KEY = 'vdrive-theme';
+const STORAGE_KEY = 'RawDrive-theme';
 
 /**
  * Get system color scheme preference
@@ -138,15 +138,20 @@ export function ThemeProvider({
 
   // Update resolved theme when theme changes
   useEffect(() => {
-    if (forcedTheme) {
-      setResolvedTheme(forcedTheme);
-      applyTheme(forcedTheme);
-      return;
-    }
+    // Use requestAnimationFrame to avoid sync setState in effect
+    const frame = requestAnimationFrame(() => {
+      if (forcedTheme) {
+        setResolvedTheme(forcedTheme);
+        applyTheme(forcedTheme);
+        return;
+      }
 
-    const resolved = resolveTheme(theme);
-    setResolvedTheme(resolved);
-    applyTheme(resolved);
+      const resolved = resolveTheme(theme);
+      setResolvedTheme(resolved);
+      applyTheme(resolved);
+    });
+
+    return () => cancelAnimationFrame(frame);
   }, [theme, forcedTheme]);
 
   // Listen for system preference changes
@@ -203,6 +208,7 @@ export function ThemeProvider({
  * }
  * ```
  */
+// eslint-disable-next-line react-refresh/only-export-components
 export function useTheme(): ThemeContextValue {
   const context = useContext(ThemeContext);
 
@@ -220,24 +226,35 @@ export function useTheme(): ThemeContextValue {
 /**
  * Check if user prefers reduced motion
  */
+// eslint-disable-next-line react-refresh/only-export-components
 export function usePrefersReducedMotion(): boolean {
-  const [prefersReduced, setPrefersReduced] = useState(false);
+  const [prefersReduced, setPrefersReduced] = useState(() => {
+    if (!isBrowser) return false;
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  });
 
   useEffect(() => {
     if (!isBrowser) return;
 
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    setPrefersReduced(mediaQuery.matches);
+    // Use requestAnimationFrame to avoid sync setState in effect
+    const frame = requestAnimationFrame(() =>
+      setPrefersReduced(mediaQuery.matches)
+    );
 
     const handleChange = (e: MediaQueryListEvent) => {
       setPrefersReduced(e.matches);
     };
 
     mediaQuery.addEventListener('change', handleChange);
-    return () => mediaQuery.removeEventListener('change', handleChange);
+    return () => {
+      cancelAnimationFrame(frame);
+      mediaQuery.removeEventListener('change', handleChange);
+    };
   }, []);
 
   return prefersReduced;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export default useTheme;

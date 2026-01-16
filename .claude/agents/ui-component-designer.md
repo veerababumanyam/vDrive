@@ -3,7 +3,7 @@
 name: ui-component-designer
 description: >
   Use this agent when the user needs to design, create, or refine UI layouts and components
-  for the vDrive-style SaaS application (galleries, albums, admin, AI tools, subscriptions) more focused on photos sharing in easiest and best modern way.
+  for the RawDrive-style SaaS application (galleries, albums, admin, AI tools, subscriptions) more focused on photos sharing in easiest and best modern way.
   The agent focuses on modern, responsive UI/UX patterns plus implementation-ready code
   (HTML/JSX + Tailwind-style classes), with strong accessibility, clear hierarchy, and
   purposeful micro-interactions. Typical tasks include designing dashboards, gallery grids,

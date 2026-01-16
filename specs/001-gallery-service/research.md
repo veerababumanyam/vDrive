@@ -104,7 +104,7 @@ spec:
 // Frontend: Exponential backoff reconnection
 class WebSocketManager {
   connect(galleryId) {
-    const ws = new WebSocket(`wss://app.vdrive.io/api/gallery/ws/gallery/${galleryId}`);
+    const ws = new WebSocket(`wss://app.RawDrive.io/api/gallery/ws/gallery/${galleryId}`);
 
     ws.onclose = () => {
       const delay = Math.min(1000 * Math.pow(2, this.reconnectAttempts), 30000);
@@ -206,7 +206,7 @@ def generate_signed_url(
     Generate presigned URL for thumbnail access.
 
     Args:
-        bucket: R2 bucket name (e.g., 'vdrive-thumbnails')
+        bucket: R2 bucket name (e.g., 'RawDrive-thumbnails')
         key: Object key (e.g., 'workspace_id/gallery_id/asset_id_800x600.jpg')
         expiration: URL validity period (4 hours = 14400 seconds)
 
@@ -239,11 +239,11 @@ async def get_gallery_photos(gallery_id: str, response: Response):
                 "id": photo.id,
                 "lqip": photo.lqip,  # Base64 data URI (already in DB)
                 "thumbnail_url": generate_signed_url(
-                    bucket='vdrive-thumbnails',
+                    bucket='RawDrive-thumbnails',
                     key=f'{photo.workspace_id}/{photo.gallery_id}/{photo.id}_800x600.jpg'
                 ),
                 "full_url": generate_signed_url(
-                    bucket='vdrive-originals',
+                    bucket='RawDrive-originals',
                     key=f'{photo.workspace_id}/{photo.gallery_id}/{photo.id}_original.jpg',
                     expiration=3600  # 1 hour for full-size downloads
                 )
@@ -386,7 +386,7 @@ apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
 metadata:
   name: gallery-service-scaledobject
-  namespace: vdrive
+  namespace: RawDrive
 spec:
   scaleTargetRef:
     name: gallery-service
@@ -399,7 +399,7 @@ spec:
     # Trigger 1: HTTP Request Rate (RPS)
     - type: prometheus
       metadata:
-        serverAddress: http://prometheus.vdrive.svc.cluster.local:9090
+        serverAddress: http://prometheus.RawDrive.svc.cluster.local:9090
         metricName: http_request_rate
         query: |
           sum(rate(http_requests_total{
@@ -411,7 +411,7 @@ spec:
     # Trigger 2: WebSocket Active Connections
     - type: prometheus
       metadata:
-        serverAddress: http://prometheus.vdrive.svc.cluster.local:9090
+        serverAddress: http://prometheus.RawDrive.svc.cluster.local:9090
         metricName: websocket_connections
         query: |
           sum(websocket_active_connections{
@@ -594,7 +594,7 @@ spec:
       terminationGracePeriodSeconds: 80  # 30s preStop + 50s for draining
       containers:
         - name: gallery-service
-          image: vdrive/gallery-service:latest
+          image: RawDrive/gallery-service:latest
           ports:
             - containerPort: 8004
               name: http
@@ -632,16 +632,16 @@ spec:
 ### Monitoring KEDA Scaling
 ```bash
 # Check ScaledObject status
-kubectl get scaledobject gallery-service-scaledobject -n vdrive
+kubectl get scaledobject gallery-service-scaledobject -n RawDrive
 
 # View HPA created by KEDA
-kubectl get hpa -n vdrive
+kubectl get hpa -n RawDrive
 
 # Watch scaling events
-kubectl get events -n vdrive --field-selector reason=SuccessfulRescale --watch
+kubectl get events -n RawDrive --field-selector reason=SuccessfulRescale --watch
 
 # Check current pod count
-kubectl get pods -n vdrive -l app=gallery-service
+kubectl get pods -n RawDrive -l app=gallery-service
 
 # View KEDA operator logs
 kubectl logs -f deployment/keda-operator -n keda

@@ -5,7 +5,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: traefik
-  namespace: vDrive
+  namespace: RawDrive
   labels:
     app: traefik
     app.kubernetes.io/name: traefik
@@ -86,7 +86,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: traefik
-  namespace: vDrive
+  namespace: RawDrive
   labels:
     app: traefik
 spec:
@@ -106,7 +106,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: traefik-internal
-  namespace: vDrive
+  namespace: RawDrive
   labels:
     app: traefik
 spec:

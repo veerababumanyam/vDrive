@@ -1,6 +1,6 @@
 # Gallery System — Comprehensive Documentation
 
-> **Purpose**: Single source of truth for vDrive's gallery system covering terminology, data models, configuration, client portal features, service architecture, and operational requirements.
+> **Purpose**: Single source of truth for RawDrive's gallery system covering terminology, data models, configuration, client portal features, service architecture, and operational requirements.
 
 ---
 
@@ -33,7 +33,7 @@
 
 ## 1. Overview
 
-Galleries are the core delivery surface in vDrive. Staff create and curate galleries inside a **workspace**, then share them with clients via a **Client Portal** using **Share Links** and explicit access policies.
+Galleries are the core delivery surface in RawDrive. Staff create and curate galleries inside a **workspace**, then share them with clients via a **Client Portal** using **Share Links** and explicit access policies.
 
 ### Goals
 
@@ -70,7 +70,7 @@ Galleries are the core delivery surface in vDrive. Staff create and curate galle
 
 | Term | Definition |
 |------|------------|
-| **User** | Authenticated identity in vDrive (photographer/team member) |
+| **User** | Authenticated identity in RawDrive (photographer/team member) |
 | **Client** | Non-team identity interacting with shared galleries via share link (favorites, comments, downloads) |
 | **Workspace Member** | User + role assignment within a specific workspace |
 | **Visitor** | Anonymous or registered client viewing a gallery via magic link |
@@ -81,7 +81,7 @@ Galleries are the core delivery surface in vDrive. Staff create and curate galle
 |------|------------|
 | **Signed URL** | Time-limited URL granting access to an object for uploads/downloads |
 | **BYOS** | Bring Your Own Storage - customer-owned storage provider (Google Drive, Dropbox, S3-compatible) |
-| **Managed Storage** | vDrive-hosted object storage (Cloudflare R2) |
+| **Managed Storage** | RawDrive-hosted object storage (Cloudflare R2) |
 | **CDN** | Content delivery network for serving optimized assets at edge |
 
 ---
@@ -751,11 +751,11 @@ const updateSW = registerSW({
 
 | Cache Name | Strategy | Max Entries | Max Age | Use Case |
 |------------|----------|-------------|---------|----------|
-| `vDrive-thumbnails` | CacheFirst | 500 | 7 days | Thumbnail images |
-| `vDrive-originals` | CacheFirst | 50 | 30 days | Full-res viewed images |
-| `vDrive-gallery-api` | StaleWhileRevalidate | 100 | 5 min | Gallery metadata |
-| `vDrive-auth` | NetworkFirst | 20 | 10 min | Auth tokens |
-| `vDrive-static` | CacheFirst | 100 | 30 days | JS, CSS, fonts |
+| `RawDrive-thumbnails` | CacheFirst | 500 | 7 days | Thumbnail images |
+| `RawDrive-originals` | CacheFirst | 50 | 30 days | Full-res viewed images |
+| `RawDrive-gallery-api` | StaleWhileRevalidate | 100 | 5 min | Gallery metadata |
+| `RawDrive-auth` | NetworkFirst | 20 | 10 min | Auth tokens |
+| `RawDrive-static` | CacheFirst | 100 | 30 days | JS, CSS, fonts |
 
 ### Caching Strategy Details
 
@@ -800,8 +800,8 @@ const updateSW = registerSW({
 
 ```json
 {
-  "name": "vDrive Gallery",
-  "short_name": "vDrive",
+  "name": "RawDrive Gallery",
+  "short_name": "RawDrive",
   "description": "Professional photography gallery",
   "start_url": "/",
   "display": "standalone",
@@ -911,8 +911,8 @@ export default defineConfig({
       registerType: 'prompt',
       includeAssets: ['favicon.ico', 'robots.txt', 'icons/*.png'],
       manifest: {
-        name: 'vDrive Gallery',
-        short_name: 'vDrive',
+        name: 'RawDrive Gallery',
+        short_name: 'RawDrive',
         theme_color: '#000000',
         // ... full manifest
       },
@@ -923,7 +923,7 @@ export default defineConfig({
             urlPattern: /^https:\/\/.*\.cloudflare\..*\/thumbnails\//,
             handler: 'CacheFirst',
             options: {
-              cacheName: 'vDrive-thumbnails',
+              cacheName: 'RawDrive-thumbnails',
               expiration: { maxEntries: 500, maxAgeSeconds: 604800 },
             },
           },
@@ -931,7 +931,7 @@ export default defineConfig({
             urlPattern: /\/api\/v1\/public\/galleries\//,
             handler: 'StaleWhileRevalidate',
             options: {
-              cacheName: 'vDrive-gallery-api',
+              cacheName: 'RawDrive-gallery-api',
               expiration: { maxEntries: 100, maxAgeSeconds: 300 },
             },
           },

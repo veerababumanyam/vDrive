@@ -1,4 +1,4 @@
-# vDrive Features Catalog
+# RawDrive Features Catalog
 
 **Version:** 0.3.3 | **Last Updated:** January 2026
 

@@ -1,12 +1,12 @@
 ---
 name: web-artifacts-builder
 aliases: [prototype, bundle, demo, standalone-html, component-demo]
-description: Build and prototype vDrive UI components with bundling support. Use for creating standalone component demos, prototyping new features, or building shareable HTML previews.
+description: Build and prototype RawDrive UI components with bundling support. Use for creating standalone component demos, prototyping new features, or building shareable HTML previews.
 ---
 
-# vDrive Component Builder
+# RawDrive Component Builder
 
-Tools for building and prototyping vDrive UI components with standalone bundling.
+Tools for building and prototyping RawDrive UI components with standalone bundling.
 
 > **For design patterns**: See the `frontend-design` skill.
 > **For design tokens**: See the `design-system` skill.
@@ -30,14 +30,14 @@ cd my-prototype
 
 Creates a project with:
 - React 18 + TypeScript + Vite
-- Tailwind CSS with vDrive theming
+- Tailwind CSS with RawDrive theming
 - shadcn/ui components (40+ pre-installed)
 - Path aliases (`@/`)
 - Parcel bundling configured
 
 ### Step 2: Develop Component
 
-Edit files in the project. Use vDrive patterns:
+Edit files in the project. Use RawDrive patterns:
 
 ```typescript
 // src/App.tsx
@@ -68,12 +68,12 @@ bash .claude/skills/web-artifacts-builder/scripts/bundle-artifact.sh
 
 Creates `bundle.html` - self-contained HTML with all dependencies inlined.
 
-## vDrive Design Integration
+## RawDrive Design Integration
 
 ### Import Design Tokens
 
 ```typescript
-// Use vDrive color tokens
+// Use RawDrive color tokens
 <div className="bg-surface text-text-primary border-border" />
 
 // Use brand colors
@@ -82,9 +82,9 @@ Creates `bundle.html` - self-contained HTML with all dependencies inlined.
 <div className="text-gold" />
 ```
 
-### Use vDrive Components
+### Use RawDrive Components
 
-The bundled shadcn/ui components match vDrive's design system:
+The bundled shadcn/ui components match RawDrive's design system:
 
 ```typescript
 import { Button } from '@/components/ui/button';
@@ -118,7 +118,7 @@ import { Badge } from '@/components/ui/badge';
 ## When to Use This Skill
 
 **Use this skill when:**
-- Prototyping a new feature before integrating into vDrive
+- Prototyping a new feature before integrating into RawDrive
 - Creating standalone demos for stakeholder review
 - Building quick UI experiments
 - Need shareable HTML without running dev server
@@ -140,7 +140,7 @@ my-prototype/
 │   └── components/
 │       └── ui/           # shadcn/ui components
 ├── index.html
-├── tailwind.config.js    # vDrive-compatible config
+├── tailwind.config.js    # RawDrive-compatible config
 ├── vite.config.ts
 └── package.json
 ```
@@ -150,13 +150,13 @@ my-prototype/
 When prototype is ready for production:
 
 1. Copy component logic to `frontend/src/components/`
-2. Update imports to use vDrive's actual components
+2. Update imports to use RawDrive's actual components
 3. Add tests in `frontend/src/test/`
 4. Integrate into appropriate page/route
 
 ## Design Guidelines
 
-Follow vDrive design principles:
+Follow RawDrive design principles:
 
 - Use semantic color tokens (`bg-surface`, not `bg-white`)
 - Use `AppButton`, `AppCard` patterns

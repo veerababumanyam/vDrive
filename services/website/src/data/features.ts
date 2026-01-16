@@ -1,5 +1,5 @@
 /**
- * Features data for vDrive product showcase
+ * Features data for RawDrive product showcase
  * 6 core AI-powered capabilities
  */
 

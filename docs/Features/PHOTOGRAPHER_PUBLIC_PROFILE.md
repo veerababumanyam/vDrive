@@ -4,7 +4,7 @@
 
 ## Overview
 
-vDrive provides photographers with customizable public profiles and digital identity features to showcase their work, build their brand, and attract clients. Public profiles serve as a professional online presence with portfolio galleries, service offerings, and booking capabilities.
+RawDrive provides photographers with customizable public profiles and digital identity features to showcase their work, build their brand, and attract clients. Public profiles serve as a professional online presence with portfolio galleries, service offerings, and booking capabilities.
 
 ## Purpose
 
@@ -306,7 +306,7 @@ interface CustomDomain {
 ```
 
 **Domain Configuration:**
-- Point domain to vDrive
+- Point domain to RawDrive
 - Automatic SSL certificate
 - Email forwarding (optional)
 - Subdomain support
@@ -470,7 +470,7 @@ interface SEOMetaTags {
 SEO-friendly URL structure.
 
 **URL Patterns:**
-- Profile: `https://vDrive.com/photographer/[username]`
+- Profile: `https://RawDrive.com/photographer/[username]`
 - Custom domain: `https://[domain].com`
 - Gallery: `https://[domain].com/gallery/[slug]`
 - Blog: `https://[domain].com/blog/[slug]`

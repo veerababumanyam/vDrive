@@ -1,4 +1,4 @@
-# Tasks: vDrive Public Website
+# Tasks: RawDrive Public Website
 
 **Input**: Design documents from `/specs/002-public-website/`
 **Prerequisites**: plan.md, spec.md, data-model.md, contracts/schemas.md, research.md, quickstart.md
@@ -46,7 +46,7 @@
 
 ---
 
-## Phase 3: User Story 1 - Discover vDrive and Understand Value (Priority: P1) 🎯 MVP
+## Phase 3: User Story 1 - Discover RawDrive and Understand Value (Priority: P1) 🎯 MVP
 
 **Goal**: Landing page with compelling headline, subheadline, trust indicators, and hero visual
 
@@ -98,7 +98,7 @@
 - [x] T029 [US3] Update pricing cards to display INR with Intl.NumberFormat in src/components/landing/PricingSection.astro
 - [x] T030 [US3] Add storage/gallery/client limits to pricing cards in src/components/landing/PricingSection.astro
 - [x] T031 [US3] Add "Most Popular" badge to Professional tier in src/components/landing/PricingSection.astro
-- [x] T032 [US3] Update CTA links to app.vdrive.io/sign-up?plan={id} in src/components/landing/PricingSection.astro
+- [x] T032 [US3] Update CTA links to app.RawDrive.io/sign-up?plan={id} in src/components/landing/PricingSection.astro
 - [x] T033 [US3] Create standalone pricing page with annual/monthly toggle in src/pages/pricing.astro
 - [x] T034 [US3] Add Product JSON-LD schemas for each pricing tier in src/pages/pricing.astro
 - [x] T035 [US3] Add FAQ section with FAQ schema to pricing page in src/pages/pricing.astro
@@ -120,7 +120,7 @@
 - [x] T038 [US4] Update docs index page with category grid in src/pages/docs/index.astro
 - [x] T039 [US4] Update docs slug page to use DocsLayout in src/pages/docs/[...slug].astro
 - [x] T040 [US4] Extend docs content collection schema with lastUpdated field in src/content/config.ts
-- [x] T041 [P] [US4] Create sample doc: Getting Started with vDrive in src/content/docs/getting-started.mdx
+- [x] T041 [P] [US4] Create sample doc: Getting Started with RawDrive in src/content/docs/getting-started.mdx
 - [x] T042 [P] [US4] Create sample doc: Creating Your First Gallery in src/content/docs/first-gallery.mdx
 - [x] T043 [P] [US4] Create sample doc: AI Features Guide in src/content/docs/ai-features.mdx
 - [x] T044 [US4] Add client-side search for docs using content collection in src/components/docs/DocsSearch.astro

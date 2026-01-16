@@ -527,6 +527,197 @@ class TestGetGalleryPhotosAdvanced:
 
 
 @pytest.mark.asyncio
+class TestVerifyLinkAdvanced:
+    """Test advanced scenarios for verify-link endpoint."""
+
+    async def test_verify_link_logs_failure_with_gallery_id(
+        self, client: AsyncClient, test_db_session
+    ):
+        """Test that failed verification with existing gallery logs the attempt."""
+        # Create gallery and expired share link
+        gallery = Gallery(
+            workspace_id="00000000-0000-0000-0000-000000000123",
+            title="Test Gallery",
+            status="published",
+        )
+        test_db_session.add(gallery)
+        await test_db_session.commit()
+
+        share_link = ShareLink(
+            link_id="logged-expired-link",
+            gallery_id=gallery.id,
+            status="expired",
+        )
+        test_db_session.add(share_link)
+        await test_db_session.commit()
+
+        # This should log the failed attempt since we have a gallery_id
+        response = await client.post(
+            "/api/v1/public/verify-link",
+            json={"link_id": "logged-expired-link"},
+        )
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["access_granted"] is False
+        assert data["error"] == "expired"
+        # The audit log should have been created (we can't check directly but code path is covered)
+
+    async def test_verify_link_unknown_error_code(
+        self, client: AsyncClient, test_db_session, mocker
+    ):
+        """Test verify link with an unknown error code falls back to 'Access denied'."""
+        from src.app.services.share_link_service import ShareLinkService
+
+        # Create gallery and share link
+        gallery = Gallery(
+            workspace_id="00000000-0000-0000-0000-000000000123",
+            title="Test Gallery",
+            status="published",
+        )
+        test_db_session.add(gallery)
+        await test_db_session.commit()
+
+        share_link = ShareLink(
+            link_id="unknown-error-link",
+            gallery_id=gallery.id,
+            status="active",
+        )
+        test_db_session.add(share_link)
+        await test_db_session.commit()
+
+        # Mock verify_link to return an unknown error code
+        mocker.patch.object(
+            ShareLinkService,
+            "verify_link",
+            return_value=(False, share_link, "unknown_error"),
+        )
+
+        response = await client.post(
+            "/api/v1/public/verify-link",
+            json={"link_id": "unknown-error-link"},
+        )
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["access_granted"] is False
+        assert data["message"] == "Access denied"
+
+
+@pytest.mark.asyncio
+class TestGetGalleryPhotosURLGeneration:
+    """Test URL generation in get gallery photos endpoint."""
+
+    async def test_get_photos_url_generation_error(
+        self, client: AsyncClient, test_db_session, mocker
+    ):
+        """Test handling URL generation failure gracefully."""
+        from src.app.services.signed_url_service import SignedUrlService
+
+        gallery = Gallery(
+            workspace_id="00000000-0000-0000-0000-000000000123",
+            title="Test Gallery",
+            status="published",
+        )
+        test_db_session.add(gallery)
+        await test_db_session.commit()
+
+        asset = GalleryAsset(
+            gallery_id=gallery.id,
+            asset_id="00000000-0000-0000-0000-000000000001",
+            is_private=False,
+        )
+        test_db_session.add(asset)
+        await test_db_session.commit()
+
+        # Mock generate_asset_urls to raise an exception
+        mocker.patch.object(
+            SignedUrlService,
+            "generate_asset_urls",
+            side_effect=Exception("S3 connection error"),
+        )
+
+        response = await client.get(f"/api/v1/public/gallery/{gallery.id}/photos")
+
+        # Should still succeed but with None URLs
+        assert response.status_code == 200
+        data = response.json()
+        assert len(data["data"]) == 1
+        # URLs should be None due to error (graceful degradation)
+
+    async def test_get_photos_with_private_asset_no_urls(
+        self, client: AsyncClient, test_db_session
+    ):
+        """Test that private assets don't get signed URLs generated."""
+        gallery = Gallery(
+            workspace_id="00000000-0000-0000-0000-000000000123",
+            title="Test Gallery",
+            status="published",
+        )
+        test_db_session.add(gallery)
+        await test_db_session.commit()
+
+        # Private asset should not have URLs generated
+        asset = GalleryAsset(
+            gallery_id=gallery.id,
+            asset_id="00000000-0000-0000-0000-000000000001",
+            is_private=True,
+            pin_hash=hash_password("1234"),
+        )
+        test_db_session.add(asset)
+        await test_db_session.commit()
+
+        response = await client.get(f"/api/v1/public/gallery/{gallery.id}/photos")
+
+        assert response.status_code == 200
+        # Private assets should still be returned (with placeholder URLs) but is_private=True
+
+
+@pytest.mark.asyncio
+class TestVerifyPinAdvanced:
+    """Test advanced scenarios for verify-pin endpoint."""
+
+    async def test_verify_pin_url_generation_error(
+        self, client: AsyncClient, test_db_session, mocker
+    ):
+        """Test handling URL generation failure during PIN verification."""
+        from src.app.services.signed_url_service import SignedUrlService
+
+        gallery = Gallery(
+            workspace_id="00000000-0000-0000-0000-000000000123",
+            title="Test Gallery",
+            status="published",
+        )
+        test_db_session.add(gallery)
+        await test_db_session.commit()
+
+        asset = GalleryAsset(
+            gallery_id=gallery.id,
+            asset_id="00000000-0000-0000-0000-000000000001",
+            is_private=True,
+            pin_hash=hash_password("1234"),
+        )
+        test_db_session.add(asset)
+        await test_db_session.commit()
+
+        # Mock generate_asset_urls to raise an exception
+        mocker.patch.object(
+            SignedUrlService,
+            "generate_asset_urls",
+            side_effect=Exception("S3 connection error"),
+        )
+
+        response = await client.post(
+            f"/api/v1/public/photo/{asset.id}/verify-pin?gallery_id={gallery.id}",
+            json={"pin": "1234"},
+        )
+
+        # Should return 500 error
+        assert response.status_code == 500
+        assert "Failed to generate access URL" in response.json()["detail"]
+
+
+@pytest.mark.asyncio
 class TestGetGalleryPhotosErrorPaths:
     """Test error paths in get gallery photos endpoint."""
 

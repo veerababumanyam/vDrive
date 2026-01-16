@@ -42,7 +42,7 @@ def get_url() -> str:
     if settings:
         return settings.DATABASE_URL
     # Fallback for local development
-    return "postgresql+asyncpg://vDrive:vDrive_dev_password@localhost:5432/vDrive"
+    return "postgresql+asyncpg://RawDrive:RawDrive_dev_password@localhost:5432/RawDrive"
 
 
 def run_migrations_offline() -> None:

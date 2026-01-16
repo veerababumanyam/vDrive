@@ -6,10 +6,10 @@ Links users to workspaces with role-based permissions.
 
 from datetime import datetime
 from enum import Enum
-from typing import TYPE_CHECKING, Dict, List
+from typing import TYPE_CHECKING, Dict, List, Optional
 from uuid import uuid4
 
-from sqlalchemy import JSON, DateTime, Enum as SQLEnum, ForeignKey, String, UniqueConstraint, func
+from sqlalchemy import JSON, DateTime, ForeignKey, String, UniqueConstraint, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.app.core.database import Base, GUID
@@ -29,8 +29,8 @@ class WorkspaceRole(str, Enum):
 
 
 # Default permissions by role
-DEFAULT_PERMISSIONS: Dict[WorkspaceRole, List[str]] = {
-    WorkspaceRole.OWNER: [
+DEFAULT_PERMISSIONS: Dict[str, List[str]] = {
+    "owner": [
         "workspace:delete",
         "workspace:settings",
         "members:manage",
@@ -43,7 +43,7 @@ DEFAULT_PERMISSIONS: Dict[WorkspaceRole, List[str]] = {
         "assets:delete",
         "ai:use",
     ],
-    WorkspaceRole.ADMIN: [
+    "admin": [
         "workspace:settings",
         "members:manage",
         "galleries:create",
@@ -54,14 +54,14 @@ DEFAULT_PERMISSIONS: Dict[WorkspaceRole, List[str]] = {
         "assets:delete",
         "ai:use",
     ],
-    WorkspaceRole.EDITOR: [
+    "editor": [
         "galleries:create",
         "galleries:edit",
         "galleries:publish",
         "assets:upload",
         "ai:use",
     ],
-    WorkspaceRole.VIEWER: [
+    "viewer": [
         "galleries:view",
         "assets:view",
     ],
@@ -73,6 +73,7 @@ class WorkspaceMember(Base):
     Workspace membership model.
 
     Associates users with workspaces and defines their role/permissions.
+    Matches migration schema: 20260114_0000_001_initial_schema.py
     """
 
     __tablename__ = "workspace_members"
@@ -101,11 +102,11 @@ class WorkspaceMember(Base):
         index=True,
     )
 
-    # Role
-    role: Mapped[WorkspaceRole] = mapped_column(
-        SQLEnum(WorkspaceRole, name="workspace_role"),
+    # Role (stored as string to match migration)
+    role: Mapped[str] = mapped_column(
+        String(20),
         nullable=False,
-        default=WorkspaceRole.VIEWER,
+        default="viewer",
     )
 
     # Custom permissions (overrides role defaults if set)
@@ -116,7 +117,7 @@ class WorkspaceMember(Base):
     )
 
     # Invitation tracking
-    invited_by: Mapped[str] = mapped_column(
+    invited_by: Mapped[Optional[str]] = mapped_column(
         String(36),  # User ID who invited this member
         nullable=True,
     )
@@ -171,12 +172,12 @@ class WorkspaceMember(Base):
     @property
     def is_owner(self) -> bool:
         """Check if member is workspace owner."""
-        return self.role == WorkspaceRole.OWNER
+        return self.role == "owner"
 
     @property
     def is_admin(self) -> bool:
         """Check if member is workspace admin or owner."""
-        return self.role in (WorkspaceRole.OWNER, WorkspaceRole.ADMIN)
+        return self.role in ("owner", "admin")
 
     def __repr__(self) -> str:
-        return f"<WorkspaceMember user={self.user_id} workspace={self.workspace_id} role={self.role.value}>"
+        return f"<WorkspaceMember user={self.user_id} workspace={self.workspace_id} role={self.role}>"

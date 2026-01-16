@@ -2,7 +2,7 @@
 
 from datetime import datetime
 from enum import Enum
-from typing import Any, Optional
+from typing import Any, Literal, Optional
 from uuid import UUID
 
 from pydantic import BaseModel, Field
@@ -80,50 +80,35 @@ class WebSocketMessage(BaseModel):
 class WebSocketConnectedMessage(WebSocketMessage):
     """Connected confirmation message."""
 
-    type: WebSocketMessageType = Field(
-        default=WebSocketMessageType.CONNECTED,
-        const=True,
-    )
+    type: Literal[WebSocketMessageType.CONNECTED] = WebSocketMessageType.CONNECTED
     data: ConnectionInfo
 
 
 class WebSocketPhotoAddedMessage(WebSocketMessage):
     """Photo added notification."""
 
-    type: WebSocketMessageType = Field(
-        default=WebSocketMessageType.PHOTO_ADDED,
-        const=True,
-    )
+    type: Literal[WebSocketMessageType.PHOTO_ADDED] = WebSocketMessageType.PHOTO_ADDED
     data: PhotoAddedData
 
 
 class WebSocketPhotoRemovedMessage(WebSocketMessage):
     """Photo removed notification."""
 
-    type: WebSocketMessageType = Field(
-        default=WebSocketMessageType.PHOTO_REMOVED,
-        const=True,
-    )
+    type: Literal[WebSocketMessageType.PHOTO_REMOVED] = WebSocketMessageType.PHOTO_REMOVED
     data: PhotoRemovedData
 
 
 class WebSocketGalleryUpdatedMessage(WebSocketMessage):
     """Gallery metadata update notification."""
 
-    type: WebSocketMessageType = Field(
-        default=WebSocketMessageType.GALLERY_UPDATED,
-        const=True,
-    )
+    type: Literal[WebSocketMessageType.GALLERY_UPDATED] = WebSocketMessageType.GALLERY_UPDATED
     data: GalleryUpdatedData
 
 
 class WebSocketErrorMessage(WebSocketMessage):
     """Error notification."""
 
-    type: WebSocketMessageType = Field(
-        default=WebSocketMessageType.ERROR,
-        const=True,
-    )
+    type: Literal[WebSocketMessageType.ERROR] = WebSocketMessageType.ERROR
     data: ErrorData
 
 
@@ -131,13 +116,13 @@ class WebSocketErrorMessage(WebSocketMessage):
 class ClientPingMessage(BaseModel):
     """Client ping for keepalive."""
 
-    type: str = Field(default="ping", const=True)
+    type: Literal["ping"] = "ping"
 
 
 class ClientSubscribeMessage(BaseModel):
     """Client subscribe to additional gallery (future use)."""
 
-    type: str = Field(default="subscribe", const=True)
+    type: Literal["subscribe"] = "subscribe"
     gallery_id: UUID = Field(..., description="Gallery to subscribe to")
 
 

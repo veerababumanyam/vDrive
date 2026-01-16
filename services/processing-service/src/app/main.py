@@ -246,7 +246,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator:
 
 # Create FastAPI application
 app = FastAPI(
-    title="vDrive Processing Service",
+    title="RawDrive Processing Service",
     description="Kafka-based async processing for thumbnails, EXIF, and face detection",
     version=settings.SERVICE_VERSION,
     docs_url="/docs" if settings.APP_ENV != "production" else None,

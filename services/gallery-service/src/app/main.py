@@ -1,5 +1,5 @@
 """
-vDrive Gallery Service - FastAPI Application
+RawDrive Gallery Service - FastAPI Application
 
 Gallery management, photo organization, WebSocket real-time updates,
 and high-performance public gallery viewing on port 8004.
@@ -49,7 +49,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator:
 
 
 app = FastAPI(
-    title="vDrive Gallery Service",
+    title="RawDrive Gallery Service",
     description="Gallery management and high-performance public gallery viewing",
     version=settings.SERVICE_VERSION,
     docs_url="/docs" if settings.APP_ENV != "production" else None,

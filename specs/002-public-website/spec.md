@@ -1,4 +1,4 @@
-# Feature Specification: vDrive Public Website
+# Feature Specification: RawDrive Public Website
 
 **Feature Branch**: `002-public-website`
 **Created**: 2026-01-13
@@ -7,7 +7,7 @@
 
 ## Overview
 
-The vDrive Public Website is a dedicated marketing microservice that serves as the primary acquisition channel for the photography platform. It provides comprehensive information about vDrive's features, pricing (optimized for Indian market in INR), documentation, and blog content. The website is built for 2026 SEO standards including AI agent crawling compatibility and achieves perfect Lighthouse scores.
+The RawDrive Public Website is a dedicated marketing microservice that serves as the primary acquisition channel for the photography platform. It provides comprehensive information about RawDrive's features, pricing (optimized for Indian market in INR), documentation, and blog content. The website is built for 2026 SEO standards including AI agent crawling compatibility and achieves perfect Lighthouse scores.
 
 **Service Details:**
 
@@ -16,16 +16,16 @@ The vDrive Public Website is a dedicated marketing microservice that serves as t
 | Stack          | Astro 5 (Static Site Generation + Islands) |
 | Location       | `services/website`                         |
 | Port           | 8011                                       |
-| Domain         | www.vdrive.io                              |
+| Domain         | www.RawDrive.io                              |
 | Dependencies   | Backend API (for auth redirect/checkout)   |
 
 ---
 
 ## User Scenarios & Testing *(mandatory)*
 
-### User Story 1 - Discover vDrive and Understand Value (Priority: P1)
+### User Story 1 - Discover RawDrive and Understand Value (Priority: P1)
 
-A professional photographer visits www.vdrive.io for the first time through organic search or referral. They need to quickly understand what vDrive offers and why it's valuable for their business within 30 seconds of landing.
+A professional photographer visits www.RawDrive.io for the first time through organic search or referral. They need to quickly understand what RawDrive offers and why it's valuable for their business within 30 seconds of landing.
 
 **Why this priority**: First impressions determine conversion. The landing page is the highest-traffic entry point and must immediately communicate value proposition to reduce bounce rate.
 
@@ -41,9 +41,9 @@ A professional photographer visits www.vdrive.io for the first time through orga
 
 ### User Story 2 - Explore Product Features (Priority: P1)
 
-A photographer wants to understand the specific capabilities of vDrive before signing up. They need detailed information about each feature to evaluate if it meets their business needs.
+A photographer wants to understand the specific capabilities of RawDrive before signing up. They need detailed information about each feature to evaluate if it meets their business needs.
 
-**Why this priority**: Feature understanding directly influences purchase decisions. Photographers need to validate that vDrive solves their specific pain points.
+**Why this priority**: Feature understanding directly influences purchase decisions. Photographers need to validate that RawDrive solves their specific pain points.
 
 **Independent Test**: Can be tested by navigating to /features and verifying all 6 highlighted features are displayed with descriptions, benefits, and visual demonstrations.
 
@@ -57,7 +57,7 @@ A photographer wants to understand the specific capabilities of vDrive before si
 
 ### User Story 3 - Evaluate Pricing and Choose Plan (Priority: P1)
 
-A photographer ready to consider vDrive wants to see pricing options in their local currency (INR) to make an informed purchasing decision.
+A photographer ready to consider RawDrive wants to see pricing options in their local currency (INR) to make an informed purchasing decision.
 
 **Why this priority**: Pricing transparency in local currency is essential for conversion in the Indian market. Unclear pricing leads to drop-off.
 
@@ -67,13 +67,13 @@ A photographer ready to consider vDrive wants to see pricing options in their lo
 
 1. **Given** a user visits the pricing page, **When** it loads, **Then** they see 5 pricing tiers in INR: Free (₹0), Starter (₹500), Professional (₹1,500), Business (₹3,000), Enterprise (Contact us).
 2. **Given** a user views a pricing card, **When** examining details, **Then** they see storage limits, gallery limits, client limits, and included features clearly listed.
-3. **Given** a user clicks "Get Started" on a plan, **When** the action occurs, **Then** they are redirected to app.vdrive.io/sign-up with the selected plan pre-populated.
+3. **Given** a user clicks "Get Started" on a plan, **When** the action occurs, **Then** they are redirected to app.RawDrive.io/sign-up with the selected plan pre-populated.
 
 ---
 
 ### User Story 4 - Learn from Documentation and Guides (Priority: P2)
 
-A potential or existing user wants to learn how to use vDrive effectively through documentation, tutorials, and guides before committing or to maximize their usage.
+A potential or existing user wants to learn how to use RawDrive effectively through documentation, tutorials, and guides before committing or to maximize their usage.
 
 **Why this priority**: Self-service documentation reduces support burden and helps users get started quickly. Important for user success but secondary to initial conversion.
 
@@ -89,7 +89,7 @@ A potential or existing user wants to learn how to use vDrive effectively throug
 
 ### User Story 5 - Read Industry Content and Updates (Priority: P2)
 
-A photographer interested in photography business tips, vDrive updates, or industry insights wants to consume valuable content that establishes vDrive as a thought leader.
+A photographer interested in photography business tips, RawDrive updates, or industry insights wants to consume valuable content that establishes RawDrive as a thought leader.
 
 **Why this priority**: Blog content supports SEO, builds trust, and nurtures leads. Secondary to core conversion pages but important for organic traffic.
 
@@ -121,7 +121,7 @@ A user with visual preferences or accessibility needs wants to switch between li
 
 ### User Story 7 - AI Agent Discovers and Indexes Content (Priority: P3)
 
-AI search agents and RAG systems need to efficiently crawl, understand, and index vDrive's website content for accurate retrieval and summarization.
+AI search agents and RAG systems need to efficiently crawl, understand, and index RawDrive's website content for accurate retrieval and summarization.
 
 **Why this priority**: AI agent optimization is emerging best practice for 2026 SEO but less critical than traditional SEO for current traffic.
 
@@ -232,8 +232,8 @@ AI search agents and RAG systems need to efficiently crawl, understand, and inde
 1. **Existing Service**: The website service already exists at `services/website/` with basic Astro, Tailwind, React setup. This specification enhances rather than replaces.
 2. **Port Configuration**: Port 8011 will be used per CLAUDE.md documentation (aligning with existing infrastructure).
 3. **Content Source**: Blog and documentation content will be authored in MDX format within the service's content collections.
-4. **Authentication**: Sign-up and sign-in flows redirect to app.vdrive.io (React app) - no auth implemented in website service.
-5. **Payment**: Pricing CTAs link to app.vdrive.io checkout flow - no payment processing in website service.
+4. **Authentication**: Sign-up and sign-in flows redirect to app.RawDrive.io (React app) - no auth implemented in website service.
+5. **Payment**: Pricing CTAs link to app.RawDrive.io checkout flow - no payment processing in website service.
 6. **Analytics**: Google Analytics or similar to be configured via environment variable.
 7. **Images**: Dashboard mockups and feature visuals will use placeholder images initially, to be replaced with production assets.
 8. **Currency**: INR pricing is primary; multi-currency support is out of scope for initial implementation.
@@ -244,7 +244,7 @@ AI search agents and RAG systems need to efficiently crawl, understand, and inde
 ## Dependencies
 
 - **Backend API**: Required for auth redirect URLs (sign-in, sign-up endpoints).
-- **Design System**: Uses vDrive design tokens from `docs/project-starter-kit/04-DESIGN-SYSTEM.md`.
+- **Design System**: Uses RawDrive design tokens from `docs/project-starter-kit/04-DESIGN-SYSTEM.md`.
 - **Astro 5**: Static site generator with hybrid rendering capability.
 - **MDX**: For blog and documentation content authoring.
 - **Tailwind CSS**: For styling with design system tokens.

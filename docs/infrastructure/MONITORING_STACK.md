@@ -2,7 +2,7 @@
 
 ## Overview
 
-vDrive uses a comprehensive observability stack:
+RawDrive uses a comprehensive observability stack:
 
 | Component | Port | Purpose |
 |-----------|------|---------|
@@ -22,10 +22,10 @@ vDrive uses a comprehensive observability stack:
 ### Kubernetes
 ```bash
 # Port forward Grafana
-kubectl port-forward svc/grafana 3001:3000 -n vDrive
+kubectl port-forward svc/grafana 3001:3000 -n RawDrive
 
 # Port forward Prometheus
-kubectl port-forward svc/prometheus 9090:9090 -n vDrive
+kubectl port-forward svc/prometheus 9090:9090 -n RawDrive
 ```
 
 ## Prometheus Configuration

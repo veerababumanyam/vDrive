@@ -26,7 +26,7 @@ This guide walks through setting up, running, and testing the Gallery Service mi
 ### 1. Clone Repository and Navigate to Infrastructure
 
 ```bash
-cd /Users/v13478/Desktop/vDrive
+cd /Users/v13478/Desktop/RawDrive
 cd infrastructure/docker
 ```
 
@@ -44,7 +44,7 @@ docker compose up -d postgres redis kafka zookeeper traefik prometheus grafana
 docker compose exec backend alembic upgrade head
 
 # Or manually run Gallery Service specific migrations
-docker compose exec postgres psql -U vdrive -d vdrive -f /migrations/001_create_galleries_schema.sql
+docker compose exec postgres psql -U RawDrive -d RawDrive -f /migrations/001_create_galleries_schema.sql
 ```
 
 ### 4. Start Gallery Service
@@ -83,7 +83,7 @@ Create or update `infrastructure/docker/.env`:
 
 ```bash
 # Database (PostgreSQL)
-DATABASE_URL=postgresql://vdrive:password@postgres:5432/vdrive
+DATABASE_URL=postgresql://RawDrive:password@postgres:5432/RawDrive
 DATABASE_POOL_SIZE=20
 DATABASE_MAX_OVERFLOW=10
 
@@ -104,8 +104,8 @@ JWT_EXPIRATION=3600
 R2_ENDPOINT_URL=https://<account-id>.r2.cloudflarestorage.com
 R2_ACCESS_KEY_ID=<cloudflare-r2-access-key>
 R2_SECRET_ACCESS_KEY=<cloudflare-r2-secret-key>
-R2_BUCKET_THUMBNAILS=vdrive-thumbnails
-R2_BUCKET_ORIGINALS=vdrive-originals
+R2_BUCKET_THUMBNAILS=RawDrive-thumbnails
+R2_BUCKET_ORIGINALS=RawDrive-originals
 R2_REGION=auto
 
 # Service Configuration
@@ -115,7 +115,7 @@ LOG_LEVEL=INFO
 ENVIRONMENT=development
 
 # CORS (comma-separated origins)
-CORS_ORIGINS=http://localhost:3000,http://localhost:5173,https://app.vdrive.io
+CORS_ORIGINS=http://localhost:3000,http://localhost:5173,https://app.RawDrive.io
 
 # Rate Limiting
 RATE_LIMIT_PER_IP=200
@@ -184,8 +184,8 @@ services:
     build:
       context: ../../services/gallery-service
       dockerfile: Dockerfile
-    container_name: vdrive-gallery-service
-    image: vdrive/gallery-service:latest
+    container_name: RawDrive-gallery-service
+    image: RawDrive/gallery-service:latest
     ports:
       - "8004:8004"
     environment:
@@ -206,11 +206,11 @@ services:
       - redis
       - kafka
     networks:
-      - vdrive-network
+      - RawDrive-network
     labels:
       # Traefik routing
       - "traefik.enable=true"
-      - "traefik.http.routers.gallery-service.rule=Host(`app.vdrive.io`) && PathPrefix(`/api/gallery`)"
+      - "traefik.http.routers.gallery-service.rule=Host(`app.RawDrive.io`) && PathPrefix(`/api/gallery`)"
       - "traefik.http.routers.gallery-service.entrypoints=websecure"
       - "traefik.http.routers.gallery-service.tls=true"
       - "traefik.http.services.gallery-service.loadbalancer.server.port=8004"
@@ -636,7 +636,7 @@ Query logs in Grafana → Explore → Loki:
 
 ```bash
 # Connect to PostgreSQL
-docker compose exec postgres psql -U vdrive -d vdrive
+docker compose exec postgres psql -U RawDrive -d RawDrive
 
 # Check gallery count
 SELECT status, COUNT(*) FROM galleries GROUP BY status;
@@ -772,5 +772,5 @@ docker compose exec gallery-service alembic downgrade -1
 For issues or questions:
 - **Documentation**: `/docs/Features/GALLERY_COMPREHENSIVE.md`
 - **API Spec**: `/specs/001-gallery-service/contracts/gallery-api.yaml`
-- **GitHub Issues**: https://github.com/vdrive/vdrive/issues
-- **Email**: support@vdrive.io
+- **GitHub Issues**: https://github.com/RawDrive/RawDrive/issues
+- **Email**: support@RawDrive.io

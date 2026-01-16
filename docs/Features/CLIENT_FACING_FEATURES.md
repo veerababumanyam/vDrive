@@ -4,7 +4,7 @@
 
 ## Executive Summary
 
-vDrive provides a comprehensive suite of client-facing features that enable photographers to share galleries with clients in a professional, branded, and interactive environment. Clients can view photos, provide feedback, make selections, and download content—all within a customizable, secure interface.
+RawDrive provides a comprehensive suite of client-facing features that enable photographers to share galleries with clients in a professional, branded, and interactive environment. Clients can view photos, provide feedback, make selections, and download content—all within a customizable, secure interface.
 
 This document defines production-ready business requirements from the client's perspective, informed by leading platforms (Pixieset, SmugMug, Zenfolio, ShootProof).
 
@@ -904,7 +904,7 @@ Bottom of gallery displays contact and social info.
 - Social media links
 - Copyright notice
 - Custom links
-- "Powered by vDrive" (optional)
+- "Powered by RawDrive" (optional)
 
 ### 9.4 Watermarking
 

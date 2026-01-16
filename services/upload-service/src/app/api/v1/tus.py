@@ -1,5 +1,6 @@
 """TUS v1.0.0 resumable upload protocol endpoints."""
 
+import base64
 from datetime import datetime, timezone
 from typing import Optional
 
@@ -10,7 +11,6 @@ from ...core.config import settings
 from ...core.database import AsyncSessionLocal
 from ...core.auth import get_current_user, CurrentUser
 from ...models import Upload
-from ...schemas.upload import CreateUploadRequest
 from ...schemas.events import UploadInitiatedEvent
 from ...services.validation_service import get_validation_service
 from ...services.event_service import get_event_service
@@ -25,6 +25,36 @@ router = APIRouter()
 TUS_VERSION = "1.0.0"
 TUS_EXTENSION = "creation,termination"
 TUS_MAX_SIZE = settings.TUS_MAX_SIZE
+
+
+def parse_tus_metadata(metadata_str: Optional[str]) -> dict:
+    """Parse TUS Upload-Metadata header into dict.
+
+    TUS protocol sends metadata as: "key1 base64value1,key2 base64value2"
+    Example: "filename dGVzdC5qcGc=,filetype aW1hZ2UvanBlZw=="
+
+    Args:
+        metadata_str: The Upload-Metadata header value
+
+    Returns:
+        Dictionary of key-value pairs from the metadata
+    """
+    if not metadata_str:
+        return {}
+
+    result = {}
+    for pair in metadata_str.split(","):
+        parts = pair.strip().split(" ", 1)
+        if len(parts) == 2:
+            key = parts[0]
+            try:
+                value = base64.b64decode(parts[1]).decode("utf-8")
+            except Exception:
+                value = parts[1]  # Use as-is if not valid base64
+            result[key] = value
+        elif len(parts) == 1 and parts[0]:
+            result[parts[0]] = ""
+    return result
 
 
 @router.options("/")
@@ -47,7 +77,6 @@ async def tus_options():
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def create_upload(
-    request: CreateUploadRequest,
     upload_length: int = Header(..., alias="Upload-Length"),
     upload_metadata: Optional[str] = Header(None, alias="Upload-Metadata"),
     tus_resumable: str = Header(..., alias="Tus-Resumable"),
@@ -57,6 +86,10 @@ async def create_upload(
     TUS POST endpoint - Create upload session.
 
     Requires JWT authentication. Workspace is extracted from token.
+    File metadata (filename, filetype) is extracted from Upload-Metadata header.
+
+    TUS Upload-Metadata format: "key1 base64value1,key2 base64value2"
+    Expected keys: filename, filetype (mime type)
 
     Returns:
         201 with Location header pointing to upload URL
@@ -77,6 +110,19 @@ async def create_upload(
                 detail="No workspace assigned to user",
             )
 
+        # Parse metadata from TUS header
+        metadata = parse_tus_metadata(upload_metadata)
+        filename = metadata.get("filename", "unknown")
+        mime_type = metadata.get("filetype", "application/octet-stream")
+        checksum_client = metadata.get("checksum")
+
+        logger.debug(
+            "Parsed TUS metadata",
+            metadata=metadata,
+            filename=filename,
+            mime_type=mime_type,
+        )
+
         # Validate file size
         validation_service = get_validation_service()
         if not validation_service.validate_file_size(upload_length):
@@ -85,15 +131,15 @@ async def create_upload(
                 detail=f"File size {upload_length} exceeds maximum {TUS_MAX_SIZE}",
             )
 
-        # Validate MIME type
-        if not validation_service.validate_mime_type(request.mime_type):
+        # Validate MIME type (allow unknown types for flexibility)
+        if mime_type != "application/octet-stream" and not validation_service.validate_mime_type(mime_type):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"MIME type {request.mime_type} not allowed",
+                detail=f"MIME type {mime_type} not allowed",
             )
 
         # Validate filename
-        if not validation_service.validate_filename(request.filename):
+        if filename != "unknown" and not validation_service.validate_filename(filename):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Invalid filename",
@@ -120,10 +166,11 @@ async def create_upload(
         await backend.create(
             upload_id=upload_id,
             workspace_id=workspace_id,
-            filename=request.filename,
-            mime_type=request.mime_type,
+            user_id=current_user.user_id,
+            filename=filename,
+            mime_type=mime_type,
             expected_size=upload_length,
-            checksum_client=request.checksum_client,
+            checksum_client=checksum_client,
         )
 
         upload_url = f"{settings.API_BASE_URL}/api/v1/files/{upload_id}"
@@ -132,7 +179,7 @@ async def create_upload(
         event = UploadInitiatedEvent(
             upload_id=upload_id,
             workspace_id=workspace_id,
-            filename=request.filename,
+            filename=filename,
             expected_size=upload_length,
         )
         event_service = get_event_service()
@@ -141,7 +188,7 @@ async def create_upload(
         logger.info(
             "TUS upload session created via API",
             upload_id=upload_id,
-            filename=request.filename,
+            filename=filename,
             expected_size=upload_length,
         )
 

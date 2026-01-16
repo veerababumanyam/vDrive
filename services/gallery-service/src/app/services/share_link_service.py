@@ -11,7 +11,127 @@ from src.app.models.share_link import ShareLink
 from src.app.utils.security import verify_password
 
 
+from src.app.schemas.share_link import ShareLinkCreate
+
 class ShareLinkService:
+    """Service for share link operations."""
+
+    @staticmethod
+    async def list_links(
+        gallery_id: str,
+        db: AsyncSession,
+    ) -> list[ShareLink]:
+        """List share links for a gallery.
+
+        Args:
+            gallery_id: Gallery UUID
+            db: Database session
+
+        Returns:
+            List of ShareLink objects
+        """
+        result = await db.execute(
+            select(ShareLink)
+            .where(ShareLink.gallery_id == gallery_id)
+            .where(ShareLink.status != "revoked")  # Don't show revoked? or maybe should show them.
+            .order_by(ShareLink.created_at.desc())
+        )
+        return list(result.scalars().all())
+
+    @staticmethod
+    async def create_link(
+        gallery_id: str,
+        data: ShareLinkCreate,
+        created_by_id: str,
+        db: AsyncSession,
+    ) -> ShareLink:
+        """Create a new share link.
+
+        Args:
+            gallery_id: Gallery UUID
+            data: Creation data
+            created_by_id: User creating the link
+            db: Database session
+
+        Returns:
+            Created ShareLink
+        """
+        # Hash password if provided
+        password_hash = None
+        password_required = False
+        if data.password:
+            from argon2 import PasswordHasher
+            ph = PasswordHasher()
+            password_hash = ph.hash(data.password)
+            password_required = True
+
+        # Parse expiry
+        expires_at_dt = None
+        if data.expires_at:
+            expires_at_dt = datetime.fromisoformat(data.expires_at)
+
+        share_link = ShareLink(
+            gallery_id=gallery_id,
+            label=data.label,
+            expires_at=expires_at_dt,
+            max_accesses=data.max_accesses,
+            password_required=password_required,
+            password_hash=password_hash,
+            email_registration_required=data.email_registration_required,
+            allowed_actions=data.allowed_actions,
+            download_variant=data.download_variant,
+            created_by_id=created_by_id,
+        )
+
+        db.add(share_link)
+        await db.commit()
+        await db.refresh(share_link)
+
+        logger.info(
+            "Share link created",
+            link_id=share_link.link_id,
+            gallery_id=gallery_id,
+        )
+
+        return share_link
+
+    @staticmethod
+    async def revoke_link(
+        link_id: str,
+        gallery_id: str,
+        db: AsyncSession,
+    ) -> bool:
+        """Revoke a share link.
+
+        Args:
+            link_id: Link ID (not the token link_id, but the UUID id) or the token?
+                     Frontend passes link.id typically.
+            gallery_id: Gallery UUID for ownership check
+            db: Database session
+
+        Returns:
+            True if revoked, False if not found
+        """
+        result = await db.execute(
+            select(ShareLink)
+            .where(ShareLink.id == link_id)
+            .where(ShareLink.gallery_id == gallery_id)
+        )
+        share_link = result.scalar_one_or_none()
+
+        if not share_link:
+            return False
+
+        share_link.status = "revoked"
+        db.add(share_link)
+        await db.commit()
+
+        logger.info(
+            "Share link revoked",
+            share_link_id=link_id,
+            gallery_id=gallery_id,
+        )
+        return True
     """Service for share link operations."""
 
     @staticmethod

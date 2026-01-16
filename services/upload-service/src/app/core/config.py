@@ -29,10 +29,11 @@ class Settings(BaseSettings):
     # Server Configuration
     HOST: str = Field(default="0.0.0.0")
     PORT: int = Field(default=8008)
+    API_BASE_URL: str = Field(default="http://localhost:8008")
 
     # Database Configuration
     DATABASE_URL: str = Field(
-        default="postgresql+asyncpg://vDrive:vDrive_dev_password@localhost:5432/vDrive"
+        default="postgresql+asyncpg://RawDrive:RawDrive_dev_password@localhost:5432/RawDrive"
     )
     DB_POOL_MIN_SIZE: int = Field(default=5)
     DB_POOL_MAX_SIZE: int = Field(default=20)
@@ -49,12 +50,12 @@ class Settings(BaseSettings):
     # R2 Storage Configuration
     R2_ACCESS_KEY_ID: str = Field(default="")
     R2_SECRET_ACCESS_KEY: str = Field(default="")
-    R2_BUCKET_NAME: str = Field(default="vdrive")
+    R2_BUCKET_NAME: str = Field(default="RawDrive")
     R2_ENDPOINT: str = Field(default="")
 
     # JWT Authentication
     JWT_SECRET: str = Field(default="")
-    JWT_ALGORITHM: str = Field(default="EdDSA")
+    JWT_ALGORITHM: str = Field(default="HS256")  # Must match onboarding-service
 
     # Encryption Configuration
     ENCRYPTION_MASTER_KEY: str = Field(default="")

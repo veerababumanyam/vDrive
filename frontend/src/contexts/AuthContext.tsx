@@ -5,7 +5,7 @@
  * T014: Create AuthContext.tsx with token state management
  */
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import { authApi, type LoginRequest, type LoginResponse, handleAuthError, setTokenInMemory } from '../services/authService';
 
 /**
@@ -216,6 +216,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
  *
  * @throws Error if used outside AuthProvider
  */
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAuth(): AuthContextValue {
   const context = useContext(AuthContext);
 

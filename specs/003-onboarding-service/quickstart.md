@@ -28,7 +28,7 @@ docker compose up -d postgres redis kafka
 cp .env.example .env
 
 # Required environment variables for onboarding service:
-# DATABASE_URL=postgresql+asyncpg://vdrive:vdrive@localhost:5432/vdrive
+# DATABASE_URL=postgresql+asyncpg://RawDrive:RawDrive@localhost:5432/RawDrive
 # REDIS_URL=redis://localhost:6379/0
 # JWT_SECRET=<generate-64-byte-hex>
 # GOOGLE_CLIENT_ID=<your-google-oauth-client-id>
@@ -261,7 +261,7 @@ docker compose exec redis redis-cli GET "rate_limit:register:<your-ip>"
 ### Build Docker Image
 
 ```bash
-docker build -t vdrive/onboarding-service:latest .
+docker build -t RawDrive/onboarding-service:latest .
 ```
 
 ### Run with Docker Compose

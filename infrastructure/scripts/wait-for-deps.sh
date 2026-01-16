@@ -7,7 +7,7 @@ set -e
 # Configuration
 POSTGRES_HOST="${POSTGRES_HOST:-postgres}"
 POSTGRES_PORT="${POSTGRES_PORT:-5432}"
-POSTGRES_USER="${POSTGRES_USER:-vdrive}"
+POSTGRES_USER="${POSTGRES_USER:-RawDrive}"
 
 REDIS_HOST="${REDIS_HOST:-redis}"
 REDIS_PORT="${REDIS_PORT:-6379}"
@@ -146,7 +146,7 @@ show_help() {
     echo "Environment Variables:"
     echo "  POSTGRES_HOST      PostgreSQL host (default: postgres)"
     echo "  POSTGRES_PORT      PostgreSQL port (default: 5432)"
-    echo "  POSTGRES_USER      PostgreSQL user (default: vdrive)"
+    echo "  POSTGRES_USER      PostgreSQL user (default: RawDrive)"
     echo "  POSTGRES_TIMEOUT   PostgreSQL wait timeout in seconds (default: 60)"
     echo ""
     echo "  REDIS_HOST         Redis host (default: redis)"

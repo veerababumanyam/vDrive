@@ -6,7 +6,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: backend
-  namespace: vDrive
+  namespace: RawDrive
   labels:
     app: backend
     app.kubernetes.io/name: backend
@@ -26,19 +26,19 @@ spec:
         prometheus.io/port: "8000"
         prometheus.io/path: "/metrics"
     spec:
-      serviceAccountName: vDrive-service
+      serviceAccountName: RawDrive-service
       containers:
         - name: backend
-          image: ghcr.io/vDrive/backend:latest
+          image: ghcr.io/RawDrive/backend:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8000
               name: http
           envFrom:
             - configMapRef:
-                name: vDrive-config
+                name: RawDrive-config
             - secretRef:
-                name: vDrive-secrets
+                name: RawDrive-secrets
           env:
             - name: SERVICE_NAME
               value: "backend"
@@ -72,7 +72,7 @@ spec:
               exec:
                 command: ["/bin/sh", "-c", "sleep 10"]
       imagePullSecrets:
-        - name: vDrive-registry
+        - name: RawDrive-registry
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -87,7 +87,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: backend
-  namespace: vDrive
+  namespace: RawDrive
   labels:
     app: backend
 spec:
@@ -104,5 +104,5 @@ spec:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: vDrive-service
-  namespace: vDrive
+  name: RawDrive-service
+  namespace: RawDrive

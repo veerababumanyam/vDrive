@@ -1,14 +1,14 @@
 ---
 name: saas-practices
 aliases: [multi-tenancy, billing, subscriptions, onboarding, metering, workspace, plans]
-description: SaaS best practices for vDrive photography platform. Use when implementing multi-tenancy, subscription features, billing, onboarding, or usage metering.
+description: SaaS best practices for RawDrive photography platform. Use when implementing multi-tenancy, subscription features, billing, onboarding, or usage metering.
 ---
 
-# SaaS Best Practices for vDrive
+# SaaS Best Practices for RawDrive
 
 ## Multi-Tenancy Architecture
 
-vDrive uses **workspace-scoped multi-tenancy** where all data is isolated by `workspace_id`.
+RawDrive uses **workspace-scoped multi-tenancy** where all data is isolated by `workspace_id`.
 
 ### Key Files
 

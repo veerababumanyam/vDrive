@@ -1,5 +1,5 @@
 # ===========================================
-# vDrive AI Search Service Dockerfile
+# RawDrive AI Search Service Dockerfile
 # ===========================================
 # Semantic search, RAG chat, and caption generation on port 8009
 # Dependencies: PostgreSQL (pgvector), Kafka, Gemini API

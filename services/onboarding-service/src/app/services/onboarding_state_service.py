@@ -196,7 +196,7 @@ class OnboardingStateService:
             await self.kafka_producer.publish_onboarding_completed(event)
 
         return OnboardingCompleteResponse(
-            message="Onboarding completed successfully! Welcome to vDrive.",
+            message="Onboarding completed successfully! Welcome to RawDrive.",
             redirect_url="/dashboard",
             workspace_id=workspace_id,
         )

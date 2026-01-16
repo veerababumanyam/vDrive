@@ -4,7 +4,7 @@
 
 ## Overview
 
-vDrive provides comprehensive admin and platform management tools for system administrators to monitor, manage, and optimize the platform. These tools enable user management, system monitoring, analytics, and configuration.
+RawDrive provides comprehensive admin and platform management tools for system administrators to monitor, manage, and optimize the platform. These tools enable user management, system monitoring, analytics, and configuration.
 
 ## Purpose
 
@@ -128,7 +128,7 @@ Subscription and feature management.
 
 ### Support Access (auditable cross-workspace access)
 
-Platform admins sometimes need to inspect a specific workspace for support. vDrive treats this as a separate, auditable capability.
+Platform admins sometimes need to inspect a specific workspace for support. RawDrive treats this as a separate, auditable capability.
 
 **Requirements:**
 - Support access sessions are scoped to a single `workspace_id`.
@@ -741,7 +741,7 @@ Configure platform-wide settings.
 Configure AI providers and model routing.
 
 **Goals**
-- Default to **Google Gemini** models for vDrive-hosted deployments.
+- Default to **Google Gemini** models for RawDrive-hosted deployments.
 - Allow Platform Admin (global) and Workspace Admin (per workspace) to switch providers/models without redeploying.
 - Support cloud providers and local/self-hosted endpoints.
 

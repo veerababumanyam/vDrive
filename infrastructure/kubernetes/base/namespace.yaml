@@ -1,20 +1,20 @@
 # ===========================================
-# vDrive Kubernetes Namespace
+# RawDrive Kubernetes Namespace
 # ===========================================
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: vDrive
+  name: RawDrive
   labels:
-    app.kubernetes.io/name: vDrive
-    app.kubernetes.io/part-of: vDrive-platform
+    app.kubernetes.io/name: RawDrive
+    app.kubernetes.io/part-of: RawDrive-platform
 ---
 # Resource Quota for the namespace
 apiVersion: v1
 kind: ResourceQuota
 metadata:
-  name: vDrive-quota
-  namespace: vDrive
+  name: RawDrive-quota
+  namespace: RawDrive
 spec:
   hard:
     requests.cpu: "20"
@@ -28,8 +28,8 @@ spec:
 apiVersion: v1
 kind: LimitRange
 metadata:
-  name: vDrive-limit-range
-  namespace: vDrive
+  name: RawDrive-limit-range
+  namespace: RawDrive
 spec:
   limits:
     - default:

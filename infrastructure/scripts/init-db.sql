@@ -1,5 +1,5 @@
 -- ===========================================
--- vDrive PostgreSQL Initialization Script
+-- RawDrive PostgreSQL Initialization Script
 -- ===========================================
 -- This script runs on first database creation
 -- Image: timescale/timescaledb-ha:pg16
@@ -41,9 +41,9 @@ CREATE SCHEMA IF NOT EXISTS audit;
 -- ===========================================
 -- Grant permissions
 -- ===========================================
-GRANT ALL ON SCHEMA app TO vDrive;
-GRANT ALL ON SCHEMA audit TO vDrive;
-GRANT USAGE ON SCHEMA public TO vDrive;
+GRANT ALL ON SCHEMA app TO RawDrive;
+GRANT ALL ON SCHEMA audit TO RawDrive;
+GRANT USAGE ON SCHEMA public TO RawDrive;
 
 -- ===========================================
 -- Create audit log function
@@ -195,7 +195,7 @@ $$;
 DO $$
 BEGIN
     RAISE NOTICE '===========================================';
-    RAISE NOTICE 'vDrive database initialization complete!';
+    RAISE NOTICE 'RawDrive database initialization complete!';
     RAISE NOTICE '===========================================';
 END
 $$;

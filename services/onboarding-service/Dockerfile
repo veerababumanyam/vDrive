@@ -1,5 +1,5 @@
 # ===========================================
-# vDrive Onboarding Service Dockerfile
+# RawDrive Onboarding Service Dockerfile
 # ===========================================
 # User registration and email verification on port 8006
 

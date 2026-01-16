@@ -1,4 +1,4 @@
-# vDrive Technology Stack
+# RawDrive Technology Stack
 
 **Version:** 0.3.3 | **Last Updated:** January 2026
 
@@ -119,23 +119,23 @@
 
 ## Shared Packages (pnpm Workspaces)
 
-vDrive uses a monorepo with shared TypeScript packages that generate Python equivalents:
+RawDrive uses a monorepo with shared TypeScript packages that generate Python equivalents:
 
 | Package | Purpose | Key Exports |
 |---------|---------|-------------|
-| `@vDrive/shared-types` | Domain types | `InvitationStatus`, `GalleryStatus`, `GradientConfiguration` |
-| `@vDrive/shared-constants` | Configuration | `API_BASE`, `STORAGE`, `AI_THRESHOLDS`, `PAGINATION` |
-| `@vDrive/shared-validation` | Validation | `isValidHexColor`, `hexColorSchema`, `sanitizeHtml` |
-| `@vDrive/shared-utils` | Utilities | `formatRelativeDate`, `formatFileSize`, `truncate` |
+| `@RawDrive/shared-types` | Domain types | `InvitationStatus`, `GalleryStatus`, `GradientConfiguration` |
+| `@RawDrive/shared-constants` | Configuration | `API_BASE`, `STORAGE`, `AI_THRESHOLDS`, `PAGINATION` |
+| `@RawDrive/shared-validation` | Validation | `isValidHexColor`, `hexColorSchema`, `sanitizeHtml` |
+| `@RawDrive/shared-utils` | Utilities | `formatRelativeDate`, `formatFileSize`, `truncate` |
 
 ### Usage
 
 ```typescript
 // TypeScript (Frontend)
-import { InvitationStatus, GalleryStatus } from '@vDrive/shared-types';
-import { API_BASE, PAGINATION } from '@vDrive/shared-constants';
-import { isValidHexColor, sanitizeHtml } from '@vDrive/shared-validation';
-import { formatRelativeDate, formatFileSize } from '@vDrive/shared-utils';
+import { InvitationStatus, GalleryStatus } from '@RawDrive/shared-types';
+import { API_BASE, PAGINATION } from '@RawDrive/shared-constants';
+import { isValidHexColor, sanitizeHtml } from '@RawDrive/shared-validation';
+import { formatRelativeDate, formatFileSize } from '@RawDrive/shared-utils';
 ```
 
 ```python

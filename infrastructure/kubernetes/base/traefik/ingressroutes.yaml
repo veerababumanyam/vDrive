@@ -1,5 +1,5 @@
 # ===========================================
-# Traefik IngressRoutes for vDrive Services
+# Traefik IngressRoutes for RawDrive Services
 # ===========================================
 # Install Traefik CRDs first: kubectl apply -f https://raw.githubusercontent.com/traefik/traefik/v3.0/docs/content/reference/dynamic-configuration/kubernetes-crd-definition-v1.yml
 
@@ -8,7 +8,7 @@ apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
   name: rate-limit-standard
-  namespace: vDrive
+  namespace: RawDrive
 spec:
   rateLimit:
     average: 100
@@ -20,7 +20,7 @@ apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
   name: rate-limit-gallery
-  namespace: vDrive
+  namespace: RawDrive
 spec:
   rateLimit:
     average: 200
@@ -32,7 +32,7 @@ apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
   name: rate-limit-auth
-  namespace: vDrive
+  namespace: RawDrive
 spec:
   rateLimit:
     average: 5
@@ -44,7 +44,7 @@ apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
   name: cors-headers
-  namespace: vDrive
+  namespace: RawDrive
 spec:
   headers:
     accessControlAllowMethods:
@@ -60,7 +60,7 @@ spec:
       - X-Requested-With
       - X-Request-ID
     accessControlAllowOriginList:
-      - "https://app.vDrive.com"
+      - "https://app.RawDrive.com"
       - "http://localhost:5173"
     accessControlMaxAge: 86400
     accessControlAllowCredentials: true
@@ -70,7 +70,7 @@ apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
   name: security-headers
-  namespace: vDrive
+  namespace: RawDrive
 spec:
   headers:
     browserXssFilter: true
@@ -85,7 +85,7 @@ apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
   name: backend-api
-  namespace: vDrive
+  namespace: RawDrive
 spec:
   entryPoints:
     - websecure
@@ -106,7 +106,7 @@ apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
   name: gallery-api
-  namespace: vDrive
+  namespace: RawDrive
 spec:
   entryPoints:
     - websecure
@@ -126,7 +126,7 @@ apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
   name: billing-api
-  namespace: vDrive
+  namespace: RawDrive
 spec:
   entryPoints:
     - websecure
@@ -146,7 +146,7 @@ apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
   name: stripe-webhooks
-  namespace: vDrive
+  namespace: RawDrive
 spec:
   entryPoints:
     - websecure
@@ -163,7 +163,7 @@ apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
   name: upload-api
-  namespace: vDrive
+  namespace: RawDrive
 spec:
   entryPoints:
     - websecure
@@ -182,7 +182,7 @@ apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
   name: face-api
-  namespace: vDrive
+  namespace: RawDrive
 spec:
   entryPoints:
     - websecure
@@ -202,7 +202,7 @@ apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
   name: webhooks-api
-  namespace: vDrive
+  namespace: RawDrive
 spec:
   entryPoints:
     - websecure

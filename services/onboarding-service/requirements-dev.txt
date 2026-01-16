@@ -1,5 +1,5 @@
 # ===========================================
-# vDrive Onboarding Service Dev Dependencies
+# RawDrive Onboarding Service Dev Dependencies
 # ===========================================
 -r requirements.txt
 

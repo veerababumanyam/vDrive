@@ -45,6 +45,7 @@ class UploadStatusResponse(BaseModel):
     received_bytes: int
     progress_percent: float
     status: str
+    asset_id: Optional[str] = None
     expires_at: datetime
     created_at: datetime
     updated_at: datetime
@@ -58,3 +59,9 @@ class ListUploadsResponse(BaseModel):
     uploads: list[UploadStatusResponse]
     total: int
     cursor: Optional[str] = None
+
+class UploadListResponse(BaseModel):
+    uploads: list[UploadStatusResponse]
+    total: int
+    limit: int
+    offset: int

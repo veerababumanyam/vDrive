@@ -1,8 +1,8 @@
-Below is a concise High-Level Design (HLD) for vDrive aligned to the consolidated PRD (Draft v2).
+Below is a concise High-Level Design (HLD) for RawDrive aligned to the consolidated PRD (Draft v2).
 
 ---
 
-# High-Level Design (HLD) — vDrive
+# High-Level Design (HLD) — RawDrive
 
 > Terminology: See [`GLOSSARY.md`](GLOSSARY.md) (canonical terms for Workspace, Asset, Share Link, Trial, etc.).
 

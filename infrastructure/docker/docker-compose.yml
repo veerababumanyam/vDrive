@@ -1,7 +1,7 @@
-# vDrive Full Production Stack
+# RawDrive Full Production Stack
 # Usage: docker compose -f infrastructure/docker/docker-compose.yml up -d
 
-name: vDrive
+name: RawDrive
 
 services:
   # ===================
@@ -9,24 +9,24 @@ services:
   # ===================
   postgres:
     image: timescale/timescaledb-ha:pg16
-    container_name: vDrive-postgres
+    container_name: RawDrive-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-vDrive}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-vDrive_dev_password}
-      POSTGRES_DB: ${POSTGRES_DB:-vDrive}
+      POSTGRES_USER: ${POSTGRES_USER:-RawDrive}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-RawDrive_dev_password}
+      POSTGRES_DB: ${POSTGRES_DB:-RawDrive}
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/home/postgres/pgdata/data
       - ../scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-vDrive} -d ${POSTGRES_DB:-vDrive}" ]
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-RawDrive} -d ${POSTGRES_DB:-RawDrive}" ]
       interval: 10s
       timeout: 5s
       retries: 5
     networks:
-      - vDrive-network
+      - RawDrive-network
     deploy:
       resources:
         limits:
@@ -38,7 +38,7 @@ services:
   # ===================
   redis:
     image: redis:7-alpine
-    container_name: vDrive-redis
+    container_name: RawDrive-redis
     restart: unless-stopped
     command: redis-server --appendonly yes --maxmemory 512mb --maxmemory-policy allkeys-lru
     ports:
@@ -51,7 +51,7 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - vDrive-network
+      - RawDrive-network
     deploy:
       resources:
         limits:
@@ -62,7 +62,7 @@ services:
   # ===================
   traefik:
     image: traefik:v3.0
-    container_name: vDrive-traefik
+    container_name: RawDrive-traefik
     restart: unless-stopped
     command:
       - "--configFile=/etc/traefik/traefik.yaml"
@@ -84,7 +84,7 @@ services:
     labels:
       - "traefik.enable=true"
     networks:
-      - vDrive-network
+      - RawDrive-network
     depends_on:
       postgres:
         condition: service_healthy
@@ -101,7 +101,7 @@ services:
   # ===================
   zookeeper:
     image: confluentinc/cp-zookeeper:7.5.0
-    container_name: vDrive-zookeeper
+    container_name: RawDrive-zookeeper
     restart: unless-stopped
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
@@ -120,7 +120,7 @@ services:
       retries: 5
       start_period: 15s
     networks:
-      - vDrive-network
+      - RawDrive-network
     deploy:
       resources:
         limits:
@@ -131,7 +131,7 @@ services:
   # ===================
   kafka:
     image: confluentinc/cp-kafka:7.5.0
-    container_name: vDrive-kafka
+    container_name: RawDrive-kafka
     restart: unless-stopped
     environment:
       KAFKA_BROKER_ID: 1
@@ -158,7 +158,7 @@ services:
       timeout: 10s
       retries: 5
     networks:
-      - vDrive-network
+      - RawDrive-network
     depends_on:
       zookeeper:
         condition: service_healthy
@@ -172,10 +172,10 @@ services:
   # ===================
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
-    container_name: vDrive-kafka-ui
+    container_name: RawDrive-kafka-ui
     restart: unless-stopped
     environment:
-      KAFKA_CLUSTERS_0_NAME: vDrive
+      KAFKA_CLUSTERS_0_NAME: RawDrive
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
       KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
       DYNAMIC_CONFIG_ENABLED: "true"
@@ -187,7 +187,7 @@ services:
       timeout: 10s
       retries: 3
     networks:
-      - vDrive-network
+      - RawDrive-network
     depends_on:
       kafka:
         condition: service_healthy
@@ -197,7 +197,7 @@ services:
   # ===================
   kafka-init:
     image: confluentinc/cp-kafka:7.5.0
-    container_name: vDrive-kafka-init
+    container_name: RawDrive-kafka-init
     entrypoint: [ "/bin/bash", "-c" ]
     command: |
       "
@@ -240,7 +240,7 @@ services:
       kafka-topics --list --bootstrap-server kafka:9092
       "
     networks:
-      - vDrive-network
+      - RawDrive-network
     depends_on:
       kafka:
         condition: service_healthy
@@ -250,7 +250,7 @@ services:
   # ===================
   prometheus:
     image: prom/prometheus:v2.47.0
-    container_name: vDrive-prometheus
+    container_name: RawDrive-prometheus
     restart: unless-stopped
     command:
       - "--config.file=/etc/prometheus/prometheus.yaml"
@@ -270,7 +270,7 @@ services:
       timeout: 10s
       retries: 3
     networks:
-      - vDrive-network
+      - RawDrive-network
     deploy:
       resources:
         limits:
@@ -281,7 +281,7 @@ services:
   # ===================
   grafana:
     image: grafana/grafana:10.2.0
-    container_name: vDrive-grafana
+    container_name: RawDrive-grafana
     restart: unless-stopped
     environment:
       GF_SECURITY_ADMIN_USER: admin
@@ -302,7 +302,7 @@ services:
       timeout: 10s
       retries: 3
     networks:
-      - vDrive-network
+      - RawDrive-network
     depends_on:
       - prometheus
 
@@ -311,7 +311,7 @@ services:
   # ===================
   alertmanager:
     image: prom/alertmanager:v0.27.0
-    container_name: vDrive-alertmanager
+    container_name: RawDrive-alertmanager
     restart: unless-stopped
     command:
       - '--config.file=/etc/alertmanager/alertmanager.yaml'
@@ -327,7 +327,7 @@ services:
       timeout: 10s
       retries: 3
     networks:
-      - vDrive-network
+      - RawDrive-network
     deploy:
       resources:
         limits:
@@ -338,7 +338,7 @@ services:
   # ===================
   loki:
     image: grafana/loki:3.0.0
-    container_name: vDrive-loki
+    container_name: RawDrive-loki
     restart: unless-stopped
     command: -config.file=/etc/loki/loki-config.yaml
     ports:
@@ -352,7 +352,7 @@ services:
       timeout: 10s
       retries: 3
     networks:
-      - vDrive-network
+      - RawDrive-network
     deploy:
       resources:
         limits:
@@ -363,7 +363,7 @@ services:
   # ===================
   promtail:
     image: grafana/promtail:3.0.0
-    container_name: vDrive-promtail
+    container_name: RawDrive-promtail
     restart: unless-stopped
     command: -config.file=/etc/promtail/promtail-config.yaml
     volumes:
@@ -371,7 +371,7 @@ services:
       - /var/log:/var/log:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
-      - vDrive-network
+      - RawDrive-network
     depends_on:
       - loki
 
@@ -380,14 +380,14 @@ services:
   # ===================
   redis-exporter:
     image: oliver006/redis_exporter:latest
-    container_name: vDrive-redis-exporter
+    container_name: RawDrive-redis-exporter
     restart: unless-stopped
     environment:
       REDIS_ADDR: redis://redis:6379
     ports:
       - "9121:9121"
     networks:
-      - vDrive-network
+      - RawDrive-network
     depends_on:
       redis:
         condition: service_healthy
@@ -397,14 +397,14 @@ services:
   # ===================
   postgres-exporter:
     image: prometheuscommunity/postgres-exporter:latest
-    container_name: vDrive-postgres-exporter
+    container_name: RawDrive-postgres-exporter
     restart: unless-stopped
     environment:
-      DATA_SOURCE_NAME: "postgresql://${POSTGRES_USER:-vDrive}:${POSTGRES_PASSWORD:-vDrive_dev_password}@postgres:5432/${POSTGRES_DB:-vDrive}?sslmode=disable"
+      DATA_SOURCE_NAME: "postgresql://${POSTGRES_USER:-RawDrive}:${POSTGRES_PASSWORD:-RawDrive_dev_password}@postgres:5432/${POSTGRES_DB:-RawDrive}?sslmode=disable"
     ports:
       - "9187:9187"
     networks:
-      - vDrive-network
+      - RawDrive-network
     depends_on:
       postgres:
         condition: service_healthy
@@ -414,7 +414,7 @@ services:
   # ===================
   kafka-exporter:
     image: danielqsj/kafka-exporter:latest
-    container_name: vDrive-kafka-exporter
+    container_name: RawDrive-kafka-exporter
     restart: unless-stopped
     command:
       - "--kafka.server=kafka:9092"
@@ -422,7 +422,7 @@ services:
     ports:
       - "9308:9308"
     networks:
-      - vDrive-network
+      - RawDrive-network
     depends_on:
       kafka:
         condition: service_healthy
@@ -432,7 +432,7 @@ services:
   # ===================
   flower:
     image: mher/flower:latest
-    container_name: vDrive-flower
+    container_name: RawDrive-flower
     restart: unless-stopped
     environment:
       CELERY_BROKER_URL: redis://redis:6379/1
@@ -441,7 +441,7 @@ services:
     ports:
       - "5555:5555"
     networks:
-      - vDrive-network
+      - RawDrive-network
     depends_on:
       redis:
         condition: service_healthy
@@ -458,7 +458,7 @@ services:
         SITE_URL: ${WEBSITE_URL:-https://www.vdrive.io}
         APP_URL: ${APP_URL:-https://app.vdrive.io}
     image: ghcr.io/vdrive/website:${VERSION:-latest}
-    container_name: vDrive-website
+    container_name: RawDrive-website
     restart: unless-stopped
     ports:
       - "${WEBSITE_PORT:-8020}:8020"
@@ -473,7 +473,7 @@ services:
       retries: 3
       start_period: 10s
     networks:
-      - vDrive-network
+      - RawDrive-network
     labels:
       - "traefik.enable=true"
       # HTTP Router - Public Website
@@ -506,7 +506,7 @@ services:
         VITE_API_URL: ${API_URL:-https://app.vdrive.io/api}
         VITE_WEBSITE_URL: ${WEBSITE_URL:-https://www.vdrive.io}
     image: ghcr.io/vdrive/frontend:${VERSION:-latest}
-    container_name: vDrive-frontend
+    container_name: RawDrive-frontend
     restart: unless-stopped
     ports:
       - "${FRONTEND_PORT:-3000}:80"
@@ -519,7 +519,7 @@ services:
       retries: 3
       start_period: 10s
     networks:
-      - vDrive-network
+      - RawDrive-network
     labels:
       - "traefik.enable=true"
       # HTTP Router - App Frontend
@@ -549,14 +549,14 @@ services:
       context: ../../backend
       dockerfile: Dockerfile
     image: ghcr.io/vdrive/backend:${VERSION:-latest}
-    container_name: vDrive-backend
+    container_name: RawDrive-backend
     restart: unless-stopped
     ports:
       - "${BACKEND_PORT:-8000}:8000"
     environment:
       SERVICE_NAME: backend
       PORT: "8000"
-      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-vDrive}:${POSTGRES_PASSWORD:-vDrive_dev_password}@postgres:5432/${POSTGRES_DB:-vDrive}
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-RawDrive}:${POSTGRES_PASSWORD:-RawDrive_dev_password}@postgres:5432/${POSTGRES_DB:-RawDrive}
       REDIS_URL: redis://redis:6379/0
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       JWT_PRIVATE_KEY: ${JWT_PRIVATE_KEY}
@@ -566,13 +566,13 @@ services:
       ARGON2_MEMORY_COST: ${ARGON2_MEMORY_COST:-65536}
       ARGON2_PARALLELISM: ${ARGON2_PARALLELISM:-4}
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      test: [ "CMD", "curl", "-f", "http://localhost:8000/health" ]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 30s
     networks:
-      - vDrive-network
+      - RawDrive-network
     depends_on:
       postgres:
         condition: service_healthy
@@ -604,14 +604,14 @@ services:
       context: ../../services/onboarding-service
       dockerfile: Dockerfile
     image: ghcr.io/vdrive/onboarding-service:${VERSION:-latest}
-    container_name: vDrive-onboarding
+    container_name: RawDrive-onboarding
     restart: unless-stopped
     ports:
       - "${ONBOARDING_SERVICE_PORT:-8006}:8006"
     environment:
       SERVICE_NAME: onboarding-service
       PORT: "8006"
-      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-vDrive}:${POSTGRES_PASSWORD:-vDrive_dev_password}@postgres:5432/${POSTGRES_DB:-vDrive}
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-RawDrive}:${POSTGRES_PASSWORD:-RawDrive_dev_password}@postgres:5432/${POSTGRES_DB:-RawDrive}
       REDIS_URL: redis://redis:6379/0
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       EMAIL_VERIFICATION_EXPIRY_HOURS: "24"
@@ -621,13 +621,13 @@ services:
       ARGON2_MEMORY_COST: ${ARGON2_MEMORY_COST:-65536}
       ARGON2_PARALLELISM: ${ARGON2_PARALLELISM:-4}
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8006/health"]
+      test: [ "CMD", "curl", "-f", "http://localhost:8006/health" ]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 20s
     networks:
-      - vDrive-network
+      - RawDrive-network
     depends_on:
       postgres:
         condition: service_healthy
@@ -651,38 +651,50 @@ services:
           cpus: '0.5'
 
   # ===========================================
-  # Gallery Service
-  # Port 8004 - Gallery Management & Public Viewing
+  # Export Service
+  # Port 8009 - Bulk Export & Migration Tools
   # ===========================================
-  gallery-service:
+  export-service:
     build:
-      context: ../../services/gallery-service
+      context: ../../services/export-service
       dockerfile: Dockerfile
-    image: ghcr.io/vdrive/gallery-service:${VERSION:-latest}
-    container_name: vDrive-gallery
+    image: ghcr.io/vdrive/export-service:${VERSION:-latest}
+    container_name: RawDrive-export-service
     restart: unless-stopped
     ports:
-      - "${GALLERY_SERVICE_PORT:-8004}:8004"
+      - "${EXPORT_SERVICE_PORT:-8023}:8023"
     environment:
-      SERVICE_NAME: gallery-service
-      PORT: "8004"
-      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-vDrive}:${POSTGRES_PASSWORD:-vDrive_dev_password}@postgres:5432/${POSTGRES_DB:-vDrive}
+      SERVICE_NAME: export-service
+      PORT: "8023"
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-RawDrive}:${POSTGRES_PASSWORD:-RawDrive_dev_password}@postgres:5432/${POSTGRES_DB:-RawDrive}
       REDIS_URL: redis://redis:6379/0
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      CELERY_BROKER_URL: redis://redis:6379/1
+      CELERY_RESULT_BACKEND: redis://redis:6379/2
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_ALGORITHM: HS256
+      R2_ENDPOINT_URL: ${R2_ENDPOINT_URL}
       R2_ACCESS_KEY_ID: ${R2_ACCESS_KEY_ID}
       R2_SECRET_ACCESS_KEY: ${R2_SECRET_ACCESS_KEY}
-      R2_BUCKET_NAME: ${R2_BUCKET_NAME:-vdrive}
-      R2_ENDPOINT: ${R2_ENDPOINT}
-      JWT_SECRET: ${JWT_SECRET}
-      JWT_ALGORITHM: ${JWT_ALGORITHM:-EdDSA}
+      R2_BUCKET_NAME: ${R2_BUCKET_NAME:-RawDrive-exports}
+      R2_PUBLIC_URL: ${R2_PUBLIC_URL}
+      MAX_EXPORT_SIZE_BYTES: ${MAX_EXPORT_SIZE_BYTES:-10737418240}
+      EXPORT_RETENTION_HOURS: ${EXPORT_RETENTION_HOURS:-72}
+      MAX_CONCURRENT_EXPORTS: ${MAX_CONCURRENT_EXPORTS:-2}
+      BACKEND_SERVICE_URL: http://backend:8000
+      GALLERY_SERVICE_URL: http://gallery-service:8004
+      RATE_LIMIT_EXPORT_MAX: ${RATE_LIMIT_EXPORT_MAX:-5}
+      RATE_LIMIT_EXPORT_WINDOW_SECONDS: ${RATE_LIMIT_EXPORT_WINDOW_SECONDS:-3600}
+      APP_ENV: ${APP_ENV:-production}
+      DEBUG: ${DEBUG:-false}
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8004/health"]
+      test: [ "CMD", "curl", "-f", "http://localhost:8009/health" ]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 20s
     networks:
-      - vDrive-network
+      - RawDrive-network
     depends_on:
       postgres:
         condition: service_healthy
@@ -692,58 +704,59 @@ services:
         condition: service_healthy
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.gallery.rule=PathPrefix(`/api/v1/galleries`)"
-      - "traefik.http.routers.gallery.priority=140"
-      - "traefik.http.services.gallery.loadbalancer.server.port=8004"
-      - "traefik.http.services.gallery.loadbalancer.healthcheck.path=/health"
+      - "traefik.http.routers.export.rule=PathPrefix(`/api/v1/export`)"
+      - "traefik.http.routers.export.priority=125"
+      - "traefik.http.services.export.loadbalancer.server.port=8023"
+      - "traefik.http.services.export.loadbalancer.healthcheck.path=/health"
       - "prometheus.io/scrape=true"
-      - "prometheus.io/port=8004"
+      - "prometheus.io/port=8023"
       - "prometheus.io/path=/metrics"
     deploy:
       resources:
         limits:
           memory: 1G
-          cpus: '1.0'
+          cpus: '0.5'
 
   # ===========================================
-  # Upload Service
-  # Port 8008 - TUS Resumable Upload Protocol
+  # Export Worker (Celery)
+  # Background processing for export jobs
   # ===========================================
-  upload-service:
+  export-worker:
     build:
-      context: ../../services/upload-service
+      context: ../../services/export-service
       dockerfile: Dockerfile
-    image: ghcr.io/vdrive/upload-service:${VERSION:-latest}
-    container_name: vDrive-upload
+    image: ghcr.io/vdrive/export-service:${VERSION:-latest}
+    container_name: RawDrive-export-worker
     restart: unless-stopped
-    ports:
-      - "${UPLOAD_SERVICE_PORT:-8008}:8008"
+    command: celery -A src.app.workers.celery_app worker --loglevel=info --concurrency=2 --queues=exports,exports_priority --max-tasks-per-child=50
     environment:
-      SERVICE_NAME: upload-service
-      SERVICE_VERSION: "1.0.0"
-      APP_ENV: ${APP_ENV:-development}
-      PORT: "8008"
-      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-vDrive}:${POSTGRES_PASSWORD:-vDrive_dev_password}@postgres:5432/${POSTGRES_DB:-vDrive}
+      SERVICE_NAME: export-worker
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-RawDrive}:${POSTGRES_PASSWORD:-RawDrive_dev_password}@postgres:5432/${POSTGRES_DB:-RawDrive}
       REDIS_URL: redis://redis:6379/0
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      CELERY_BROKER_URL: redis://redis:6379/1
+      CELERY_RESULT_BACKEND: redis://redis:6379/2
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_ALGORITHM: HS256
+      R2_ENDPOINT_URL: ${R2_ENDPOINT_URL}
       R2_ACCESS_KEY_ID: ${R2_ACCESS_KEY_ID}
       R2_SECRET_ACCESS_KEY: ${R2_SECRET_ACCESS_KEY}
-      R2_BUCKET_NAME: ${R2_BUCKET_NAME:-vdrive}
-      R2_ENDPOINT: ${R2_ENDPOINT}
-      JWT_SECRET: ${JWT_SECRET}
-      JWT_ALGORITHM: ${JWT_ALGORITHM:-EdDSA}
-      ENCRYPTION_MASTER_KEY: ${ENCRYPTION_MASTER_KEY}
-      TUS_MAX_SIZE: ${TUS_MAX_SIZE:-10737418240}
-      TUS_UPLOAD_URL_TTL_HOURS: ${TUS_UPLOAD_URL_TTL_HOURS:-24}
-      MAX_CONCURRENT_UPLOADS_PER_WORKSPACE: ${MAX_CONCURRENT_UPLOADS_PER_WORKSPACE:-10}
+      R2_BUCKET_NAME: ${R2_BUCKET_NAME:-RawDrive-exports}
+      R2_PUBLIC_URL: ${R2_PUBLIC_URL}
+      MAX_EXPORT_SIZE_BYTES: ${MAX_EXPORT_SIZE_BYTES:-10737418240}
+      EXPORT_RETENTION_HOURS: ${EXPORT_RETENTION_HOURS:-72}
+      BACKEND_SERVICE_URL: http://backend:8000
+      GALLERY_SERVICE_URL: http://gallery-service:8004
+      APP_ENV: ${APP_ENV:-production}
+      DEBUG: ${DEBUG:-false}
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8008/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 20s
+      test: [ "CMD-SHELL", "celery -A src.app.workers.celery_app inspect ping -d celery@$HOSTNAME" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
     networks:
-      - vDrive-network
+      - RawDrive-network
     depends_on:
       postgres:
         condition: service_healthy
@@ -751,205 +764,40 @@ services:
         condition: service_healthy
       kafka:
         condition: service_healthy
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.upload.rule=PathPrefix(`/api/v1/files`) || PathPrefix(`/api/v1/uploads`)"
-      - "traefik.http.routers.upload.priority=150"
-      - "traefik.http.services.upload.loadbalancer.server.port=8008"
-      - "traefik.http.services.upload.loadbalancer.healthcheck.path=/health"
-      - "prometheus.io/scrape=true"
-      - "prometheus.io/port=8008"
-      - "prometheus.io/path=/metrics"
-    deploy:
-      resources:
-        limits:
-          memory: 1G
-          cpus: '1.0'
-
-  # ===========================================
-  # Processing Service
-  # Port 8010 - Media Processing Kafka Consumers
-  # ===========================================
-  processing-service:
-    build:
-      context: ../../services/processing-service
-      dockerfile: Dockerfile
-    image: ghcr.io/vdrive/processing-service:${VERSION:-latest}
-    container_name: vDrive-processing
-    restart: unless-stopped
-    ports:
-      - "${PROCESSING_SERVICE_PORT:-8010}:8010"
-    environment:
-      SERVICE_NAME: processing-service
-      SERVICE_VERSION: "1.0.0"
-      APP_ENV: ${APP_ENV:-development}
-      PORT: "8010"
-      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-vDrive}:${POSTGRES_PASSWORD:-vDrive_dev_password}@postgres:5432/${POSTGRES_DB:-vDrive}
-      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      KAFKA_CONSUMER_GROUP_ID: processing-service-group
-      R2_ACCESS_KEY_ID: ${R2_ACCESS_KEY_ID}
-      R2_SECRET_ACCESS_KEY: ${R2_SECRET_ACCESS_KEY}
-      R2_BUCKET_NAME: ${R2_BUCKET_NAME:-vdrive}
-      R2_ENDPOINT: ${R2_ENDPOINT}
-      ENCRYPTION_MASTER_KEY: ${ENCRYPTION_MASTER_KEY}
-      GOOGLE_CLOUD_VISION_CREDENTIALS: ${GOOGLE_CLOUD_VISION_CREDENTIALS}
-      GOOGLE_CLOUD_VISION_PROJECT_ID: ${GOOGLE_CLOUD_VISION_PROJECT_ID}
-      FACE_DETECTION_RATE_LIMIT_PER_MINUTE: ${FACE_DETECTION_RATE_LIMIT_PER_MINUTE:-60}
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8010/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 20s
-    networks:
-      - vDrive-network
-    depends_on:
-      postgres:
-        condition: service_healthy
-      kafka:
+      export-service:
         condition: service_healthy
     labels:
       - "prometheus.io/scrape=true"
-      - "prometheus.io/port=8010"
-      - "prometheus.io/path=/metrics"
+      - "prometheus.io/port=9091"
     deploy:
       resources:
         limits:
           memory: 2G
-          cpus: '2.0'
-
-  # ===========================================
-  # Face Service
-  # Port 8002 - Face Detection, Embedding & Clustering
-  # ===========================================
-  face-service:
-    build:
-      context: ../../services/face-service
-      dockerfile: Dockerfile
-    image: ghcr.io/vdrive/face-service:${VERSION:-latest}
-    container_name: vDrive-face
-    restart: unless-stopped
-    ports:
-      - "${FACE_SERVICE_PORT:-8002}:8002"
-    environment:
-      SERVICE_NAME: face-service
-      SERVICE_VERSION: "1.0.0"
-      APP_ENV: ${APP_ENV:-development}
-      PORT: "8002"
-      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-vDrive}:${POSTGRES_PASSWORD:-vDrive_dev_password}@postgres:5432/${POSTGRES_DB:-vDrive}
-      REDIS_URL: redis://redis:6379/0
-      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      KAFKA_CONSUMER_GROUP_ID: face-service-group
-      GOOGLE_CLOUD_VISION_CREDENTIALS: ${GOOGLE_CLOUD_VISION_CREDENTIALS}
-      GOOGLE_CLOUD_VISION_PROJECT_ID: ${GOOGLE_CLOUD_VISION_PROJECT_ID}
-      FACE_DETECTION_RATE_LIMIT_PER_MINUTE: ${FACE_DETECTION_RATE_LIMIT_PER_MINUTE:-60}
-      SENTRY_DSN: ${FACE_SERVICE_SENTRY_DSN:-}
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8002/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 60s
-    networks:
-      - vDrive-network
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-      kafka:
-        condition: service_healthy
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.face.rule=PathPrefix(`/api/v1/faces`) || PathPrefix(`/api/v1/people`) || PathPrefix(`/api/v1/find-me`)"
-      - "traefik.http.routers.face.priority=145"
-      - "traefik.http.services.face.loadbalancer.server.port=8002"
-      - "traefik.http.services.face.loadbalancer.healthcheck.path=/health"
-      - "prometheus.io/scrape=true"
-      - "prometheus.io/port=8002"
-      - "prometheus.io/path=/metrics"
-    deploy:
-      resources:
-        limits:
-          memory: 4G
-          cpus: '2.0'
-
-  # ===========================================
-  # AI Search Service
-  # Port 8009 - Semantic Search, RAG Chat, Captions
-  # ===========================================
-  ai-search-service:
-    build:
-      context: ../../services/ai-search-service
-      dockerfile: Dockerfile
-    image: ghcr.io/vdrive/ai-search-service:${VERSION:-latest}
-    container_name: vDrive-ai-search
-    restart: unless-stopped
-    ports:
-      - "${AI_SEARCH_SERVICE_PORT:-8009}:8009"
-    environment:
-      SERVICE_NAME: ai-search-service
-      SERVICE_VERSION: "1.0.0"
-      APP_ENV: ${APP_ENV:-development}
-      PORT: "8009"
-      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-vDrive}:${POSTGRES_PASSWORD:-vDrive_dev_password}@postgres:5432/${POSTGRES_DB:-vDrive}
-      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      KAFKA_CONSUMER_GROUP_ID: ai-search-service-group
-      GEMINI_API_KEY: ${GEMINI_API_KEY}
-      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.0-flash}
-      CLIP_MODEL: ${CLIP_MODEL:-clip-ViT-L-14}
-      SENTRY_DSN: ${AI_SEARCH_SERVICE_SENTRY_DSN:-}
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8009/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 90s
-    networks:
-      - vDrive-network
-    depends_on:
-      postgres:
-        condition: service_healthy
-      kafka:
-        condition: service_healthy
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.ai-search.rule=PathPrefix(`/api/v1/search`) || PathPrefix(`/api/v1/similar`) || PathPrefix(`/api/v1/chat`) || PathPrefix(`/api/v1/captions`)"
-      - "traefik.http.routers.ai-search.priority=146"
-      - "traefik.http.services.ai-search.loadbalancer.server.port=8009"
-      - "traefik.http.services.ai-search.loadbalancer.healthcheck.path=/health"
-      - "prometheus.io/scrape=true"
-      - "prometheus.io/port=8009"
-      - "prometheus.io/path=/metrics"
-    deploy:
-      resources:
-        limits:
-          memory: 8G
-          cpus: '4.0'
+          cpus: '1.0'
 
 networks:
-  vDrive-network:
+  RawDrive-network:
     driver: bridge
-    name: vDrive-network
+    name: RawDrive-network
 
 volumes:
   postgres_data:
-    name: vDrive-postgres-data
+    name: RawDrive-postgres-data
   redis_data:
-    name: vDrive-redis-data
+    name: RawDrive-redis-data
   traefik_certs:
-    name: vDrive-traefik-certs
+    name: RawDrive-traefik-certs
   zookeeper_data:
-    name: vDrive-zookeeper-data
+    name: RawDrive-zookeeper-data
   zookeeper_log:
-    name: vDrive-zookeeper-log
+    name: RawDrive-zookeeper-log
   kafka_data:
-    name: vDrive-kafka-data
+    name: RawDrive-kafka-data
   prometheus_data:
-    name: vDrive-prometheus-data
+    name: RawDrive-prometheus-data
   grafana_data:
-    name: vDrive-grafana-data
+    name: RawDrive-grafana-data
   alertmanager_data:
-    name: vDrive-alertmanager-data
+    name: RawDrive-alertmanager-data
   loki_data:
-    name: vDrive-loki-data
+    name: RawDrive-loki-data

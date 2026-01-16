@@ -37,13 +37,11 @@ def upgrade() -> None:
         "galleries",
         # Primary key
         sa.Column("id", postgresql.UUID(as_uuid=False), primary_key=True),
-        # Multi-tenancy
+        # Multi-tenancy (FK constraint intentionally omitted - workspaces table is in backend service)
         sa.Column(
             "workspace_id",
             postgresql.UUID(as_uuid=False),
-            sa.ForeignKey("workspaces.id", ondelete="CASCADE"),
             nullable=False,
-            index=True,
         ),
         # Basic info
         sa.Column("title", sa.String(200), nullable=False),
@@ -56,7 +54,6 @@ def upgrade() -> None:
             sa.String(20),
             nullable=False,
             server_default="draft",
-            index=True,
         ),  # draft, published, archived
         # Cover image
         sa.Column(
@@ -99,10 +96,10 @@ def upgrade() -> None:
         sa.Column("primary_color", sa.String(7), nullable=True),  # hex color
         sa.Column("secondary_color", sa.String(7), nullable=True),
         # Audit fields
+        # Created by (FK constraint intentionally omitted - users table is in backend service)
         sa.Column(
             "created_by_id",
             postgresql.UUID(as_uuid=False),
-            sa.ForeignKey("users.id", ondelete="SET NULL"),
             nullable=True,
         ),
         sa.Column(
@@ -143,7 +140,7 @@ def upgrade() -> None:
             postgresql.UUID(as_uuid=False),
             sa.ForeignKey("galleries.id", ondelete="CASCADE"),
             nullable=False,
-            index=True,
+            
         ),
         # Basic info
         sa.Column("name", sa.String(100), nullable=False),
@@ -189,14 +186,14 @@ def upgrade() -> None:
         # Primary key
         sa.Column("id", postgresql.UUID(as_uuid=False), primary_key=True),
         # Link ID (URL token - different from PK)
-        sa.Column("link_id", sa.String(64), nullable=False, unique=True, index=True),
+        sa.Column("link_id", sa.String(64), nullable=False, unique=True),
         # Parent gallery
         sa.Column(
             "gallery_id",
             postgresql.UUID(as_uuid=False),
             sa.ForeignKey("galleries.id", ondelete="CASCADE"),
             nullable=False,
-            index=True,
+            
         ),
         # Metadata
         sa.Column("label", sa.String(100), nullable=True),
@@ -212,7 +209,7 @@ def upgrade() -> None:
             sa.String(20),
             nullable=False,
             server_default="active",
-            index=True,
+            
         ),  # active, expired, revoked
         sa.Column("expires_at", sa.DateTime(timezone=True), nullable=True),
         sa.Column("max_accesses", sa.Integer(), nullable=True),
@@ -249,10 +246,10 @@ def upgrade() -> None:
             server_default="M",
         ),  # L, M, Q, H
         # Audit fields
+        # Created by (FK constraint intentionally omitted - users table is in backend service)
         sa.Column(
             "created_by_id",
             postgresql.UUID(as_uuid=False),
-            sa.ForeignKey("users.id", ondelete="SET NULL"),
             nullable=True,
         ),
         sa.Column(
@@ -288,22 +285,21 @@ def upgrade() -> None:
             postgresql.UUID(as_uuid=False),
             sa.ForeignKey("galleries.id", ondelete="CASCADE"),
             nullable=False,
-            index=True,
+            
         ),
         sa.Column(
             "sub_gallery_id",
             postgresql.UUID(as_uuid=False),
             sa.ForeignKey("sub_galleries.id", ondelete="SET NULL"),
             nullable=True,
-            index=True,
+            
         ),
-        # Asset reference (from main assets table)
+        # Asset reference (FK constraint intentionally omitted - assets table is in asset-service)
         sa.Column(
             "asset_id",
             postgresql.UUID(as_uuid=False),
-            sa.ForeignKey("assets.id", ondelete="CASCADE"),
             nullable=False,
-            index=True,
+            
         ),
         # Gallery-specific metadata
         sa.Column("sort_order", sa.Integer(), nullable=False, server_default="0"),
@@ -353,16 +349,14 @@ def upgrade() -> None:
         "visitors",
         # Primary key
         sa.Column("id", postgresql.UUID(as_uuid=False), primary_key=True),
-        # Multi-tenancy
+        # Multi-tenancy (FK constraint intentionally omitted - workspaces table is in backend service)
         sa.Column(
             "workspace_id",
             postgresql.UUID(as_uuid=False),
-            sa.ForeignKey("workspaces.id", ondelete="CASCADE"),
             nullable=False,
-            index=True,
         ),
         # Contact info
-        sa.Column("email", sa.String(255), nullable=False, index=True),
+        sa.Column("email", sa.String(255), nullable=False),
         sa.Column("name", sa.String(200), nullable=True),
         sa.Column("phone", sa.String(20), nullable=True),
         sa.Column("address", sa.Text(), nullable=True),
@@ -403,24 +397,24 @@ def upgrade() -> None:
             postgresql.UUID(as_uuid=False),
             sa.ForeignKey("visitors.id", ondelete="CASCADE"),
             nullable=False,
-            index=True,
+            
         ),
         sa.Column(
             "gallery_id",
             postgresql.UUID(as_uuid=False),
             sa.ForeignKey("galleries.id", ondelete="CASCADE"),
             nullable=False,
-            index=True,
+            
         ),
         sa.Column(
             "link_id",
             postgresql.UUID(as_uuid=False),
             sa.ForeignKey("share_links.id", ondelete="SET NULL"),
             nullable=True,
-            index=True,
+            
         ),
         # Access metadata
-        sa.Column("accessed_at", sa.DateTime(timezone=True), nullable=False, index=True),
+        sa.Column("accessed_at", sa.DateTime(timezone=True), nullable=False),
         sa.Column("ip_address", sa.String(45), nullable=True),  # IPv6 support
         sa.Column("user_agent", sa.Text(), nullable=True),
         sa.Column("referrer", sa.Text(), nullable=True),
@@ -445,27 +439,27 @@ def upgrade() -> None:
             postgresql.UUID(as_uuid=False),
             sa.ForeignKey("galleries.id", ondelete="CASCADE"),
             nullable=True,
-            index=True,
+            
         ),
         sa.Column(
             "link_id",
             postgresql.UUID(as_uuid=False),
             sa.ForeignKey("share_links.id", ondelete="SET NULL"),
             nullable=True,
-            index=True,
+            
         ),
         sa.Column(
             "asset_id",
             postgresql.UUID(as_uuid=False),
             nullable=True,
-            index=True,
+            
         ),
         # Event details
         sa.Column(
             "event_type",
             sa.String(50),
             nullable=False,
-            index=True,
+            
         ),  # password_attempt, pin_attempt, rate_limit_violation
         sa.Column(
             "result",
@@ -475,7 +469,7 @@ def upgrade() -> None:
         sa.Column("message", sa.Text(), nullable=True),
         sa.Column("event_metadata", postgresql.JSONB(), nullable=True),
         # Client info
-        sa.Column("ip_address", sa.String(45), nullable=True, index=True),
+        sa.Column("ip_address", sa.String(45), nullable=True),
         sa.Column("user_agent", sa.Text(), nullable=True),
         # Timestamp
         sa.Column(
@@ -483,7 +477,7 @@ def upgrade() -> None:
             sa.DateTime(timezone=True),
             nullable=False,
             server_default=sa.func.now(),
-            index=True,
+            
         ),
     )
 

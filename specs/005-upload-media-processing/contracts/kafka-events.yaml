@@ -3,7 +3,7 @@
 
 asyncapi: 2.6.0
 info:
-  title: vDrive Upload & Processing Events
+  title: RawDrive Upload & Processing Events
   version: 1.0.0
   description: |
     Kafka events for upload service and processing pipeline.

@@ -198,6 +198,7 @@ class WorkspaceService:
         workspace = await self.workspace_repo.create(
             name=request.name,
             slug=request.slug,
+            owner_id=user_id,
             business_type=BusinessType(request.business_type.value),
             currency=request.currency,
             timezone=request.timezone,
@@ -210,7 +211,7 @@ class WorkspaceService:
         await self.member_repo.create(
             user_id=user_id,
             workspace_id=workspace.id,
-            role=WorkspaceRole.OWNER,
+            role="owner",
         )
 
         # 5. Update onboarding state
@@ -242,7 +243,7 @@ class WorkspaceService:
                 workspace_name=workspace.name,
                 workspace_slug=workspace.slug,
                 owner_id=user_id,
-                business_type=workspace.business_type.value,
+                business_type=workspace.business_type,
                 trial_config={
                     "tier": settings.TRIAL_TIER,
                     "duration_days": settings.TRIAL_DURATION_DAYS,
@@ -257,7 +258,7 @@ class WorkspaceService:
             id=workspace.id,
             name=workspace.name,
             slug=workspace.slug,
-            business_type=workspace.business_type.value,
+            business_type=workspace.business_type,
             currency=workspace.currency,
             timezone=workspace.timezone,
             date_format=workspace.date_format,

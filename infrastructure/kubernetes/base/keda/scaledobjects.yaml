@@ -1,5 +1,5 @@
 # ===========================================
-# KEDA ScaledObjects for vDrive Services
+# KEDA ScaledObjects for RawDrive Services
 # ===========================================
 # Prerequisites: kubectl apply -f https://github.com/kedacore/keda/releases/download/v2.12.0/keda-2.12.0.yaml
 
@@ -8,7 +8,7 @@ apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
 metadata:
   name: backend-scaledobject
-  namespace: vDrive
+  namespace: RawDrive
 spec:
   scaleTargetRef:
     name: backend
@@ -37,7 +37,7 @@ apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
 metadata:
   name: gallery-service-scaledobject
-  namespace: vDrive
+  namespace: RawDrive
 spec:
   scaleTargetRef:
     name: gallery-service
@@ -80,7 +80,7 @@ apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
 metadata:
   name: upload-service-scaledobject
-  namespace: vDrive
+  namespace: RawDrive
 spec:
   scaleTargetRef:
     name: upload-service
@@ -109,7 +109,7 @@ apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
 metadata:
   name: face-service-scaledobject
-  namespace: vDrive
+  namespace: RawDrive
 spec:
   scaleTargetRef:
     name: face-service
@@ -138,7 +138,7 @@ apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
 metadata:
   name: billing-service-scaledobject
-  namespace: vDrive
+  namespace: RawDrive
 spec:
   scaleTargetRef:
     name: billing-service
@@ -159,7 +159,7 @@ apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
 metadata:
   name: webhooks-service-scaledobject
-  namespace: vDrive
+  namespace: RawDrive
 spec:
   scaleTargetRef:
     name: webhooks-service
@@ -181,7 +181,7 @@ apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
 metadata:
   name: notifications-service-scaledobject
-  namespace: vDrive
+  namespace: RawDrive
 spec:
   scaleTargetRef:
     name: notifications-service
@@ -203,7 +203,7 @@ apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
 metadata:
   name: onboarding-service-scaledobject
-  namespace: vDrive
+  namespace: RawDrive
 spec:
   scaleTargetRef:
     name: onboarding-service
@@ -224,7 +224,7 @@ apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
 metadata:
   name: ai-search-service-scaledobject
-  namespace: vDrive
+  namespace: RawDrive
 spec:
   scaleTargetRef:
     name: ai-search-service
@@ -260,7 +260,7 @@ apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
 metadata:
   name: celery-worker-scaledobject
-  namespace: vDrive
+  namespace: RawDrive
 spec:
   scaleTargetRef:
     name: celery-worker

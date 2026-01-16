@@ -22,7 +22,7 @@ class Settings(BaseSettings):
 
     # Database
     DATABASE_URL: str = Field(
-        default="postgresql+asyncpg://vdrive_user:vdrive_pass@postgres:5432/vdrive_db"
+        default="postgresql+asyncpg://RawDrive_user:RawDrive_pass@postgres:5432/RawDrive_db"
     )
 
     # Redis
@@ -45,7 +45,7 @@ class Settings(BaseSettings):
     R2_ENDPOINT: str = Field(default="https://xxx.r2.cloudflarestorage.com")
     R2_ACCESS_KEY_ID: str = Field(default="")
     R2_SECRET_ACCESS_KEY: str = Field(default="")
-    R2_BUCKET_NAME: str = Field(default="vdrive-assets")
+    R2_BUCKET_NAME: str = Field(default="RawDrive-assets")
     R2_PUBLIC_URL: Optional[str] = Field(default=None)
 
     # Encryption

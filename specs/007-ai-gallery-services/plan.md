@@ -4,7 +4,7 @@
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                              vDrive Platform                                 │
+│                              RawDrive Platform                                 │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                             │
 │  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐            │
@@ -268,7 +268,7 @@ face-service:
   build:
     context: ../../services/face-service
     dockerfile: Dockerfile
-  container_name: vdrive-face-service
+  container_name: RawDrive-face-service
   ports:
     - "8002:8002"
   environment:
@@ -288,7 +288,7 @@ ai-search-service:
   build:
     context: ../../services/ai-search-service
     dockerfile: Dockerfile
-  container_name: vdrive-ai-search-service
+  container_name: RawDrive-ai-search-service
   ports:
     - "8009:8009"
   environment:

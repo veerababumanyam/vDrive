@@ -1,4 +1,4 @@
-# Data Model: vDrive Public Website
+# Data Model: RawDrive Public Website
 
 **Feature**: 002-public-website
 **Date**: 2026-01-13
@@ -26,7 +26,7 @@ const blogCollection = defineCollection({
     description: z.string(),
     pubDate: z.date(),
     updatedDate: z.date().optional(),
-    author: z.string().default('vDrive Team'),
+    author: z.string().default('RawDrive Team'),
     authorImage: z.string().optional(),
     image: z.string().optional(),           // Featured image URL
     tags: z.array(z.string()).default([]),
@@ -40,9 +40,9 @@ const blogCollection = defineCollection({
 ```yaml
 ---
 title: "Getting Started with AI Photo Tagging"
-description: "Learn how vDrive's AI automatically tags and organizes your photos"
+description: "Learn how RawDrive's AI automatically tags and organizes your photos"
 pubDate: 2026-01-10
-author: "vDrive Team"
+author: "RawDrive Team"
 image: "/blog/ai-tagging-hero.jpg"
 tags: ["AI", "Organization", "Tutorial"]
 ---
@@ -72,8 +72,8 @@ const docsCollection = defineCollection({
 **Example Frontmatter**:
 ```yaml
 ---
-title: "Introduction to vDrive"
-description: "Overview of the vDrive photography platform"
+title: "Introduction to RawDrive"
+description: "Overview of the RawDrive photography platform"
 order: 1
 section: "Getting Started"
 lastUpdated: 2026-01-13
@@ -116,7 +116,7 @@ export const pricingPlans: PricingPlan[] = [
   {
     id: 'free',
     name: 'Free',
-    description: 'Get started with vDrive',
+    description: 'Get started with RawDrive',
     priceINR: 0,
     priceMonthly: 0,
     priceYearly: 0,
@@ -133,7 +133,7 @@ export const pricingPlans: PricingPlan[] = [
     highlighted: ['1 GB storage'],
     isPopular: false,
     ctaText: 'Start Free',
-    ctaLink: 'https://app.vdrive.io/sign-up?plan=free',
+    ctaLink: 'https://app.RawDrive.io/sign-up?plan=free',
   },
   {
     id: 'starter',
@@ -156,7 +156,7 @@ export const pricingPlans: PricingPlan[] = [
     highlighted: ['10 GB storage', 'AI-powered tagging'],
     isPopular: false,
     ctaText: 'Get Started',
-    ctaLink: 'https://app.vdrive.io/sign-up?plan=starter',
+    ctaLink: 'https://app.RawDrive.io/sign-up?plan=starter',
   },
   {
     id: 'professional',
@@ -180,7 +180,7 @@ export const pricingPlans: PricingPlan[] = [
     highlighted: ['100 GB storage', 'Print album designer', 'Custom domain'],
     isPopular: true,
     ctaText: 'Get Started',
-    ctaLink: 'https://app.vdrive.io/sign-up?plan=professional',
+    ctaLink: 'https://app.RawDrive.io/sign-up?plan=professional',
   },
   {
     id: 'business',
@@ -204,7 +204,7 @@ export const pricingPlans: PricingPlan[] = [
     highlighted: ['1 TB storage', 'White-label branding', 'API access'],
     isPopular: false,
     ctaText: 'Get Started',
-    ctaLink: 'https://app.vdrive.io/sign-up?plan=business',
+    ctaLink: 'https://app.RawDrive.io/sign-up?plan=business',
   },
   {
     id: 'enterprise',
@@ -412,10 +412,10 @@ export const footerSections: FooterSection[] = [
 ];
 
 export const socialLinks = [
-  { label: 'Instagram', href: 'https://instagram.com/vdrive', icon: 'Instagram' },
-  { label: 'Twitter', href: 'https://twitter.com/vdrive', icon: 'Twitter' },
-  { label: 'LinkedIn', href: 'https://linkedin.com/company/vdrive', icon: 'LinkedIn' },
-  { label: 'YouTube', href: 'https://youtube.com/vdrive', icon: 'Youtube' },
+  { label: 'Instagram', href: 'https://instagram.com/RawDrive', icon: 'Instagram' },
+  { label: 'Twitter', href: 'https://twitter.com/RawDrive', icon: 'Twitter' },
+  { label: 'LinkedIn', href: 'https://linkedin.com/company/RawDrive', icon: 'LinkedIn' },
+  { label: 'YouTube', href: 'https://youtube.com/RawDrive', icon: 'Youtube' },
 ];
 ```
 

@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="frontend/public/android-chrome-512x512.png" alt="vDrive Logo" width="150"/>
+  <img src="frontend/public/android-chrome-512x512.png" alt="RawDrive Logo" width="150"/>
 </p>
 
-<h1 align="center">vDrive</h1>
+<h1 align="center">RawDrive</h1>
 
 <p align="center">
   <strong>Enterprise SaaS Photography Platform</strong>
@@ -31,9 +31,9 @@
 
 ## 📖 Overview
 
-vDrive is a comprehensive multi-tenant SaaS platform designed for photographers, studios, and enterprise teams to manage their complete media workflow. Built with modern microservices architecture, it provides end-to-end solutions from photo upload to client delivery.
+RawDrive is a comprehensive multi-tenant SaaS platform designed for photographers, studios, and enterprise teams to manage their complete media workflow. Built with modern microservices architecture, it provides end-to-end solutions from photo upload to client delivery.
 
-### 🎯 What vDrive Does
+### 🎯 What RawDrive Does
 
 | Capability | Description |
 |------------|-------------|
@@ -132,8 +132,8 @@ vDrive is a comprehensive multi-tenant SaaS platform designed for photographers,
 ### 1️⃣ Clone the Repository
 
 ```bash
-git clone https://github.com/vdrive/vdrive.git
-cd vdrive
+git clone https://github.com/RawDrive/RawDrive.git
+cd RawDrive
 ```
 
 ### 2️⃣ Start Infrastructure
@@ -215,19 +215,19 @@ All test accounts use password: `Test@123`
 
 | Email | Role | Tier |
 |-------|------|------|
-| `free@test.vdrive.in` | User | Free |
-| `starter@test.vdrive.in` | User | Starter |
-| `professional@test.vdrive.in` | User | Professional |
-| `business@test.vdrive.in` | User | Business |
-| `enterprise@test.vdrive.in` | User | Enterprise |
-| `superadmin@test.vdrive.in` | Super Admin | Platform |
-| `platformadmin@test.vdrive.in` | Platform Admin | Platform |
+| `free@test.RawDrive.in` | User | Free |
+| `starter@test.RawDrive.in` | User | Starter |
+| `professional@test.RawDrive.in` | User | Professional |
+| `business@test.RawDrive.in` | User | Business |
+| `enterprise@test.RawDrive.in` | User | Enterprise |
+| `superadmin@test.RawDrive.in` | Super Admin | Platform |
+| `platformadmin@test.RawDrive.in` | Platform Admin | Platform |
 
 ```bash
 # Test login via cURL
 curl -X POST http://localhost:8006/api/v1/onboarding/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email": "free@test.vdrive.in", "password": "Test@123"}'
+  -d '{"email": "free@test.RawDrive.in", "password": "Test@123"}'
 ```
 
 ---
@@ -235,7 +235,7 @@ curl -X POST http://localhost:8006/api/v1/onboarding/auth/login \
 ## 🏗️ Architecture
 
 ```
-vDrive/
+RawDrive/
 ├── 📁 frontend/               # React 19 + TypeScript + Vite
 ├── 📁 backend/                # Python FastAPI (main API)
 ├── 📁 services/
@@ -253,7 +253,7 @@ vDrive/
 │   ├── docker/                # Docker Compose files
 │   ├── kubernetes/            # K8s manifests
 │   └── monitoring/            # Grafana, Prometheus configs
-├── 📁 packages/               # Shared npm packages (@vDrive/shared-*)
+├── 📁 packages/               # Shared npm packages (@RawDrive/shared-*)
 ├── 📁 docs/                   # Documentation
 └── 📁 specs/                  # Feature specifications
 ```
@@ -262,9 +262,9 @@ vDrive/
 
 | Domain | Service | Purpose |
 |--------|---------|---------|
-| `www.vdrive.io` | Website (Astro) | Public marketing, blog, docs |
-| `app.vdrive.io` | Frontend (React) | Authenticated application |
-| `app.vdrive.io/api/*` | Backend + Microservices | REST API endpoints |
+| `www.RawDrive.io` | Website (Astro) | Public marketing, blog, docs |
+| `app.RawDrive.io` | Frontend (React) | Authenticated application |
+| `app.RawDrive.io/api/*` | Backend + Microservices | REST API endpoints |
 
 ---
 
@@ -441,11 +441,11 @@ This project is proprietary software. All rights reserved. Unauthorized copying,
 ---
 
 <p align="center">
-  Made with ❤️ by the vDrive Team
+  Made with ❤️ by the RawDrive Team
 </p>
 
 <p align="center">
-  <a href="https://vdrive.io">Website</a> •
-  <a href="https://docs.vdrive.io">Docs</a> •
-  <a href="https://twitter.com/vdriveio">Twitter</a>
+  <a href="https://RawDrive.io">Website</a> •
+  <a href="https://docs.RawDrive.io">Docs</a> •
+  <a href="https://twitter.com/RawDriveio">Twitter</a>
 </p>

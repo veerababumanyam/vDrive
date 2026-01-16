@@ -30,6 +30,7 @@ class R2TUSStorageBackend:
         self,
         upload_id: str,
         workspace_id: str,
+        user_id: str,
         filename: str,
         mime_type: str,
         expected_size: int,
@@ -62,12 +63,16 @@ class R2TUSStorageBackend:
             encryption_metadata = self.encryption_service.generate_encryption_metadata()
             iv_hex = encryption_metadata["iv"]
 
+            # Calculate expiration time
+            from datetime import datetime, timedelta, timezone
+            expires_at = datetime.now(timezone.utc) + timedelta(hours=settings.TUS_UPLOAD_URL_TTL_HOURS)
+
             # Create Upload record
             async with self.db_session_factory() as db:
                 upload = Upload(
                     id=upload_id,
                     workspace_id=workspace_id,
-                    user_id="system",  # Will be updated by TUS router with JWT user
+                    user_id=user_id,
                     filename=filename,
                     mime_type=mime_type,
                     expected_size=expected_size,
@@ -82,6 +87,7 @@ class R2TUSStorageBackend:
                         "asset_id": asset_id,
                     },
                     status=UploadStatus.CREATED.value,
+                    expires_at=expires_at,
                 )
 
                 db.add(upload)

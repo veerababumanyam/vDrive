@@ -99,16 +99,16 @@ paths:
               examples:
                 success:
                   summary: Successful signin
-                  value: "https://app.vdrive.io/dashboard#access_token=eyJ..."
+                  value: "https://app.RawDrive.io/dashboard#access_token=eyJ..."
                 user_not_found:
                   summary: No account exists
-                  value: "https://app.vdrive.io/signin?error=account_not_found&message=No%20account%20found"
+                  value: "https://app.RawDrive.io/signin?error=account_not_found&message=No%20account%20found"
                 oauth_denied:
                   summary: User denied OAuth
-                  value: "https://app.vdrive.io/signin?error=oauth_denied&message=Authorization%20cancelled"
+                  value: "https://app.RawDrive.io/signin?error=oauth_denied&message=Authorization%20cancelled"
                 oauth_failed:
                   summary: OAuth error
-                  value: "https://app.vdrive.io/signin?error=oauth_failed&message=Authentication%20failed"
+                  value: "https://app.RawDrive.io/signin?error=oauth_failed&message=Authentication%20failed"
             Set-Cookie:
               description: Refresh token cookie (on success) or cleared cookie (on error)
               schema:

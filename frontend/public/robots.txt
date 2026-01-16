@@ -1,5 +1,5 @@
-# robots.txt for vDrive
-# https://vdrive.io
+# robots.txt for RawDrive
+# https://RawDrive.io
 
 # Default rules for all crawlers
 User-agent: *
@@ -55,4 +55,4 @@ Allow: /
 Crawl-delay: 1
 
 # Sitemap location (for search engine indexing)
-Sitemap: https://vdrive.io/sitemap.xml
+Sitemap: https://RawDrive.io/sitemap.xml

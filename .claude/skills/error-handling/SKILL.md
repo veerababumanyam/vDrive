@@ -1,7 +1,7 @@
 ---
 name: error-handling
 aliases: [errors, exceptions, error-boundary, error-messages]
-description: Error handling patterns for vDrive. Use when implementing error boundaries, API error responses, form validation, loading states, or user-friendly error messages.
+description: Error handling patterns for RawDrive. Use when implementing error boundaries, API error responses, form validation, loading states, or user-friendly error messages.
 ---
 
 # Error Handling Patterns

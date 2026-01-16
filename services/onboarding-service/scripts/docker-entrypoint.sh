@@ -1,13 +1,13 @@
 #!/bin/bash
 # ===========================================
-# vDrive Onboarding Service Docker Entrypoint
+# RawDrive Onboarding Service Docker Entrypoint
 # ===========================================
 # Runs migrations and seeds test data before starting the app
 
 set -e
 
 echo "=============================================="
-echo "  vDrive Onboarding Service Startup"
+echo "  RawDrive Onboarding Service Startup"
 echo "=============================================="
 
 # Wait for PostgreSQL to be ready

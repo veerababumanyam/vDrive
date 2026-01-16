@@ -1,4 +1,4 @@
-# vDrive Database Schema
+# RawDrive Database Schema
 
 **Version:** 0.3.3 | **Last Updated:** January 2026
 
@@ -473,17 +473,17 @@ Migrations are managed with Alembic in `backend/migrations/versions/`.
 
 **Run migrations:**
 ```bash
-docker exec vDrive-backend alembic upgrade head
+docker exec RawDrive-backend alembic upgrade head
 ```
 
 **Create new migration:**
 ```bash
-docker exec vDrive-backend alembic revision --autogenerate -m "description"
+docker exec RawDrive-backend alembic revision --autogenerate -m "description"
 ```
 
 **Downgrade:**
 ```bash
-docker exec vDrive-backend alembic downgrade -1
+docker exec RawDrive-backend alembic downgrade -1
 ```
 
 ### Migration Naming
@@ -612,15 +612,15 @@ FOR EACH ROW EXECUTE FUNCTION update_gallery_stats();
 
 ```bash
 # Daily backup to R2
-pg_dump -Fc vDrive > vDrive_$(date +%Y%m%d).dump
-rclone copy vDrive_*.dump r2:vDrive-backups/
+pg_dump -Fc RawDrive > RawDrive_$(date +%Y%m%d).dump
+rclone copy RawDrive_*.dump r2:RawDrive-backups/
 ```
 
 ### Point-in-Time Recovery
 
 ```bash
 # Restore to specific time
-pg_restore -d vDrive vDrive_backup.dump
+pg_restore -d RawDrive RawDrive_backup.dump
 ```
 
 ### Backup Retention

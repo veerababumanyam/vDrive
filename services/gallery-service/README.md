@@ -1,6 +1,6 @@
 # Gallery Service
 
-High-traffic public gallery viewing microservice for vDrive photography platform.
+High-traffic public gallery viewing microservice for RawDrive photography platform.
 
 ## Features
 
@@ -69,7 +69,7 @@ PORT=8004
 APP_ENV=development
 
 # Database
-DATABASE_URL=postgresql+asyncpg://user:pass@postgres:5432/vDrive
+DATABASE_URL=postgresql+asyncpg://user:pass@postgres:5432/RawDrive
 
 # Redis & Kafka
 REDIS_URL=redis://redis:6379/0
@@ -78,7 +78,7 @@ KAFKA_BOOTSTRAP_SERVERS=kafka:9092
 # Object Storage (R2)
 R2_ACCESS_KEY_ID=<your-key>
 R2_SECRET_ACCESS_KEY=<your-secret>
-R2_BUCKET_NAME=vDrive
+R2_BUCKET_NAME=RawDrive
 R2_ENDPOINT=https://account.r2.cloudflarestorage.com
 
 # JWT (for staff endpoints)

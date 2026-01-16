@@ -7,7 +7,7 @@ from uuid import uuid4
 from sqlalchemy import (
     CheckConstraint,
     DateTime,
-    Decimal,
+    Numeric,
     ForeignKey,
     Index,
     Integer,
@@ -48,13 +48,13 @@ class AssetMetadata(Base):
     lens_model: Mapped[Optional[str]] = mapped_column(String(200))
 
     # Exposure settings
-    aperture: Mapped[Optional[float]] = mapped_column(Decimal(4, 1))
+    aperture: Mapped[Optional[float]] = mapped_column(Numeric(4, 1))
     shutter_speed: Mapped[Optional[str]] = mapped_column(String(20))
-    shutter_speed_seconds: Mapped[Optional[float]] = mapped_column(Decimal(10, 6))
+    shutter_speed_seconds: Mapped[Optional[float]] = mapped_column(Numeric(10, 6))
     iso: Mapped[Optional[int]] = mapped_column(Integer)
-    focal_length: Mapped[Optional[float]] = mapped_column(Decimal(6, 1))
-    focal_length_35mm: Mapped[Optional[float]] = mapped_column(Decimal(6, 1))
-    exposure_compensation: Mapped[Optional[float]] = mapped_column(Decimal(4, 2))
+    focal_length: Mapped[Optional[float]] = mapped_column(Numeric(6, 1))
+    focal_length_35mm: Mapped[Optional[float]] = mapped_column(Numeric(6, 1))
+    exposure_compensation: Mapped[Optional[float]] = mapped_column(Numeric(4, 2))
 
     # Other settings
     flash_fired: Mapped[Optional[bool]] = mapped_column(Boolean)
@@ -64,9 +64,9 @@ class AssetMetadata(Base):
     software: Mapped[Optional[str]] = mapped_column(String(100))
 
     # GPS location
-    gps_latitude: Mapped[Optional[float]] = mapped_column(Decimal(10, 7))
-    gps_longitude: Mapped[Optional[float]] = mapped_column(Decimal(10, 7))
-    gps_altitude: Mapped[Optional[float]] = mapped_column(Decimal(8, 2))
+    gps_latitude: Mapped[Optional[float]] = mapped_column(Numeric(10, 7))
+    gps_longitude: Mapped[Optional[float]] = mapped_column(Numeric(10, 7))
+    gps_altitude: Mapped[Optional[float]] = mapped_column(Numeric(8, 2))
 
     # Capture timestamp
     captured_at: Mapped[Optional[datetime]] = mapped_column(

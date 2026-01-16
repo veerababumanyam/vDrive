@@ -3,7 +3,7 @@
 **Input**: Design documents from `/specs/005-upload-media-processing/`
 **Prerequisites**: plan.md ✓, spec.md ✓, research.md ✓, data-model.md ✓, contracts/ ✓
 
-**Architecture Note**: Per research.md, this feature uses **Kafka consumers** (not Celery) to align with existing vDrive event-driven architecture.
+**Architecture Note**: Per research.md, this feature uses **Kafka consumers** (not Celery) to align with existing RawDrive event-driven architecture.
 
 ## Format: `[ID] [P?] [Story] Description`
 

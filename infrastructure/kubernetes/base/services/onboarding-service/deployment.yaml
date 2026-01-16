@@ -6,7 +6,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: onboarding-service
-  namespace: vDrive
+  namespace: RawDrive
   labels:
     app: onboarding-service
     app.kubernetes.io/name: onboarding-service
@@ -26,19 +26,19 @@ spec:
         prometheus.io/port: "8006"
         prometheus.io/path: "/metrics"
     spec:
-      serviceAccountName: vDrive-service
+      serviceAccountName: RawDrive-service
       containers:
         - name: onboarding-service
-          image: ghcr.io/vDrive/onboarding-service:latest
+          image: ghcr.io/RawDrive/onboarding-service:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8006
               name: http
           envFrom:
             - configMapRef:
-                name: vDrive-config
+                name: RawDrive-config
             - secretRef:
-                name: vDrive-secrets
+                name: RawDrive-secrets
           env:
             - name: SERVICE_NAME
               value: "onboarding-service"
@@ -66,13 +66,13 @@ spec:
             initialDelaySeconds: 10
             periodSeconds: 5
       imagePullSecrets:
-        - name: vDrive-registry
+        - name: RawDrive-registry
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: onboarding-service
-  namespace: vDrive
+  namespace: RawDrive
 spec:
   type: ClusterIP
   ports:

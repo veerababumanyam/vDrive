@@ -36,9 +36,9 @@ Production-grade microservice for user registration (email/password + Google OAu
 | **Library-First** | PASS | Microservice is self-contained with clear boundaries |
 | **Test-First** | PASS | Unit, integration, and contract tests planned |
 | **Observability** | PASS | Health checks, Prometheus metrics, structured logging |
-| **Simplicity** | PASS | Uses established vDrive patterns, no unnecessary abstractions |
+| **Simplicity** | PASS | Uses established RawDrive patterns, no unnecessary abstractions |
 
-**Post-Design Re-check**: PASS - All patterns follow existing vDrive microservice conventions.
+**Post-Design Re-check**: PASS - All patterns follow existing RawDrive microservice conventions.
 
 ## Project Structure
 

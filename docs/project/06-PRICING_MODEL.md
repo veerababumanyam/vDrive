@@ -2,7 +2,7 @@
 
 ## Overview
 
-The vDrive pricing model defines subscription tiers, feature availability, pricing strategy, and revenue optimization. This document provides comprehensive pricing information and business logic.
+The RawDrive pricing model defines subscription tiers, feature availability, pricing strategy, and revenue optimization. This document provides comprehensive pricing information and business logic.
 
 ## Purpose
 
@@ -20,7 +20,7 @@ The pricing model serves to:
 
 ### Tier Overview
 
-vDrive offers five subscription tiers with increasing features and capacity.
+RawDrive offers five subscription tiers with increasing features and capacity.
 
 **Tier Comparison:**
 
@@ -238,7 +238,7 @@ interface EnterpriseTier {
 
 ### Pricing Model
 
-vDrive uses a value-based pricing model with tiered features.
+RawDrive uses a value-based pricing model with tiered features.
 
 **Pricing Principles:**
 1. **Value-Based**: Price reflects value delivered

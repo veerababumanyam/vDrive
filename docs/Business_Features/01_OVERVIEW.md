@@ -1,8 +1,8 @@
-# vDrive Business Features Documentation
+# RawDrive Business Features Documentation
 
 ## Executive Overview
 
-vDrive is a comprehensive multi-tenant SaaS platform designed for photographers, studios, and enterprise teams to manage the complete media workflow. This documentation provides business-focused analysis of each feature, their value propositions, integrations, and technical architecture.
+RawDrive is a comprehensive multi-tenant SaaS platform designed for photographers, studios, and enterprise teams to manage the complete media workflow. This documentation provides business-focused analysis of each feature, their value propositions, integrations, and technical architecture.
 
 > **Reference Documentation**:
 > - `.kiro/steering/product.md` - Product overview
@@ -97,7 +97,7 @@ Enterprise-grade features including SSO, RBAC, policies, retention rules, and au
 
 ## Enterprise & Platform Bundle
 
-For larger studios and enterprise teams, vDrive offers an opinionated bundle of features that work together to support security, governance, and deep integration:
+For larger studios and enterprise teams, RawDrive offers an opinionated bundle of features that work together to support security, governance, and deep integration:
 
 - **Identity & Access**: Authentication, SSO (planned), workspace RBAC, and Self-Service security controls.
 - **Governance & Compliance**: Audit & Compliance, retention policies, legal holds, and data subject workflows.
@@ -189,4 +189,4 @@ These capabilities are designed to be fully **workspace-scoped** via `workspace_
 
 **Last Updated**: January 5, 2026  
 **Version**: 2.1  
-**Owner**: vDrive Product Team
+**Owner**: RawDrive Product Team

@@ -1,5 +1,5 @@
 # ===========================================
-# vDrive Processing Service Dockerfile
+# RawDrive Processing Service Dockerfile
 # ===========================================
 # Kafka consumer for media processing on port 8010
 # Dependencies: PostgreSQL, Kafka, R2, Google Cloud Vision

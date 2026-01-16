@@ -1,7 +1,7 @@
 # ===========================================
 # Loki Configuration (v3.0.0)
 # ===========================================
-# vDrive Log Aggregation
+# RawDrive Log Aggregation
 
 auth_enabled: false
 

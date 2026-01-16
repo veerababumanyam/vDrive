@@ -8,7 +8,7 @@ import { formatINR } from '@/utils/currency';
 import { generateProductSchema, generateFAQSchema, generateBreadcrumbSchema } from '@/utils/schema';
 import { faqData } from '@/data/faq';
 
-const APP_URL = import.meta.env.APP_URL || 'https://app.vdrive.io';
+const APP_URL = import.meta.env.APP_URL || 'https://app.RawDrive.io';
 
 // Generate JSON-LD schemas for pricing page
 const schemas = [
@@ -23,7 +23,7 @@ const schemas = [
 
 <BaseLayout
   title="Pricing"
-  description="Simple, transparent pricing for vDrive. Plans start at free with pay-as-you-grow pricing in INR. Start your 14-day free trial today."
+  description="Simple, transparent pricing for RawDrive. Plans start at free with pay-as-you-grow pricing in INR. Start your 14-day free trial today."
 >
   <JsonLd slot="head" schema={schemas} />
 

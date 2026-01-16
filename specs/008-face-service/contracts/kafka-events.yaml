@@ -1,0 +1,291 @@
+# Kafka Event Contracts: Face Service
+# Version: 1.0.0
+
+asyncapi: 2.6.0
+info:
+  title: Face Service Events
+  version: 1.0.0
+  description: |
+    Kafka event contracts for Face Service.
+
+    The service consumes `asset.processed` events to trigger face detection
+    and publishes `face.detected` events after processing.
+
+servers:
+  development:
+    url: kafka:9092
+    protocol: kafka
+    description: Local development Kafka broker
+
+channels:
+  asset.processed:
+    description: |
+      Events published by Upload Service when an asset has been fully processed
+      and is ready for face detection.
+    subscribe:
+      operationId: onAssetProcessed
+      summary: Receive asset processed events
+      message:
+        $ref: '#/components/messages/AssetProcessed'
+
+  face.detected:
+    description: |
+      Events published by Face Service after face detection completes for an asset.
+      Consumers (Gallery Service, Notifications) can use this to update their state.
+    publish:
+      operationId: publishFaceDetected
+      summary: Publish face detection results
+      message:
+        $ref: '#/components/messages/FaceDetected'
+
+components:
+  messages:
+    AssetProcessed:
+      name: AssetProcessed
+      title: Asset Processed Event
+      summary: Indicates an asset has been processed and is ready for face detection
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/AssetProcessedPayload'
+      headers:
+        type: object
+        properties:
+          correlation_id:
+            type: string
+            description: Request correlation ID for tracing
+          source:
+            type: string
+            const: upload-service
+
+    FaceDetected:
+      name: FaceDetected
+      title: Face Detected Event
+      summary: Face detection results for an asset
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/FaceDetectedPayload'
+      headers:
+        type: object
+        properties:
+          correlation_id:
+            type: string
+            description: Request correlation ID for tracing
+          source:
+            type: string
+            const: face-service
+
+  schemas:
+    AssetProcessedPayload:
+      type: object
+      required:
+        - type
+        - timestamp
+        - source
+        - version
+        - data
+      properties:
+        type:
+          type: string
+          const: asset.processed
+        timestamp:
+          type: string
+          format: date-time
+          description: ISO 8601 timestamp
+        source:
+          type: string
+          const: upload-service
+        version:
+          type: string
+          const: '1.0'
+        data:
+          type: object
+          required:
+            - asset_id
+            - workspace_id
+            - storage_path
+            - mime_type
+          properties:
+            asset_id:
+              type: string
+              format: uuid
+              description: Unique asset identifier
+            workspace_id:
+              type: string
+              format: uuid
+              description: Workspace for multi-tenancy routing
+            storage_path:
+              type: string
+              description: Path in R2 storage (e.g., "workspaces/{ws}/assets/{asset}.jpg")
+            mime_type:
+              type: string
+              description: MIME type of the asset
+              example: image/jpeg
+      example:
+        type: asset.processed
+        timestamp: '2026-01-16T10:30:00Z'
+        source: upload-service
+        version: '1.0'
+        data:
+          asset_id: 550e8400-e29b-41d4-a716-446655440001
+          workspace_id: 550e8400-e29b-41d4-a716-446655440000
+          storage_path: workspaces/550e8400-e29b-41d4-a716-446655440000/assets/550e8400-e29b-41d4-a716-446655440001.jpg
+          mime_type: image/jpeg
+
+    FaceDetectedPayload:
+      type: object
+      required:
+        - type
+        - timestamp
+        - source
+        - version
+        - data
+      properties:
+        type:
+          type: string
+          const: face.detected
+        timestamp:
+          type: string
+          format: date-time
+          description: ISO 8601 timestamp
+        source:
+          type: string
+          const: face-service
+        version:
+          type: string
+          const: '1.0'
+        data:
+          type: object
+          required:
+            - asset_id
+            - workspace_id
+            - face_count
+            - faces
+            - processing_time_ms
+          properties:
+            asset_id:
+              type: string
+              format: uuid
+              description: Asset that was processed
+            workspace_id:
+              type: string
+              format: uuid
+              description: Workspace ID (partition key)
+            face_count:
+              type: integer
+              minimum: 0
+              description: Total faces detected
+            faces:
+              type: array
+              items:
+                $ref: '#/components/schemas/DetectedFace'
+              description: Details of each detected face
+            processing_time_ms:
+              type: number
+              format: float
+              description: Processing duration in milliseconds
+      example:
+        type: face.detected
+        timestamp: '2026-01-16T10:30:05Z'
+        source: face-service
+        version: '1.0'
+        data:
+          asset_id: 550e8400-e29b-41d4-a716-446655440001
+          workspace_id: 550e8400-e29b-41d4-a716-446655440000
+          face_count: 2
+          faces:
+            - face_id: 660e8400-e29b-41d4-a716-446655440010
+              bounding_box:
+                x: 0.1
+                y: 0.2
+                width: 0.15
+                height: 0.2
+              confidence: 0.95
+              group_id: 770e8400-e29b-41d4-a716-446655440020
+            - face_id: 660e8400-e29b-41d4-a716-446655440011
+              bounding_box:
+                x: 0.6
+                y: 0.25
+                width: 0.12
+                height: 0.18
+              confidence: 0.88
+              group_id: null
+          processing_time_ms: 1250.5
+
+    DetectedFace:
+      type: object
+      required:
+        - face_id
+        - bounding_box
+        - confidence
+      properties:
+        face_id:
+          type: string
+          format: uuid
+          description: Unique face identifier
+        bounding_box:
+          type: object
+          required:
+            - x
+            - y
+            - width
+            - height
+          properties:
+            x:
+              type: number
+              format: float
+              minimum: 0
+              maximum: 1
+            y:
+              type: number
+              format: float
+              minimum: 0
+              maximum: 1
+            width:
+              type: number
+              format: float
+              minimum: 0
+              maximum: 1
+            height:
+              type: number
+              format: float
+              minimum: 0
+              maximum: 1
+        confidence:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 1
+          description: Detection confidence score
+        group_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Person group assignment (null if unassigned)
+
+# Consumer Configuration
+x-kafka-consumer-config:
+  group_id: face-service-group
+  auto_offset_reset: earliest
+  enable_auto_commit: false
+  max_poll_records: 100
+  session_timeout_ms: 30000
+  heartbeat_interval_ms: 10000
+
+# Producer Configuration
+x-kafka-producer-config:
+  compression_type: lz4
+  acks: all
+  enable_idempotence: true
+  max_in_flight_requests_per_connection: 5
+  retries: 3
+  retry_backoff_ms: 100
+
+# Processing Behavior
+x-processing-rules:
+  filter:
+    - mime_type must start with "image/"
+  idempotency:
+    key_pattern: "face_processed:{asset_id}"
+    storage: redis
+    expiry_seconds: 86400  # 24 hours
+  partition_key: workspace_id

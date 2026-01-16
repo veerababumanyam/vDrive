@@ -1,5 +1,5 @@
 # ===========================================
-# vDrive Face Service Dockerfile
+# RawDrive Face Service Dockerfile
 # ===========================================
 # Face detection, embedding, and clustering service on port 8002
 # Dependencies: PostgreSQL (pgvector), Kafka, Redis, Google Cloud Vision

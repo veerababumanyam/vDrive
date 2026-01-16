@@ -5,7 +5,7 @@ Handles email/password signin, Google OAuth, token refresh, and logout
 with rate limiting, account lockout, and audit logging.
 """
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from fastapi import APIRouter, Depends, Request, Response, status
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -26,6 +26,7 @@ from src.app.middleware.error_handler import (
     ValidationError,
 )
 from src.app.services.auth_service import AuthService
+from src.app.repositories.workspace_member_repository import WorkspaceMemberRepository
 from src.app.schemas.auth import (
     LoginRequest,
     LoginResponse,
@@ -133,7 +134,12 @@ async def login(
             remember_me=login_req.remember_me,
         )
 
-        # 5. Create tokens
+        # 5. Get user's primary workspace for JWT token
+        workspace_member_repo = WorkspaceMemberRepository(db)
+        user_workspaces = await workspace_member_repo.get_user_workspaces(str(user.id))
+        primary_workspace_id = str(user_workspaces[0].workspace_id) if user_workspaces else None
+
+        # 6. Create tokens
         access_token_expires = 15 * 60  # 15 minutes in seconds
         refresh_token_expires_days = 30 if login_req.remember_me else 7
 
@@ -141,7 +147,8 @@ async def login(
             data={
                 "sub": str(user.id),
                 "email": user.email,
-                "type": "access",
+                "email_verified": user.email_verified,
+                "workspace_id": primary_workspace_id,
             }
         )
 
@@ -151,7 +158,7 @@ async def login(
                 "type": "refresh",
                 "session_id": session_id,
             },
-            expires_days=refresh_token_expires_days,
+            expires_delta=timedelta(days=refresh_token_expires_days),
         )
 
         # 6. Set HttpOnly Secure cookie for refresh token (T020)
@@ -187,7 +194,7 @@ async def login(
                 email=user.email,
                 first_name=user.first_name,
                 last_name=user.last_name,
-                avatar_url=user.avatar_url,
+                avatar_url=getattr(user, 'avatar_url', None),
                 email_verified=user.email_verified,
             ),
         )
@@ -410,6 +417,11 @@ async def google_signin_callback(
             remember_me=False,  # Default for OAuth
         )
 
+        # Get user's primary workspace for JWT token
+        workspace_member_repo = WorkspaceMemberRepository(db)
+        user_workspaces = await workspace_member_repo.get_user_workspaces(str(user.id))
+        primary_workspace_id = str(user_workspaces[0].workspace_id) if user_workspaces else None
+
         # Create tokens
         access_token_expires = 15 * 60  # 15 minutes
 
@@ -417,7 +429,8 @@ async def google_signin_callback(
             data={
                 "sub": str(user.id),
                 "email": user.email,
-                "type": "access",
+                "email_verified": user.email_verified,
+                "workspace_id": primary_workspace_id,
             }
         )
 
@@ -427,7 +440,7 @@ async def google_signin_callback(
                 "type": "refresh",
                 "session_id": session_id,
             },
-            expires_days=7,
+            expires_delta=timedelta(days=7),
         )
 
         # Set HttpOnly Secure cookie (T037)
@@ -461,7 +474,7 @@ async def google_signin_callback(
                 email=user.email,
                 first_name=user.first_name,
                 last_name=user.last_name,
-                avatar_url=user.avatar_url,
+                avatar_url=getattr(user, 'avatar_url', None),
                 email_verified=user.email_verified,
             ),
         )
@@ -556,13 +569,19 @@ async def refresh_token(
             response.delete_cookie(key="refresh_token")
             raise AuthenticationError("User not found or inactive")
 
+        # Get user's primary workspace for JWT token
+        workspace_member_repo = WorkspaceMemberRepository(db)
+        user_workspaces = await workspace_member_repo.get_user_workspaces(str(user.id))
+        primary_workspace_id = str(user_workspaces[0].workspace_id) if user_workspaces else None
+
         # Create new access token
         access_token_expires = 15 * 60  # 15 minutes in seconds
         access_token = create_access_token(
             data={
                 "sub": str(user.id),
                 "email": user.email,
-                "type": "access",
+                "email_verified": user.email_verified,
+                "workspace_id": primary_workspace_id,
             }
         )
 
@@ -574,7 +593,7 @@ async def refresh_token(
                 "type": "refresh",
                 "session_id": session_id,
             },
-            expires_days=refresh_token_expires_days,
+            expires_delta=timedelta(days=refresh_token_expires_days),
         )
 
         # Set new refresh token in HttpOnly cookie (token rotation)

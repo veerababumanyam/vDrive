@@ -4,7 +4,7 @@
 
 ## Overview
 
-vDrive implements a comprehensive automated onboarding system that guides newly registered customers through signup, payment processing, and tier activation. The system is designed to be frictionless, secure, and user-friendly, with automatic tier activation upon successful payment.
+RawDrive implements a comprehensive automated onboarding system that guides newly registered customers through signup, payment processing, and tier activation. The system is designed to be frictionless, secure, and user-friendly, with automatic tier activation upon successful payment.
 
 ## Purpose
 
@@ -259,7 +259,7 @@ Allow signup via Google/social providers.
 **Flow:**
 1. Click "Sign up with Google"
 2. Redirect to Google OAuth
-3. User authorizes vDrive
+3. User authorizes RawDrive
 4. Return with email and name
 5. Pre-fill registration form
 6. User enters business name
@@ -712,7 +712,7 @@ Guide new customers through initial setup.
 
 ### Step 1: Welcome
 
-Introduction to vDrive.
+Introduction to RawDrive.
 
 **Content:**
 - Welcome message

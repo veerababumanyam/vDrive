@@ -88,22 +88,22 @@ export const footerNav: NavSection[] = [
 export const socialLinks = [
   {
     name: 'Twitter',
-    href: 'https://twitter.com/vdriveio',
+    href: 'https://twitter.com/RawDriveio',
     icon: 'Twitter',
   },
   {
     name: 'Instagram',
-    href: 'https://instagram.com/vdriveio',
+    href: 'https://instagram.com/RawDriveio',
     icon: 'Instagram',
   },
   {
     name: 'LinkedIn',
-    href: 'https://linkedin.com/company/vdriveio',
+    href: 'https://linkedin.com/company/RawDriveio',
     icon: 'Linkedin',
   },
   {
     name: 'YouTube',
-    href: 'https://youtube.com/@vdriveio',
+    href: 'https://youtube.com/@RawDriveio',
     icon: 'Youtube',
   },
 ];

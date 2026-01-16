@@ -4,7 +4,7 @@
 
 ## Overview
 
-vDrive provides comprehensive storage management and backup capabilities to help photographers securely store, organize, and protect their photo libraries. The system supports cloud storage integration, automatic backups, and disaster recovery.
+RawDrive provides comprehensive storage management and backup capabilities to help photographers securely store, organize, and protect their photo libraries. The system supports cloud storage integration, automatic backups, and disaster recovery.
 
 ## Purpose
 
@@ -104,7 +104,7 @@ Connect to external cloud storage.
 - AWS S3
 - Custom S3-compatible storage
 
-**vDrive-hosted default (Managed Storage):**
+**RawDrive-hosted default (Managed Storage):**
 - Cloudflare R2 for object storage (assets + derivatives)
 - Cloudflare CDN for global delivery (signed URLs + cache rules)
 
@@ -114,7 +114,7 @@ Connect cloud storage accounts.
 
 **Setup Process:**
 1. Select cloud provider
-2. Authorize vDrive
+2. Authorize RawDrive
 3. Grant permissions
 4. Verify connection
 5. Configure sync settings
@@ -222,7 +222,7 @@ interface BackupSchedule {
 Store backups securely.
 
 **Backup Locations:**
-- Primary: vDrive-managed storage (Cloudflare R2)
+- Primary: RawDrive-managed storage (Cloudflare R2)
 - Secondary: Geo-redundant backup (Enterprise)
 - Tertiary: Customer's cloud provider (if connected)
 

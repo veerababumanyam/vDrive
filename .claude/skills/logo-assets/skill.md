@@ -1,7 +1,7 @@
 ---
 name: logo-assets
 aliases: [logo, favicon, icon, branding, assets]
-description: Logo and favicon asset guidelines for vDrive. Use when referencing logos, updating branding, or implementing theme-aware images.
+description: Logo and favicon asset guidelines for RawDrive. Use when referencing logos, updating branding, or implementing theme-aware images.
 ---
 
 # Logo & Favicon Assets
@@ -72,7 +72,7 @@ function MyComponent() {
     ? '/logo-dark-192x192.png'
     : '/logo-light-192x192.png';
 
-  return <img src={logoSrc} alt="vDrive" width={48} height={48} />;
+  return <img src={logoSrc} alt="RawDrive" width={48} height={48} />;
 }
 ```
 
@@ -85,8 +85,8 @@ Icons are defined for Android PWA installation and splash screens.
 **Manifest structure:**
 ```json
 {
-  "name": "vDrive",
-  "short_name": "vDrive",
+  "name": "RawDrive",
+  "short_name": "RawDrive",
   "icons": [
     {
       "src": "/logo-light-192x192.png",
@@ -183,7 +183,7 @@ magick frontend/public/logo-dark-512x512.png -resize 192x192 frontend/public/log
 2. Go to Application > Manifest
 3. Verify manifest loads without errors
 4. Check Application > Icons for proper icon registration
-5. Install PWA: Chrome menu > Install vDrive
+5. Install PWA: Chrome menu > Install RawDrive
 6. Verify installed app uses correct icon
 
 ### Network Testing

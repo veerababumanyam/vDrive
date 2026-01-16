@@ -1,4 +1,4 @@
-# vDrive Branding & Assets
+# RawDrive Branding & Assets
 
 **Version:** 0.3.3 | **Last Updated:** January 2026
 
@@ -157,8 +157,8 @@ Location: `frontend/public/manifest.json`
 
 ```json
 {
-  "name": "vDrive",
-  "short_name": "vDrive",
+  "name": "RawDrive",
+  "short_name": "RawDrive",
   "description": "Professional Photography Management Platform",
   "start_url": "/",
   "display": "standalone",
@@ -189,15 +189,15 @@ Location: `frontend/public/robots.txt`
 ```
 User-agent: *
 Allow: /
-Sitemap: https://vDrive.com/sitemap.xml
+Sitemap: https://RawDrive.com/sitemap.xml
 ```
 
 ### Meta Tags Template
 
 ```html
-<meta name="description" content="vDrive - Enterprise SaaS Professional Photography Management Platform. AI-powered galleries, client proofing, and album design.">
+<meta name="description" content="RawDrive - Enterprise SaaS Professional Photography Management Platform. AI-powered galleries, client proofing, and album design.">
 <meta name="keywords" content="photography, galleries, client proofing, album design, AI, professional photography">
-<meta property="og:title" content="vDrive - Professional Photography Platform">
+<meta property="og:title" content="RawDrive - Professional Photography Platform">
 <meta property="og:description" content="Enterprise-grade photography management with AI-powered features.">
 <meta property="og:image" content="/android-chrome-512x512.png">
 <meta property="og:type" content="website">

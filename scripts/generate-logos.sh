@@ -8,7 +8,7 @@ LIGHT_SOURCE="frontend/public/android-chrome-512x512.png"
 DARK_SOURCE="frontend/public/logo-dark-512x512.png"
 OUTPUT_DIR="frontend/public"
 
-echo "🎨 vDrive Logo Generator"
+echo "🎨 RawDrive Logo Generator"
 echo "========================"
 echo ""
 

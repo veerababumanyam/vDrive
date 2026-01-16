@@ -1,4 +1,4 @@
-# vDrive API Standards
+# RawDrive API Standards
 
 **Version:** 0.3.3 | **Last Updated:** January 2026
 
@@ -6,9 +6,9 @@
 
 ## API Overview
 
-vDrive follows RESTful API conventions with JSON payloads. All APIs are versioned under `/api/v1/`.
+RawDrive follows RESTful API conventions with JSON payloads. All APIs are versioned under `/api/v1/`.
 
-**Base URL:** `https://api.vDrive.com/api/v1`
+**Base URL:** `https://api.RawDrive.com/api/v1`
 
 ---
 
@@ -419,9 +419,9 @@ Auto-generated documentation available at:
 ### Python
 
 ```python
-from vDrive import vDriveClient
+from RawDrive import RawDriveClient
 
-client = vDriveClient(
+client = RawDriveClient(
     api_key="your-api-key",
     workspace_id="your-workspace-id"
 )
@@ -432,9 +432,9 @@ galleries = client.galleries.list(limit=20)
 ### TypeScript
 
 ```typescript
-import { vDriveClient } from '@vDrive/sdk';
+import { RawDriveClient } from '@RawDrive/sdk';
 
-const client = new vDriveClient({
+const client = new RawDriveClient({
   apiKey: 'your-api-key',
   workspaceId: 'your-workspace-id'
 });

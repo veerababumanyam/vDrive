@@ -45,7 +45,7 @@ boto3==1.34.0 (already present)
 ### Decision: Kafka Consumers (Not Celery)
 
 **Rationale**:
-- vDrive already uses Kafka for event-driven architecture
+- RawDrive already uses Kafka for event-driven architecture
 - Kafka topics pre-created: `upload.initiated`, `upload.completed`, `asset.processing`, `asset.processed`
 - Single event bus simplifies operations vs dual systems (Kafka + Celery)
 - Better ordering guarantees with partition key = `workspace_id`
@@ -160,7 +160,7 @@ ffmpeg-python==0.2.0 # Video thumbnails
 
 **Rationale**:
 - `exifread` is lightweight and handles all common EXIF formats
-- `pgvector` already configured in vDrive for semantic search
+- `pgvector` already configured in RawDrive for semantic search
 - Store structured metadata in PostgreSQL, embeddings in pgvector
 
 **Fields Extracted**:
@@ -216,7 +216,7 @@ workspaces/{workspace_id}/assets/{asset_id}/
 ```
 
 **R2 Configuration**:
-- Bucket: `vdrive` (from settings)
+- Bucket: `RawDrive` (from settings)
 - Endpoint: Cloudflare R2 (S3-compatible)
 - Access: boto3 with S3v4 signature
 

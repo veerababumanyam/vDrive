@@ -59,7 +59,7 @@
 
 ### User
 
-Represents an individual account holder in the vDrive platform.
+Represents an individual account holder in the RawDrive platform.
 
 | Field | Type | Constraints | Description |
 |-------|------|-------------|-------------|

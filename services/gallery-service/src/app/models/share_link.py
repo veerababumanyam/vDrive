@@ -13,7 +13,7 @@ from sqlalchemy import (
     String,
     text,
 )
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects.postgresql import ARRAY, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.app.core.database import Base
@@ -51,12 +51,21 @@ class ShareLink(Base):
         index=True,
     )
 
+    # Label and target type
+    label: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    target_type: Mapped[str] = mapped_column(
+        String(20),
+        nullable=False,
+        default="gallery",
+        server_default="'gallery'",
+    )
+
     # Core fields
     status: Mapped[str] = mapped_column(
         String(20),
         nullable=False,
         default="active",
-        server_default="active",
+        server_default="'active'",
         index=True,
     )  # active, expired, revoked
 
@@ -64,7 +73,6 @@ class ShareLink(Base):
     expires_at: Mapped[Optional[datetime]] = mapped_column(
         DateTime(timezone=True),
         nullable=True,
-        index=True,
     )
 
     # Access limits
@@ -73,12 +81,38 @@ class ShareLink(Base):
         Integer, nullable=False, default=0, server_default="0"
     )
 
-    # QR code configuration
-    qr_enabled: Mapped[bool] = mapped_column(
-        Boolean, nullable=False, default=True, server_default="true"
+    # Security settings
+    password_required: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False, server_default="false"
     )
+    password_hash: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    email_registration_required: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False, server_default="false"
+    )
+
+    # Permissions
+    allowed_actions: Mapped[Optional[list[str]]] = mapped_column(
+        ARRAY(String(20)),
+        nullable=False,
+        default=list,
+        server_default="'{}'",
+    )
+    download_variant: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
+
+    # QR code configuration (matches migration schema)
+    qr_size: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    qr_color: Mapped[Optional[str]] = mapped_column(String(7), nullable=True)
     qr_logo_enabled: Mapped[bool] = mapped_column(
-        Boolean, nullable=False, default=True, server_default="true"
+        Boolean, nullable=False, default=False, server_default="false"
+    )
+    qr_error_correction: Mapped[str] = mapped_column(
+        String(1), nullable=False, default="M", server_default="'M'"
+    )
+
+    # Created by (FK constraint exists in DB for cross-service, not declared here)
+    created_by_id: Mapped[Optional[str]] = mapped_column(
+        UUID(as_uuid=False),
+        nullable=True,
     )
 
     # Timestamps
@@ -103,7 +137,6 @@ class ShareLink(Base):
     # Composite indexes for common queries
     __table_args__ = (
         Index("idx_share_link_gallery_status", "gallery_id", "status"),
-        Index("idx_share_link_expires", "expires_at"),
     )
 
     def to_dict(self) -> dict:
@@ -112,13 +145,21 @@ class ShareLink(Base):
             "id": self.id,
             "link_id": self.link_id,
             "gallery_id": self.gallery_id,
+            "label": self.label,
+            "target_type": self.target_type,
             "status": self.status,
             "expires_at": self.expires_at.isoformat() if self.expires_at else None,
             "max_accesses": self.max_accesses,
             "access_count": self.access_count,
+            "password_required": self.password_required,
+            "email_registration_required": self.email_registration_required,
+            "allowed_actions": self.allowed_actions or [],
+            "download_variant": self.download_variant,
             "qr_config": {
-                "enabled": self.qr_enabled,
+                "size": self.qr_size,
+                "color": self.qr_color,
                 "logo_enabled": self.qr_logo_enabled,
+                "error_correction": self.qr_error_correction,
             },
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,

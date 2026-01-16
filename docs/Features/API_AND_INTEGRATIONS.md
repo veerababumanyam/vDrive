@@ -4,7 +4,7 @@
 
 ## Overview
 
-vDrive provides a comprehensive REST API and integration capabilities for developers to build custom applications, automate workflows, and connect with third-party services. The API is available to Business and Enterprise tier customers.
+RawDrive provides a comprehensive REST API and integration capabilities for developers to build custom applications, automate workflows, and connect with third-party services. The API is available to Business and Enterprise tier customers.
 
 ## Purpose
 
@@ -20,7 +20,7 @@ API and integration features serve to:
 
 ### REST API vs MCP
 
-vDrive supports two complementary integration surfaces:
+RawDrive supports two complementary integration surfaces:
 
 - **REST API**: traditional CRUD + workflow endpoints for systems integration.
 - **MCP (Model Context Protocol)**: a tool/resource discovery + invocation interface designed for AI clients/agents.
@@ -449,8 +449,8 @@ const verifyWebhookSignature = (payload: string, signature: string, secret: stri
 };
 
 // In webhook handler
-app.post('/webhooks/vDrive', (req, res) => {
-  const signature = req.headers['x-vDrive-signature'];
+app.post('/webhooks/RawDrive', (req, res) => {
+  const signature = req.headers['x-RawDrive-signature'];
   const payload = JSON.stringify(req.body);
   
   if (!verifyWebhookSignature(payload, signature, WEBHOOK_SECRET)) {
@@ -564,8 +564,8 @@ Response: { success: true, syncedAt: Date }
 API documentation in OpenAPI format.
 
 **Documentation URL:**
-- https://api.vDrive.com/docs
-- https://api.vDrive.com/swagger.json
+- https://api.RawDrive.com/docs
+- https://api.RawDrive.com/swagger.json
 
 **Documentation Features:**
 - Interactive API explorer

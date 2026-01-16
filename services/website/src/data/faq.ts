@@ -11,7 +11,7 @@ export const faqData: FAQ[] = [
   {
     question: 'How does the 14-day free trial work?',
     answer:
-      'Start using vDrive immediately with full access to all features. No credit card required. At the end of your trial, choose a plan that fits your needs or your data will be safely stored for 30 days.',
+      'Start using RawDrive immediately with full access to all features. No credit card required. At the end of your trial, choose a plan that fits your needs or your data will be safely stored for 30 days.',
   },
   {
     question: 'Can I upgrade or downgrade my plan?',
@@ -56,6 +56,6 @@ export const faqData: FAQ[] = [
   {
     question: 'Can I bring my own storage (BYOS)?',
     answer:
-      'Yes! Enterprise customers can connect their own Cloudflare R2, AWS S3, or Google Cloud Storage buckets. This gives you full control over your data while using vDrive for management.',
+      'Yes! Enterprise customers can connect their own Cloudflare R2, AWS S3, or Google Cloud Storage buckets. This gives you full control over your data while using RawDrive for management.',
   },
 ];

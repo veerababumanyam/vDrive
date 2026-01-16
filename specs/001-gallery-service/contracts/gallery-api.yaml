@@ -1,6 +1,6 @@
 openapi: 3.1.0
 info:
-  title: vDrive Gallery Service API
+  title: RawDrive Gallery Service API
   version: 1.0.0
   description: |
     Gallery Service microservice for high-traffic public gallery viewing, Magic Links,
@@ -14,14 +14,14 @@ info:
     - Multi-tenant workspace isolation
 
   contact:
-    name: vDrive API Support
-    url: https://vdrive.io/support
-    email: support@vdrive.io
+    name: RawDrive API Support
+    url: https://RawDrive.io/support
+    email: support@RawDrive.io
 
 servers:
   - url: http://localhost:8004
     description: Development (Docker Compose)
-  - url: https://app.vdrive.io/api/gallery
+  - url: https://app.RawDrive.io/api/gallery
     description: Production (Kubernetes + Traefik)
 
 tags:

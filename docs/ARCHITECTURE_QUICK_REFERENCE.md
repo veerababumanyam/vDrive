@@ -1,10 +1,10 @@
-# vDrive Architecture Quick Reference
+# RawDrive Architecture Quick Reference
 
 **Last Updated**: January 9, 2026 (v0.3.2)
 
 ## System Overview
 
-vDrive is a multi-tenant SaaS platform built on a modern, scalable architecture designed for 20,000+ photographers with high performance, reliability, and security.
+RawDrive is a multi-tenant SaaS platform built on a modern, scalable architecture designed for 20,000+ photographers with high performance, reliability, and security.
 
 ```mermaid
 flowchart TB
@@ -77,13 +77,13 @@ flowchart TB
 ### 3. Frontend Layer
 - **Framework**: React 19 + TypeScript + Vite
 - **Styling**: Tailwind CSS + Framer Motion
-- **Shared Packages**: pnpm workspaces (`@vDrive/shared-*`)
+- **Shared Packages**: pnpm workspaces (`@RawDrive/shared-*`)
 - **Deployment**: Hostinger VPS / Kubernetes
 - **Build**: Optimized production builds with code splitting
 - **PWA**: Service Worker with Workbox for offline caching
-  - `vDrive-thumbnails`: CacheFirst (500 entries, 7-day expiry)
-  - `vDrive-gallery-api`: StaleWhileRevalidate (100 entries, 5-min)
-  - `vDrive-auth`: NetworkFirst (20 entries, 10-min)
+  - `RawDrive-thumbnails`: CacheFirst (500 entries, 7-day expiry)
+  - `RawDrive-gallery-api`: StaleWhileRevalidate (100 entries, 5-min)
+  - `RawDrive-auth`: NetworkFirst (20 entries, 10-min)
 
 ### 4. API Gateway & Ingress
 - **API Gateway**: Traefik v3 (Kubernetes IngressRoute CRDs)
@@ -219,14 +219,14 @@ flowchart TB
 
 ### 10. Shared Packages Layer (pnpm Monorepo)
 
-vDrive uses a **pnpm workspace monorepo** for cross-platform type sharing:
+RawDrive uses a **pnpm workspace monorepo** for cross-platform type sharing:
 
 | Package | Purpose | Key Exports |
 |---------|---------|-------------|
-| `@vDrive/shared-types` | Domain types & enums | `InvitationStatus`, `GalleryStatus`, `GradientConfiguration` |
-| `@vDrive/shared-constants` | Configuration values | `API_BASE`, `STORAGE`, `AI_THRESHOLDS`, `PAGINATION` |
-| `@vDrive/shared-validation` | Validation schemas | `isValidHexColor`, `hexColorSchema`, `sanitizeHtml` |
-| `@vDrive/shared-utils` | Utility functions | `formatRelativeDate`, `formatFileSize`, `truncate` |
+| `@RawDrive/shared-types` | Domain types & enums | `InvitationStatus`, `GalleryStatus`, `GradientConfiguration` |
+| `@RawDrive/shared-constants` | Configuration values | `API_BASE`, `STORAGE`, `AI_THRESHOLDS`, `PAGINATION` |
+| `@RawDrive/shared-validation` | Validation schemas | `isValidHexColor`, `hexColorSchema`, `sanitizeHtml` |
+| `@RawDrive/shared-utils` | Utility functions | `formatRelativeDate`, `formatFileSize`, `truncate` |
 
 **Type Generation Pipeline**:
 - TypeScript is the **single source of truth**

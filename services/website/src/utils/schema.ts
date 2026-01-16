@@ -5,8 +5,8 @@
 
 import type { PricingPlan } from '../data/pricing';
 
-const SITE_URL = import.meta.env.SITE_URL || 'https://www.vdrive.io';
-const APP_URL = import.meta.env.APP_URL || 'https://app.vdrive.io';
+const SITE_URL = import.meta.env.SITE_URL || 'https://www.RawDrive.io';
+const APP_URL = import.meta.env.APP_URL || 'https://app.RawDrive.io';
 
 /**
  * Organization schema for the company
@@ -15,22 +15,22 @@ export function generateOrganizationSchema() {
   return {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: 'vDrive',
+    name: 'RawDrive',
     url: SITE_URL,
     logo: `${SITE_URL}/logo.svg`,
     description:
       'Professional photography client gallery platform with AI-powered organization, beautiful client portals, and secure cloud storage.',
     foundingDate: '2024',
     sameAs: [
-      'https://twitter.com/vdriveio',
-      'https://instagram.com/vdriveio',
-      'https://linkedin.com/company/vdriveio',
-      'https://youtube.com/@vdriveio',
+      'https://twitter.com/RawDriveio',
+      'https://instagram.com/RawDriveio',
+      'https://linkedin.com/company/RawDriveio',
+      'https://youtube.com/@RawDriveio',
     ],
     contactPoint: {
       '@type': 'ContactPoint',
       contactType: 'customer service',
-      email: 'support@vdrive.io',
+      email: 'support@RawDrive.io',
       availableLanguage: 'English',
     },
     address: {
@@ -47,7 +47,7 @@ export function generateWebSiteSchema() {
   return {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    name: 'vDrive',
+    name: 'RawDrive',
     url: SITE_URL,
     description:
       'Professional Photography Client Galleries Made Simple. Share, deliver, and sell your photos with AI-powered galleries.',
@@ -69,7 +69,7 @@ export function generateSoftwareApplicationSchema() {
   return {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
-    name: 'vDrive',
+    name: 'RawDrive',
     applicationCategory: 'PhotographyApplication',
     operatingSystem: 'Web',
     url: SITE_URL,
@@ -107,11 +107,11 @@ export function generateProductSchema(plan: PricingPlan) {
   return {
     '@context': 'https://schema.org',
     '@type': 'Product',
-    name: `vDrive ${plan.name}`,
+    name: `RawDrive ${plan.name}`,
     description: plan.description,
     brand: {
       '@type': 'Brand',
-      name: 'vDrive',
+      name: 'RawDrive',
     },
     offers: {
       '@type': 'Offer',
@@ -173,7 +173,7 @@ export function generateBlogPostingSchema(post: {
     },
     publisher: {
       '@type': 'Organization',
-      name: 'vDrive',
+      name: 'RawDrive',
       logo: {
         '@type': 'ImageObject',
         url: `${SITE_URL}/logo.svg`,
@@ -225,11 +225,11 @@ export function generateArticleSchema(doc: {
     dateModified: doc.lastUpdated?.toISOString(),
     author: {
       '@type': 'Organization',
-      name: 'vDrive',
+      name: 'RawDrive',
     },
     publisher: {
       '@type': 'Organization',
-      name: 'vDrive',
+      name: 'RawDrive',
       logo: {
         '@type': 'ImageObject',
         url: `${SITE_URL}/logo.svg`,

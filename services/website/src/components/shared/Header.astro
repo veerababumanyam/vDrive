@@ -2,26 +2,26 @@
 import ThemeToggle from '@/components/shared/ThemeToggle.astro';
 import { headerNav, headerCTAs } from '@/data/navigation';
 
-const APP_URL = import.meta.env.APP_URL || 'https://app.vdrive.io';
+const APP_URL = import.meta.env.APP_URL || 'https://app.RawDrive.io';
 ---
 
 <header class="sticky top-0 z-50 w-full border-b border-neutral-200 bg-white/80 backdrop-blur-md dark:border-warm-800 dark:bg-warm-950/80 transition-colors duration-200">
   <nav class="container-lg" aria-label="Main navigation">
     <div class="flex h-16 items-center justify-between">
       <!-- Logo -->
-      <a href="/" class="flex items-center gap-2" aria-label="vDrive Home">
+      <a href="/" class="flex items-center gap-2" aria-label="RawDrive Home">
         <picture>
           <source srcset="/logo-dark-32x32.png" media="(prefers-color-scheme: dark)" />
           <img
             src="/logo-light-32x32.png"
-            alt="vDrive Logo"
+            alt="RawDrive Logo"
             width="32"
             height="32"
             class="h-8 w-8"
           />
         </picture>
         <span class="text-xl font-bold text-neutral-900 dark:text-white">
-          vDrive
+          RawDrive
         </span>
       </a>
 

@@ -2,7 +2,7 @@
 
 ## Overview
 
-vDrive uses Kustomize for Kubernetes deployments with three environment overlays:
+RawDrive uses Kustomize for Kubernetes deployments with three environment overlays:
 
 | Environment | Purpose | Min Resources |
 |-------------|---------|---------------|
@@ -97,7 +97,7 @@ Edit `infrastructure/kubernetes/base/config/secrets.yaml`:
 
 ```yaml
 stringData:
-  DATABASE_URL: "postgresql://vDrive:YOUR_PASSWORD@postgres:5432/vDrive"
+  DATABASE_URL: "postgresql://RawDrive:YOUR_PASSWORD@postgres:5432/RawDrive"
   JWT_SECRET: "YOUR_64_BYTE_HEX_SECRET"
   STRIPE_SECRET_KEY: "sk_live_YOUR_KEY"
   R2_ACCESS_KEY_ID: "YOUR_KEY"
@@ -122,11 +122,11 @@ All services communicate via Kubernetes DNS:
 
 | Service | Internal DNS |
 |---------|--------------|
-| Backend | `backend.vDrive.svc.cluster.local:8000` |
-| Gallery | `gallery-service.vDrive.svc.cluster.local:8004` |
-| PostgreSQL | `postgres.vDrive.svc.cluster.local:5432` |
-| Redis | `redis.vDrive.svc.cluster.local:6379` |
-| Kafka | `kafka.vDrive.svc.cluster.local:9092` |
+| Backend | `backend.RawDrive.svc.cluster.local:8000` |
+| Gallery | `gallery-service.RawDrive.svc.cluster.local:8004` |
+| PostgreSQL | `postgres.RawDrive.svc.cluster.local:5432` |
+| Redis | `redis.RawDrive.svc.cluster.local:6379` |
+| Kafka | `kafka.RawDrive.svc.cluster.local:9092` |
 
 ## Environment Overlays
 
@@ -134,7 +134,7 @@ All services communicate via Kubernetes DNS:
 
 - Single replica for most services
 - Reduced resource limits
-- Local image tags (`vDrive/backend:dev`)
+- Local image tags (`RawDrive/backend:dev`)
 - KEDA scaling: 1-3 replicas
 
 ### Staging (`overlays/staging/`)
@@ -155,29 +155,29 @@ All services communicate via Kubernetes DNS:
 
 ```bash
 # Check all pods
-kubectl get pods -n vDrive
+kubectl get pods -n RawDrive
 
 # Check services
-kubectl get svc -n vDrive
+kubectl get svc -n RawDrive
 
 # Check ingress routes
-kubectl get ingressroutes -n vDrive
+kubectl get ingressroutes -n RawDrive
 
 # Check KEDA scaled objects
-kubectl get scaledobjects -n vDrive
+kubectl get scaledobjects -n RawDrive
 
 # View pod logs
-kubectl logs -f deployment/backend -n vDrive
+kubectl logs -f deployment/backend -n RawDrive
 
 # Describe problematic pod
-kubectl describe pod <pod-name> -n vDrive
+kubectl describe pod <pod-name> -n RawDrive
 ```
 
 ## Scaling
 
 ### Manual Scaling
 ```bash
-kubectl scale deployment/backend --replicas=5 -n vDrive
+kubectl scale deployment/backend --replicas=5 -n RawDrive
 ```
 
 ### KEDA Autoscaling (Automatic)
@@ -191,13 +191,13 @@ KEDA automatically scales based on:
 
 ```bash
 # View rollout history
-kubectl rollout history deployment/backend -n vDrive
+kubectl rollout history deployment/backend -n RawDrive
 
 # Rollback to previous version
-kubectl rollout undo deployment/backend -n vDrive
+kubectl rollout undo deployment/backend -n RawDrive
 
 # Rollback to specific revision
-kubectl rollout undo deployment/backend --to-revision=2 -n vDrive
+kubectl rollout undo deployment/backend --to-revision=2 -n RawDrive
 ```
 
 ## Cleanup
@@ -207,27 +207,27 @@ kubectl rollout undo deployment/backend --to-revision=2 -n vDrive
 kubectl delete -k infrastructure/kubernetes/overlays/dev
 
 # Delete namespace (removes everything)
-kubectl delete namespace vDrive
+kubectl delete namespace RawDrive
 ```
 
 ## Troubleshooting
 
 ### Pod not starting
 ```bash
-kubectl describe pod <pod-name> -n vDrive
-kubectl logs <pod-name> -n vDrive --previous
+kubectl describe pod <pod-name> -n RawDrive
+kubectl logs <pod-name> -n RawDrive --previous
 ```
 
 ### Database connection issues
 ```bash
 # Test PostgreSQL connectivity
-kubectl run -it --rm debug --image=postgres:16 --restart=Never -n vDrive -- \
-  psql -h postgres -U vDrive -d vDrive -c "SELECT 1"
+kubectl run -it --rm debug --image=postgres:16 --restart=Never -n RawDrive -- \
+  psql -h postgres -U RawDrive -d RawDrive -c "SELECT 1"
 ```
 
 ### Service discovery issues
 ```bash
 # Test DNS resolution
-kubectl run -it --rm debug --image=busybox --restart=Never -n vDrive -- \
-  nslookup backend.vDrive.svc.cluster.local
+kubectl run -it --rm debug --image=busybox --restart=Never -n RawDrive -- \
+  nslookup backend.RawDrive.svc.cluster.local
 ```

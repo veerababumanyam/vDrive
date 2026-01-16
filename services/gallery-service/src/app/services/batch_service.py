@@ -190,19 +190,9 @@ class BatchService:
                         results["failed"] += 1
                         continue
 
-                    # Get max position
-                    max_pos_result = await db.execute(
-                        select(GalleryAsset.position)
-                        .where(GalleryAsset.gallery_id == destination_id)
-                        .order_by(GalleryAsset.position.desc())
-                        .limit(1)
-                    )
-                    max_pos = max_pos_result.scalar() or 0
-
                     new_asset = GalleryAsset(
                         gallery_id=destination_id,
                         asset_id=asset_id,
-                        position=max_pos + 1,
                     )
                     db.add(new_asset)
                     results["processed_ids"].append(str(asset_id))
@@ -249,14 +239,15 @@ class BatchService:
                     results["failed"] += 1
 
         elif operation in [BatchOperationType.SHOW_ASSETS, BatchOperationType.HIDE_ASSETS]:
-            is_visible = operation == BatchOperationType.SHOW_ASSETS
+            # is_private=True means hidden, is_private=False means visible
+            is_private = operation == BatchOperationType.HIDE_ASSETS
 
             for asset_id in asset_ids:
                 try:
                     result = await db.execute(
                         update(GalleryAsset)
                         .where(GalleryAsset.asset_id == asset_id)
-                        .values(is_visible=is_visible, updated_at=datetime.now(timezone.utc))
+                        .values(is_private=is_private, updated_at=datetime.now(timezone.utc))
                     )
                     if result.rowcount > 0:
                         results["processed_ids"].append(str(asset_id))
@@ -274,15 +265,31 @@ class BatchService:
             BatchOperationType.SET_FAVORITES,
             BatchOperationType.UNSET_FAVORITES,
         ]:
-            is_favorite = operation == BatchOperationType.SET_FAVORITES
+            # Increment or decrement favorites_count
+            is_increment = operation == BatchOperationType.SET_FAVORITES
 
             for asset_id in asset_ids:
                 try:
-                    result = await db.execute(
-                        update(GalleryAsset)
-                        .where(GalleryAsset.asset_id == asset_id)
-                        .values(is_favorite=is_favorite, updated_at=datetime.now(timezone.utc))
-                    )
+                    if is_increment:
+                        result = await db.execute(
+                            update(GalleryAsset)
+                            .where(GalleryAsset.asset_id == asset_id)
+                            .values(
+                                favorites_count=GalleryAsset.favorites_count + 1,
+                                updated_at=datetime.now(timezone.utc),
+                            )
+                        )
+                    else:
+                        # Decrement but don't go below 0
+                        result = await db.execute(
+                            update(GalleryAsset)
+                            .where(GalleryAsset.asset_id == asset_id)
+                            .where(GalleryAsset.favorites_count > 0)
+                            .values(
+                                favorites_count=GalleryAsset.favorites_count - 1,
+                                updated_at=datetime.now(timezone.utc),
+                            )
+                        )
                     if result.rowcount > 0:
                         results["processed_ids"].append(str(asset_id))
                         results["successful"] += 1
@@ -310,18 +317,9 @@ class BatchService:
                     )
 
                     # Add to destination
-                    max_pos_result = await db.execute(
-                        select(GalleryAsset.position)
-                        .where(GalleryAsset.gallery_id == destination_id)
-                        .order_by(GalleryAsset.position.desc())
-                        .limit(1)
-                    )
-                    max_pos = max_pos_result.scalar() or 0
-
                     new_asset = GalleryAsset(
                         gallery_id=destination_id,
                         asset_id=asset_id,
-                        position=max_pos + 1,
                     )
                     db.add(new_asset)
                     results["processed_ids"].append(str(asset_id))
@@ -355,18 +353,9 @@ class BatchService:
                         continue
 
                     # Add to destination
-                    max_pos_result = await db.execute(
-                        select(GalleryAsset.position)
-                        .where(GalleryAsset.gallery_id == destination_id)
-                        .order_by(GalleryAsset.position.desc())
-                        .limit(1)
-                    )
-                    max_pos = max_pos_result.scalar() or 0
-
                     new_asset = GalleryAsset(
                         gallery_id=destination_id,
                         asset_id=asset_id,
-                        position=max_pos + 1,
                     )
                     db.add(new_asset)
                     results["processed_ids"].append(str(asset_id))
@@ -434,7 +423,7 @@ class BatchService:
                             Gallery.id == gallery_id,
                             Gallery.workspace_id == workspace_id,
                         )
-                        .values(is_archived=True, updated_at=datetime.now(timezone.utc))
+                        .values(status="archived", updated_at=datetime.now(timezone.utc))
                     )
                     if result.rowcount > 0:
                         results["processed_ids"].append(str(gallery_id))
@@ -452,7 +441,8 @@ class BatchService:
             BatchOperationType.PUBLISH_GALLERIES,
             BatchOperationType.UNPUBLISH_GALLERIES,
         ]:
-            is_published = operation == BatchOperationType.PUBLISH_GALLERIES
+            # Use status field: "published" or "draft"
+            new_status = "published" if operation == BatchOperationType.PUBLISH_GALLERIES else "draft"
 
             for gallery_id in gallery_ids:
                 try:
@@ -463,7 +453,7 @@ class BatchService:
                             Gallery.workspace_id == workspace_id,
                         )
                         .values(
-                            is_published=is_published,
+                            status=new_status,
                             updated_at=datetime.now(timezone.utc),
                         )
                     )

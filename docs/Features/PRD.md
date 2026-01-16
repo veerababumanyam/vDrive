@@ -1,20 +1,20 @@
 
 # Product Requirements Document (PRD)
-## vDrive — Photo & Video Delivery Platform with Albums, CRM, AI Search (GEO), and Enterprise BYOS Governance
+## RawDrive — Photo & Video Delivery Platform with Albums, CRM, AI Search (GEO), and Enterprise BYOS Governance
 
 > Terminology: See [`GLOSSARY.md`](GLOSSARY.md) (canonical terms for Workspace, Asset, Share Link, Trial, etc.).
 
 **Last updated:** 27 Jan 2026  
 **Owner:** Prasad Manyam  
 **Company:** SWAZ Consultants  
-**Product:** vDrive  
+**Product:** RawDrive  
 **Status:** Draft v3 (Updated for Microservices)
 
 ---
 
 ## 1. Executive Summary
 
-vDrive is a multi-tenant platform for photographers, studios, and enterprise/corporate teams to manage the full media workflow end-to-end:
+RawDrive is a multi-tenant platform for photographers, studios, and enterprise/corporate teams to manage the full media workflow end-to-end:
 
 - **Ingest** (managed storage or BYOS), organize, and deliver photo/video galleries.
 - **Collaborate** with clients and stakeholders via selections, comments, approvals, and proofs.
@@ -23,7 +23,7 @@ vDrive is a multi-tenant platform for photographers, studios, and enterprise/cor
 - **Discover** content using AI-powered internal search (GEO): semantic metadata, embeddings, relationships, and personalized relevance.
 - **Govern** enterprise media with SSO, policies, classification labels, retention/legal hold, and auditability.
 
-vDrive competes in an overcrowded market by combining three things most tools split across products:
+RawDrive competes in an overcrowded market by combining three things most tools split across products:
 
 1) client delivery + proofing, 2) album production, and 3) enterprise-grade governance/BYOS + AI discovery.
 
@@ -34,7 +34,7 @@ vDrive competes in an overcrowded market by combining three things most tools sp
 1. **Client experience is the product.** Viewing, selecting, and approving must be effortless on mobile.
 2. **Fast by default.** Galleries feel instant via progressive loading, caching, and derivatives.
 3. **Trust and control.** Sharing is explicit, auditable, and policy-driven; no accidental leakage.
-4. **BYOS without BYOS pain.** Users keep their storage; vDrive provides the UX, metadata, search, and governance.
+4. **BYOS without BYOS pain.** Users keep their storage; RawDrive provides the UX, metadata, search, and governance.
 5. **AI that saves time, not creates work.** Background jobs, quotas/credits, clear previews, and reversible actions.
 
 ---
@@ -46,11 +46,11 @@ vDrive competes in an overcrowded market by combining three things most tools sp
 3. **Corporate Workspace Admin (Comms/HR/IT)**: SSO, roles, policies, retention, and security.
 4. **Corporate Employee (Internal Viewer)**: secure portal access to internal galleries.
 5. **External Guest / Agency**: time-boxed, scoped access with download rules.
-6. **Platform Admin (vDrive Ops)**: workspace support, abuse prevention, billing and monitoring.
+6. **Platform Admin (RawDrive Ops)**: workspace support, abuse prevention, billing and monitoring.
 
 ---
 
-## 4. Scope: What vDrive ships
+## 4. Scope: What RawDrive ships
 
 ### 4.1 In scope
 
@@ -151,7 +151,7 @@ Implementation note (for cross-doc alignment): a “single-company” product ex
 
 **Delivery requirement (hosted)**
 
-- In vDrive-hosted mode, deliver media and static assets via **Cloudflare CDN**, with cache rules that respect workspace policies (expiry/revocation), and signed URL TTLs.
+- In RawDrive-hosted mode, deliver media and static assets via **Cloudflare CDN**, with cache rules that respect workspace policies (expiry/revocation), and signed URL TTLs.
 
 **Requirements**
 
@@ -256,7 +256,7 @@ Implementation note (for cross-doc alignment): a “single-company” product ex
 
 **AI-native & multi-provider requirements**
 
-- vDrive SHALL be **AI-native**: core workflows (ingest, culling, tagging, search, album/story generation, client comms) are designed around AI assistance with human review.
+- RawDrive SHALL be **AI-native**: core workflows (ingest, culling, tagging, search, album/story generation, client comms) are designed around AI assistance with human review.
 - The AI Platform SHALL support a **Model Router** with multiple provider backends:
   - **Google Gemini** (primary/default)
   - **OpenAI**
@@ -370,7 +370,7 @@ Implementation note (for cross-doc alignment): a “single-company” product ex
   - auto-classification rules (where feasible)
   - retention rules per label
   - legal hold / immutability
-  - CMK/KMS integration (customer-provided KMS/Key Vault where applicable; for vDrive-hosted managed storage, use envelope encryption with a workspace key managed via a secure key store)
+  - CMK/KMS integration (customer-provided KMS/Key Vault where applicable; for RawDrive-hosted managed storage, use envelope encryption with a workspace key managed via a secure key store)
   - data sovereignty routing by region/country where required
   - org hierarchy (HQ → region → country → branch)
 - Audit: sensitive views/downloads, exportable logs.
@@ -407,9 +407,9 @@ Implementation note (for cross-doc alignment): a “single-company” product ex
 - Encryption at rest for secrets and tokens.
 - Audit logs for sensitive actions.
 
-### 9.4 Infrastructure baseline (vDrive-hosted)
+### 9.4 Infrastructure baseline (RawDrive-hosted)
 
-The default hosted deployment assumptions for vDrive are:
+The default hosted deployment assumptions for RawDrive are:
 
 - **Edge:** Cloudflare (CDN + WAF + DDoS protection + rate limiting).
 - **CAPTCHA:** Cloudflare Turnstile for bot mitigation.

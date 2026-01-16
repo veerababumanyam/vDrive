@@ -6,7 +6,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: notifications-service
-  namespace: vDrive
+  namespace: RawDrive
   labels:
     app: notifications-service
     app.kubernetes.io/name: notifications-service
@@ -26,19 +26,19 @@ spec:
         prometheus.io/port: "8010"
         prometheus.io/path: "/metrics"
     spec:
-      serviceAccountName: vDrive-service
+      serviceAccountName: RawDrive-service
       containers:
         - name: notifications-service
-          image: ghcr.io/vDrive/notifications-service:latest
+          image: ghcr.io/RawDrive/notifications-service:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8010
               name: http
           envFrom:
             - configMapRef:
-                name: vDrive-config
+                name: RawDrive-config
             - secretRef:
-                name: vDrive-secrets
+                name: RawDrive-secrets
           env:
             - name: SERVICE_NAME
               value: "notifications-service"
@@ -68,13 +68,13 @@ spec:
             initialDelaySeconds: 10
             periodSeconds: 5
       imagePullSecrets:
-        - name: vDrive-registry
+        - name: RawDrive-registry
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: notifications-service
-  namespace: vDrive
+  namespace: RawDrive
 spec:
   type: ClusterIP
   ports:

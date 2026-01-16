@@ -4,7 +4,7 @@
 
 ## Introduction
 
-This specification defines the Free Trial Lifecycle Management system for vDrive. The system transforms the current unlimited free tier into a time-limited 30-day free trial with Business tier features and limits. After the trial expires, users must upgrade to a paid plan or have their account disabled. The system includes automated email communications for trial reminders, expiry notifications, and post-expiry re-engagement campaigns.
+This specification defines the Free Trial Lifecycle Management system for RawDrive. The system transforms the current unlimited free tier into a time-limited 30-day free trial with Business tier features and limits. After the trial expires, users must upgrade to a paid plan or have their account disabled. The system includes automated email communications for trial reminders, expiry notifications, and post-expiry re-engagement campaigns.
 
 ## Glossary
 
@@ -22,11 +22,11 @@ This specification defines the Free Trial Lifecycle Management system for vDrive
 
 ### Requirement 1
 
-**User Story:** As a new user, I want to receive a 30-day free trial with Business tier features, so that I can fully evaluate vDrive before committing to a paid subscription.
+**User Story:** As a new user, I want to receive a 30-day free trial with Business tier features, so that I can fully evaluate RawDrive before committing to a paid subscription.
 
 #### Acceptance Criteria
 
-1. WHEN a new user signs up for vDrive THEN the Free_Trial_System SHALL create an account with trial_status set to "active_trial" and trial_expiry_date set to current_date plus 30 days
+1. WHEN a new user signs up for RawDrive THEN the Free_Trial_System SHALL create an account with trial_status set to "active_trial" and trial_expiry_date set to current_date plus 30 days
 2. WHILE a user has active_trial status THEN the Free_Trial_System SHALL grant access to all Business tier features including 1 TB storage, 200 galleries, 500 clients, custom branding, face recognition, video support, and API access
 3. WHILE a user has active_trial status THEN the Free_Trial_System SHALL enforce Business tier limits as defined in tier-limits.ts
 4. WHEN a user views their account dashboard THEN the Free_Trial_System SHALL display the number of days remaining in the trial period
@@ -92,7 +92,7 @@ This specification defines the Free Trial Lifecycle Management system for vDrive
 
 ### Requirement 7
 
-**User Story:** As a trial user, I want to easily upgrade my account at any time, so that I can continue using vDrive without interruption.
+**User Story:** As a trial user, I want to easily upgrade my account at any time, so that I can continue using RawDrive without interruption.
 
 #### Acceptance Criteria
 
@@ -139,7 +139,7 @@ This specification defines the Free Trial Lifecycle Management system for vDrive
 
 ## Overview
 
-The Free Trial Lifecycle Management system transforms vDrive's free tier into a time-limited 30-day trial with Business tier features. The system manages the complete trial lifecycle including signup, feature access, expiry handling, abuse prevention, and automated re-engagement campaigns.
+The Free Trial Lifecycle Management system transforms RawDrive's free tier into a time-limited 30-day trial with Business tier features. The system manages the complete trial lifecycle including signup, feature access, expiry handling, abuse prevention, and automated re-engagement campaigns.
 
 ## Architecture
 
@@ -756,41 +756,41 @@ Integration tests will verify:
 ### Trial Reminder Emails
 
 1. **7-Day Reminder**
-   - Subject: "Your vDrive trial ends in 7 days"
+   - Subject: "Your RawDrive trial ends in 7 days"
    - Content: Trial benefits summary, upgrade CTA, pricing link
 
 2. **3-Day Reminder**
-   - Subject: "Only 3 days left in your vDrive trial"
+   - Subject: "Only 3 days left in your RawDrive trial"
    - Content: Urgency messaging, features to lose, upgrade CTA
 
 3. **1-Day Reminder**
-   - Subject: "Final day of your vDrive trial"
+   - Subject: "Final day of your RawDrive trial"
    - Content: Last chance messaging, direct upgrade link
 
 ### Expiry Emails
 
 4. **Trial Expired**
-   - Subject: "Your vDrive trial has ended"
+   - Subject: "Your RawDrive trial has ended"
    - Content: Account status, data retention info, upgrade options
 
 ### Re-engagement Emails
 
 5. **We Miss You (7 days post-expiry)**
-   - Subject: "We miss you at vDrive"
+   - Subject: "We miss you at RawDrive"
    - Content: Special offer, feature highlights, upgrade CTA
 
 6. **Monthly Update (1-12 months)**
-   - Subject: "What's new at vDrive"
+   - Subject: "What's new at RawDrive"
    - Content: New features, improvements, upgrade CTA
 
 ### Data Deletion Emails
 
 7. **90-Day Warning**
-   - Subject: "Your vDrive data will be deleted in 30 days"
+   - Subject: "Your RawDrive data will be deleted in 30 days"
    - Content: Data summary, export option, upgrade to save data
 
 8. **Final Deletion Notice**
-   - Subject: "Your vDrive data has been deleted"
+   - Subject: "Your RawDrive data has been deleted"
    - Content: Confirmation, fresh start option
 
 ## Scheduled Jobs

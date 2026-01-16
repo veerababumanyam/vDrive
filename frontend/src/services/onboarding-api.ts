@@ -103,7 +103,8 @@ function createApiClient(): AxiosInstance {
       }
 
       // Transform error for consistent handling
-      const responseData = error.response?.data;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const responseData = error.response?.data as Record<string, any> | undefined;
 
       // Handle FastAPI's detail field (can be string or object)
       let apiError: ApiError;

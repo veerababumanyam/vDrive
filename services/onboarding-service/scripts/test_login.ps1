@@ -1,18 +1,18 @@
-# Test Login Script for vDrive Onboarding Service (PowerShell)
+# Test Login Script for RawDrive Onboarding Service (PowerShell)
 #
 # Usage: .\test_login.ps1 [-Email "email"] [-Password "password"]
 #
-# Default test user: free@test.vdrive.in / Test@123
+# Default test user: free@test.RawDrive.in / Test@123
 
 param(
-    [string]$Email = "free@test.vdrive.in",
+    [string]$Email = "free@test.RawDrive.in",
     [string]$Password = "Test@123",
     [string]$ApiBase = "http://localhost:8006/api/v1/onboarding"
 )
 
 Write-Host ""
 Write-Host "=============================================="
-Write-Host "  vDrive Login Test (PowerShell)"
+Write-Host "  RawDrive Login Test (PowerShell)"
 Write-Host "=============================================="
 Write-Host ""
 Write-Host "API Base: $ApiBase"

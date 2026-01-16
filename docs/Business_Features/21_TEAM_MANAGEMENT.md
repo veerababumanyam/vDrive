@@ -6,7 +6,7 @@
 
 ## Business Value Proposition
 
-vDrive is designed for studios of all sizes, from solo freelancers to large agencies with editors, shooters, and assistants. The Team Management module allows workspace owners to invite collaborators, assign granular roles, and maintain security through activity monitoring. This enables businesses to scale their operations securely without sharing passwords.
+RawDrive is designed for studios of all sizes, from solo freelancers to large agencies with editors, shooters, and assistants. The Team Management module allows workspace owners to invite collaborators, assign granular roles, and maintain security through activity monitoring. This enables businesses to scale their operations securely without sharing passwords.
 
 ### Key Business Benefits
 - **Operational Scalability**: Delegate tasks (editing, uploading, client comms) to staff.

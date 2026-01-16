@@ -1,4 +1,4 @@
-"""vDrive Gallery Service Configuration"""
+"""RawDrive Gallery Service Configuration"""
 
 from functools import lru_cache
 from typing import List
@@ -28,7 +28,7 @@ class Settings(BaseSettings):
 
     # Database Configuration
     DATABASE_URL: str = Field(
-        default="postgresql+asyncpg://vDrive:vDrive_dev_password@localhost:5432/vDrive"
+        default="postgresql+asyncpg://RawDrive:RawDrive_dev_password@localhost:5432/RawDrive"
     )
     DB_POOL_MIN_SIZE: int = Field(default=5)
     DB_POOL_MAX_SIZE: int = Field(default=20)
@@ -41,17 +41,20 @@ class Settings(BaseSettings):
 
     # Kafka Configuration
     KAFKA_BOOTSTRAP_SERVERS: str = Field(default="localhost:9092")
+    KAFKA_CONSUMER_GROUP_ID: str = Field(default="gallery-service")
+    KAFKA_AUTO_OFFSET_RESET: str = Field(default="earliest")
+    KAFKA_ENABLE_AUTO_COMMIT: bool = Field(default=False)
 
     # Object Storage (R2/S3)
     R2_ACCESS_KEY_ID: str = Field(default="")
     R2_SECRET_ACCESS_KEY: str = Field(default="")
-    R2_BUCKET_NAME: str = Field(default="vDrive")
+    R2_BUCKET_NAME: str = Field(default="RawDrive")
     R2_ENDPOINT: str = Field(default="")
     R2_REGION: str = Field(default="auto")
 
     # JWT Configuration (for staff endpoints)
     JWT_SECRET: str = Field(default="your-secret-key-here-change-in-production")
-    JWT_ALGORITHM: str = Field(default="EdDSA")
+    JWT_ALGORITHM: str = Field(default="HS256")
     JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(default=15)
 
     @field_validator("JWT_SECRET")

@@ -7,7 +7,7 @@ const blogCollection = defineCollection({
     description: z.string(),
     pubDate: z.date(),
     updatedDate: z.date().optional(),
-    author: z.string().default('vDrive Team'),
+    author: z.string().default('RawDrive Team'),
     authorImage: z.string().optional(),
     image: z.string().optional(),
     tags: z.array(z.string()).default([]),

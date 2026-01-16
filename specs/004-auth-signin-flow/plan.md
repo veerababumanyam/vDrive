@@ -5,7 +5,7 @@
 
 ## Summary
 
-Implement production-grade authentication with OAuth2 Password Grant flow and JWT tokens for vDrive. Backend extends the onboarding-service on port 8006 with login, token refresh, and logout endpoints. Frontend adds React signin page with auth context, protected routes, and responsive mobile-first design. Supports both email/password and Google OAuth signin methods.
+Implement production-grade authentication with OAuth2 Password Grant flow and JWT tokens for RawDrive. Backend extends the onboarding-service on port 8006 with login, token refresh, and logout endpoints. Frontend adds React signin page with auth context, protected routes, and responsive mobile-first design. Supports both email/password and Google OAuth signin methods.
 
 ## Technical Context
 

@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document summarizes the comprehensive Business Features documentation created for vDrive, covering all platform features from a business analyst perspective.
+This document summarizes the comprehensive Business Features documentation created for RawDrive, covering all platform features from a business analyst perspective.
 
 ## Documents Delivered
 

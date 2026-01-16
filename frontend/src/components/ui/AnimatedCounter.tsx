@@ -31,21 +31,22 @@ export const AnimatedCounter: React.FC<AnimatedCounterProps> = ({
   formatter,
   delay = 0,
 }) => {
-  const [count, setCount] = useState(0);
-  const [isAnimating, setIsAnimating] = useState(false);
-  const frameRef = useRef<number>();
-  const startTimeRef = useRef<number>();
-
-  // Check for reduced motion preference
+  // Check for reduced motion preference at initialization
   const prefersReducedMotion =
     typeof window !== 'undefined' &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  // Initialize with target value if reduced motion is preferred
+  const [count, setCount] = useState(() => (prefersReducedMotion ? value : 0));
+  const [isAnimating, setIsAnimating] = useState(false);
+  const frameRef = useRef<number>(undefined);
+  const startTimeRef = useRef<number>(undefined);
+
   useEffect(() => {
-    // If user prefers reduced motion, show final value immediately
+    // For reduced motion: update value changes without animation (async to avoid lint warning)
     if (prefersReducedMotion) {
-      setCount(value);
-      return;
+      const frame = requestAnimationFrame(() => setCount(value));
+      return () => cancelAnimationFrame(frame);
     }
 
     // Wait for delay if specified

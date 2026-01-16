@@ -1,7 +1,7 @@
 # ===========================================
 # Traefik v3 Static Configuration
 # ===========================================
-# vDrive API Gateway
+# RawDrive API Gateway
 
 # Global settings
 global:
@@ -67,7 +67,7 @@ providers:
   docker:
     endpoint: "unix:///var/run/docker.sock"
     exposedByDefault: false
-    network: vDrive-network
+    network: RawDrive-network
     watch: true
 
   file:

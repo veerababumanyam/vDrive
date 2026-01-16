@@ -1,5 +1,5 @@
 # ===========================================
-# vDrive Gallery Service Dockerfile
+# RawDrive Gallery Service Dockerfile
 # ===========================================
 # Gallery management service on port 8004
 # Dependencies: PostgreSQL, Redis, Kafka, R2

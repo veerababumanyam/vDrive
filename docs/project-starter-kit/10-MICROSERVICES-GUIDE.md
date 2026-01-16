@@ -1,4 +1,4 @@
-# vDrive Microservices Guide
+# RawDrive Microservices Guide
 
 **Version:** 0.4.0 | **Last Updated:** January 2026
 
@@ -6,16 +6,16 @@
 
 ## Microservices Overview
 
-vDrive uses a microservices architecture with 11+ independently deployable services, including separate frontends for public website and authenticated app:
+RawDrive uses a microservices architecture with 11+ independently deployable services, including separate frontends for public website and authenticated app:
 
 ```mermaid
 graph TB
     subgraph "Public Traffic"
-        WWW[www.vdrive.io] --> Traefik
+        WWW[www.RawDrive.io] --> Traefik
     end
 
     subgraph "App Traffic"
-        APP[app.vdrive.io] --> Traefik
+        APP[app.RawDrive.io] --> Traefik
     end
 
     Traefik[Traefik API Gateway]
@@ -43,9 +43,9 @@ graph TB
 
 | Domain | Service | Purpose |
 |--------|---------|---------|
-| `www.vdrive.io` | Website Service | Public marketing, blog, docs |
-| `app.vdrive.io` | Frontend (React) | Authenticated application |
-| `app.vdrive.io/api/*` | Backend + Services | API endpoints |
+| `www.RawDrive.io` | Website Service | Public marketing, blog, docs |
+| `app.RawDrive.io` | Frontend (React) | Authenticated application |
+| `app.RawDrive.io/api/*` | Backend + Services | API endpoints |
 
 ---
 
@@ -84,9 +84,9 @@ graph TB
 
 | Priority | Rule | Service |
 |----------|------|---------|
-| 250 | `Host(app.vdrive.io) && PathPrefix(/api)` | backend |
-| 200 | `Host(www.vdrive.io) \|\| Host(vdrive.io)` | website-service |
-| 200 | `Host(app.vdrive.io)` | frontend-service |
+| 250 | `Host(app.RawDrive.io) && PathPrefix(/api)` | backend |
+| 200 | `Host(www.RawDrive.io) \|\| Host(RawDrive.io)` | website-service |
+| 200 | `Host(app.RawDrive.io)` | frontend-service |
 | 150 | `/webhooks/stripe` | billing-service |
 | 148 | `/webhooks/razorpay` | billing-service |
 | 145 | `/api/v1/subscription/*` | billing-service |
@@ -522,7 +522,7 @@ scripts/dev-{name}-service.sh
 cd services/{name}-service && pytest
 
 # Build Docker image
-docker build -t vDrive/{name}-service services/{name}-service
+docker build -t RawDrive/{name}-service services/{name}-service
 ```
 
 ---

@@ -1,6 +1,6 @@
-# vDrive Developer Quickstart Guide
+# RawDrive Developer Quickstart Guide
 
-This guide will help you set up the vDrive development environment from scratch.
+This guide will help you set up the RawDrive development environment from scratch.
 
 ## Prerequisites
 
@@ -62,8 +62,8 @@ npm install -g pnpm
 ### Clone Repository
 
 ```bash
-git clone https://github.com/your-org/vDrive.git
-cd vDrive
+git clone https://github.com/your-org/RawDrive.git
+cd RawDrive
 ```
 
 ### Environment Configuration
@@ -80,10 +80,10 @@ Edit `.env` with your configuration:
 # =============================================================================
 # DATABASE
 # =============================================================================
-POSTGRES_USER=vdrive
-POSTGRES_PASSWORD=vdrive_dev_password
-POSTGRES_DB=vdrive
-DATABASE_URL=postgresql://vdrive:vdrive_dev_password@localhost:5432/vdrive
+POSTGRES_USER=RawDrive
+POSTGRES_PASSWORD=RawDrive_dev_password
+POSTGRES_DB=RawDrive
+DATABASE_URL=postgresql://RawDrive:RawDrive_dev_password@localhost:5432/RawDrive
 
 # =============================================================================
 # REDIS
@@ -108,16 +108,16 @@ JWT_PUBLIC_KEY_PATH=/app/keys/public.pem
 # =============================================================================
 R2_ACCESS_KEY_ID=your_r2_access_key
 R2_SECRET_ACCESS_KEY=your_r2_secret_key
-R2_BUCKET_NAME=vdrive-dev
+R2_BUCKET_NAME=RawDrive-dev
 R2_ENDPOINT_URL=https://your-account-id.r2.cloudflarestorage.com
-R2_PUBLIC_URL=https://cdn.vdrive.io
+R2_PUBLIC_URL=https://cdn.RawDrive.io
 
 # =============================================================================
 # EMAIL (SendGrid)
 # =============================================================================
 SENDGRID_API_KEY=SG.your_api_key_here
-EMAIL_FROM_ADDRESS=noreply@vdrive.io
-EMAIL_FROM_NAME=vDrive
+EMAIL_FROM_ADDRESS=noreply@RawDrive.io
+EMAIL_FROM_NAME=RawDrive
 
 # =============================================================================
 # PAYMENTS
@@ -196,18 +196,18 @@ docker compose ps
 
 # Expected output:
 # NAME                  STATUS
-# vDrive-postgres       running (healthy)
-# vDrive-redis          running (healthy)
-# vDrive-kafka          running
-# vDrive-zookeeper      running
-# vDrive-traefik        running
+# RawDrive-postgres       running (healthy)
+# RawDrive-redis          running (healthy)
+# RawDrive-kafka          running
+# RawDrive-zookeeper      running
+# RawDrive-traefik        running
 ```
 
 ### Service URLs
 
 | Service | URL | Credentials |
 |---------|-----|-------------|
-| PostgreSQL | `localhost:5432` | vDrive / vDrive_dev_password |
+| PostgreSQL | `localhost:5432` | RawDrive / RawDrive_dev_password |
 | Redis | `localhost:6379` | - |
 | Kafka | `localhost:9092` | - |
 | Traefik Dashboard | http://localhost:8080 | - |
@@ -216,7 +216,7 @@ docker compose ps
 
 ```bash
 # Create required topics
-docker exec -it vdrive-kafka kafka-topics.sh --create \
+docker exec -it RawDrive-kafka kafka-topics.sh --create \
   --bootstrap-server localhost:9092 \
   --topic gallery.events \
   --partitions 3 \
@@ -224,7 +224,7 @@ docker exec -it vdrive-kafka kafka-topics.sh --create \
 
 # Create all topics
 for topic in gallery.events asset.events face.events client.events billing.events notification.events webhook.events invitation.events audit.events dlq.events; do
-  docker exec -it vDrive-kafka kafka-topics.sh --create \
+  docker exec -it RawDrive-kafka kafka-topics.sh --create \
     --bootstrap-server localhost:9092 \
     --topic $topic \
     --partitions 3 \
@@ -233,7 +233,7 @@ for topic in gallery.events asset.events face.events client.events billing.event
 done
 
 # List topics
-docker exec -it vDrive-kafka kafka-topics.sh --list \
+docker exec -it RawDrive-kafka kafka-topics.sh --list \
   --bootstrap-server localhost:9092
 ```
 
@@ -266,7 +266,7 @@ python scripts/seed_dev_data.py
 ```
 
 This creates:
-- Admin user: `admin@vdrive.io` / `Admin123!`
+- Admin user: `admin@RawDrive.io` / `Admin123!`
 - Test workspace: "Demo Photography Studio"
 - Sample galleries and assets
 - Test subscription plans
@@ -275,7 +275,7 @@ This creates:
 
 ```bash
 # Connect to PostgreSQL
-docker exec -it vdrive-postgres psql -U vdrive -d vdrive
+docker exec -it RawDrive-postgres psql -U RawDrive -d RawDrive
 
 # Check tables
 \dt
@@ -559,7 +559,7 @@ alembic downgrade -1
 alembic history
 
 # Connect to database
-docker exec -it vDrive-postgres psql -U vdrive -d vdrive
+docker exec -it RawDrive-postgres psql -U RawDrive -d RawDrive
 ```
 
 ### Code Quality
@@ -601,7 +601,7 @@ netstat -ano | findstr :5432  # Windows
 docker ps | grep postgres
 
 # Check container logs
-docker logs vDrive-postgres
+docker logs RawDrive-postgres
 
 # Restart container
 docker compose restart postgres
@@ -632,7 +632,7 @@ pnpm install
 
 ```bash
 # Create topic manually
-docker exec -it vDrive-kafka kafka-topics.sh --create \
+docker exec -it RawDrive-kafka kafka-topics.sh --create \
   --bootstrap-server localhost:9092 \
   --topic your.topic.name \
   --partitions 3 \
@@ -665,13 +665,13 @@ curl http://localhost:8004/health  # Gallery
 curl http://localhost:8005/health  # Billing
 
 # Check database
-docker exec vdrive-postgres pg_isready -U vdrive
+docker exec RawDrive-postgres pg_isready -U RawDrive
 
 # Check Redis
-docker exec vDrive-redis redis-cli ping
+docker exec RawDrive-redis redis-cli ping
 
 # Check Kafka
-docker exec vDrive-kafka kafka-broker-api-versions.sh \
+docker exec RawDrive-kafka kafka-broker-api-versions.sh \
   --bootstrap-server localhost:9092
 ```
 
@@ -686,6 +686,6 @@ docker exec vDrive-kafka kafka-broker-api-versions.sh \
 
 ## Getting Help
 
-- **Slack**: #vdrive-dev
+- **Slack**: #RawDrive-dev
 - **Wiki**: Internal documentation
 - **Issues**: GitHub Issues for bugs and features

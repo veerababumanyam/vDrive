@@ -23,8 +23,7 @@ class TestGalleryModel:
             title="Test Gallery",
             description="Test description",
             status="published",
-            allow_downloads=True,
-            allow_favorites=True,
+            download_policy="all",
         )
 
         test_db_session.add(gallery)
@@ -293,7 +292,7 @@ class TestGalleryAssetModel:
         assert asset.gallery_id == gallery.id
         assert asset.asset_id == "00000000-0000-0000-0000-000000000123"
         assert asset.tags == ["landscape", "nature"]
-        assert asset.view_count == 0
+        assert asset.favorites_count == 0  # GalleryAsset tracks favorites_count, not view_count
 
     async def test_gallery_asset_to_dict(self, test_db_session):
         """Test gallery asset to_dict method."""

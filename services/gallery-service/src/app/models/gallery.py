@@ -38,10 +38,9 @@ class Gallery(Base):
         server_default=text("gen_random_uuid()"),
     )
 
-    # Multi-tenancy
+    # Multi-tenancy (FK constraint exists in DB, not declared in model to avoid cross-service dependency)
     workspace_id: Mapped[str] = mapped_column(
         UUID(as_uuid=False),
-        ForeignKey("workspaces.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
@@ -57,21 +56,44 @@ class Gallery(Base):
         index=True,
     )  # draft, published, archived
 
-    # Security
+    # Security (matches migration schema)
+    password_protected: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False, server_default="false"
+    )
     password_hash: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    pin_protected: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False, server_default="false"
+    )
 
-    # Settings (stored as individual columns for queryability)
-    allow_downloads: Mapped[bool] = mapped_column(
-        Boolean, nullable=False, default=True, server_default="true"
+    # Client info
+    client_name: Mapped[Optional[str]] = mapped_column(String(200), nullable=True)
+    shoot_date: Mapped[Optional[datetime]] = mapped_column(
+        DateTime(timezone=True), nullable=True
     )
-    allow_favorites: Mapped[bool] = mapped_column(
-        Boolean, nullable=False, default=True, server_default="true"
+    expires_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime(timezone=True), nullable=True
     )
-    watermark_enabled: Mapped[bool] = mapped_column(
+
+    # Settings (matches migration schema)
+    email_registration_required: Mapped[bool] = mapped_column(
         Boolean, nullable=False, default=False, server_default="false"
     )
-    show_exif: Mapped[bool] = mapped_column(
-        Boolean, nullable=False, default=False, server_default="false"
+    download_policy: Mapped[str] = mapped_column(
+        String(20), nullable=False, default="view_only", server_default="'view_only'"
+    )
+    layout_style: Mapped[str] = mapped_column(
+        String(20), nullable=False, default="tab", server_default="'tab'"
+    )
+    theme: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
+
+    # Branding
+    primary_color: Mapped[Optional[str]] = mapped_column(String(7), nullable=True)
+    secondary_color: Mapped[Optional[str]] = mapped_column(String(7), nullable=True)
+
+    # Created by (FK constraint exists in DB, not declared in model to avoid cross-service dependency)
+    created_by_id: Mapped[Optional[str]] = mapped_column(
+        UUID(as_uuid=False),
+        nullable=True,
     )
 
     # Cover asset (nullable, will be set after gallery_assets exist)
@@ -82,18 +104,42 @@ class Gallery(Base):
     )
 
     # Denormalized stats for performance (updated via triggers/services)
-    total_photos: Mapped[int] = mapped_column(
+    # Column names match migration schema
+    photo_count: Mapped[int] = mapped_column(
         Integer, nullable=False, default=0, server_default="0"
     )
-    total_views: Mapped[int] = mapped_column(
+    video_count: Mapped[int] = mapped_column(
         Integer, nullable=False, default=0, server_default="0"
     )
-    total_downloads: Mapped[int] = mapped_column(
+    favorites_count: Mapped[int] = mapped_column(
         Integer, nullable=False, default=0, server_default="0"
     )
-    total_favorites: Mapped[int] = mapped_column(
+    view_count: Mapped[int] = mapped_column(
         Integer, nullable=False, default=0, server_default="0"
     )
+    download_count: Mapped[int] = mapped_column(
+        Integer, nullable=False, default=0, server_default="0"
+    )
+    total_size_bytes: Mapped[int] = mapped_column(
+        Integer, nullable=False, default=0, server_default="0"
+    )
+
+    # Aliases for backward compatibility
+    @property
+    def total_photos(self) -> int:
+        return self.photo_count
+
+    @property
+    def total_views(self) -> int:
+        return self.view_count
+
+    @property
+    def total_downloads(self) -> int:
+        return self.download_count
+
+    @property
+    def total_favorites(self) -> int:
+        return self.favorites_count
 
     # Timestamps
     created_at: Mapped[datetime] = mapped_column(
@@ -146,20 +192,28 @@ class Gallery(Base):
             "title": self.title,
             "description": self.description,
             "status": self.status,
+            "client_name": self.client_name,
+            "shoot_date": self.shoot_date.isoformat() if self.shoot_date else None,
             "has_password": self.password_hash is not None,
+            "password_protected": self.password_protected,
+            "pin_protected": self.pin_protected,
             "settings": {
-                "allow_downloads": self.allow_downloads,
-                "allow_favorites": self.allow_favorites,
-                "watermark_enabled": self.watermark_enabled,
-                "show_exif": self.show_exif,
+                "allow_downloads": self.download_policy != "view_only",
+                "allow_favorites": True,  # Always allowed
+                "watermark_enabled": False,  # Not yet implemented
+                "show_exif": False,  # Not yet implemented
+            },
+            "branding": {
+                "primary_color": self.primary_color,
+                "secondary_color": self.secondary_color,
             },
             "cover_asset_id": self.cover_asset_id,
             "stats": {
-                "total_photos": self.total_photos,
-                "total_views": self.total_views,
-                "total_downloads": self.total_downloads,
-                "total_favorites": self.total_favorites,
+                "total_photos": self.photo_count,
+                "total_views": self.view_count,
+                "total_downloads": self.download_count,
+                "total_favorites": self.favorites_count,
             },
-            "created_at": self.created_at,
-            "updated_at": self.updated_at,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "updated_at": self.updated_at.isoformat() if self.updated_at else None,
         }

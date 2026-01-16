@@ -16,6 +16,27 @@ export default defineConfig({
         target: 'http://localhost:8006',
         changeOrigin: true,
       },
+      '/api/v1/galleries': {
+        target: 'http://localhost:8004',
+        changeOrigin: true,
+      },
+      '/api/v1/public': {
+        target: 'http://localhost:8004',
+        changeOrigin: true,
+      },
+      '/api/v1/ws': {
+        target: 'ws://localhost:8004',
+        changeOrigin: true,
+        ws: true,
+      },
+      '/api/v1/files': {
+        target: 'http://localhost:8008',
+        changeOrigin: true,
+      },
+      '/api/v1/uploads': {
+        target: 'http://localhost:8008',
+        changeOrigin: true,
+      },
     },
   },
 })

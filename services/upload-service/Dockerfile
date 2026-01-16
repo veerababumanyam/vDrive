@@ -1,5 +1,5 @@
 # ===========================================
-# vDrive Upload Service Dockerfile
+# RawDrive Upload Service Dockerfile
 # ===========================================
 # TUS resumable upload service on port 8008
 # Dependencies: PostgreSQL, Redis, Kafka, R2

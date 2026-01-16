@@ -2,7 +2,7 @@
 
 **Version:** 1.0.0 | **Last Updated:** January 2026
 
-This document captures technology research findings and architectural decisions for each implementation phase of the vDrive platform.
+This document captures technology research findings and architectural decisions for each implementation phase of the RawDrive platform.
 
 ---
 
@@ -580,7 +580,7 @@ class EncryptionService:
 from celery import Celery
 
 celery_app = Celery(
-    "vdrive",
+    "RawDrive",
     broker=settings.REDIS_URL,
     backend=f"db+{settings.DATABASE_URL}",
 )
@@ -1109,7 +1109,7 @@ class MagicLinkService:
 
         return {
             "token": token,
-            "url": f"https://app.vdrive.io/g/{token}",
+            "url": f"https://app.RawDrive.io/g/{token}",
             "expires_at": expires_at.isoformat(),
             "password_protected": password is not None,
         }
@@ -1542,7 +1542,7 @@ class EmailService:
             raise ValueError(f"Unknown template: {template_name}")
 
         message = Mail(
-            from_email=("no-reply@vdrive.io", "vDrive"),
+            from_email=("no-reply@RawDrive.io", "RawDrive"),
             to_emails=to_email,
         )
         message.template_id = template_id
@@ -1800,7 +1800,7 @@ export class BiometricService {
   }
 
   async authenticateAndGetToken(): Promise<string | null> {
-    const authenticated = await this.authenticate('Unlock vDrive');
+    const authenticated = await this.authenticate('Unlock RawDrive');
     if (!authenticated) return null;
 
     return await this.getCredentials('refresh_token');
@@ -1829,7 +1829,7 @@ apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
 metadata:
   name: backend-scaledobject
-  namespace: vdrive
+  namespace: RawDrive
 spec:
   scaleTargetRef:
     name: backend
@@ -1899,7 +1899,7 @@ spec:
 ```yaml
 # infrastructure/prometheus/alert-rules.yaml
 groups:
-  - name: vdrive-critical
+  - name: RawDrive-critical
     rules:
       - alert: ServiceDown
         expr: up{job=~"backend|gallery|billing"} == 0
@@ -1908,7 +1908,7 @@ groups:
           severity: critical
         annotations:
           summary: "Service {{ $labels.job }} is down"
-          runbook: "https://wiki.vdrive.io/runbooks/service-down"
+          runbook: "https://wiki.RawDrive.io/runbooks/service-down"
 
       - alert: HighErrorRate
         expr: |
@@ -1923,7 +1923,7 @@ groups:
 
       - alert: DatabaseConnectionExhausted
         expr: |
-          pg_stat_activity_count{datname="vdrive"}
+          pg_stat_activity_count{datname="RawDrive"}
           / pg_settings_max_connections
           > 0.9
         for: 5m
@@ -1932,7 +1932,7 @@ groups:
         annotations:
           summary: "PostgreSQL connections at {{ $value | humanizePercentage }}"
 
-  - name: vdrive-warning
+  - name: RawDrive-warning
     rules:
       - alert: HighLatency
         expr: |
@@ -1989,20 +1989,20 @@ groups:
 ```yaml
 # infrastructure/prometheus/recording-rules.yaml
 groups:
-  - name: vdrive-recording-rules
+  - name: RawDrive-recording-rules
     rules:
       # Pre-aggregate request rates by service
-      - record: vdrive:http_requests:rate5m
+      - record: RawDrive:http_requests:rate5m
         expr: sum(rate(traefik_service_requests_total[5m])) by (service, code)
 
       # Pre-aggregate error rates
-      - record: vdrive:http_error_rate:ratio5m
+      - record: RawDrive:http_error_rate:ratio5m
         expr: |
           sum(rate(traefik_service_requests_total{code=~"5.."}[5m])) by (service)
           / sum(rate(traefik_service_requests_total[5m])) by (service)
 
       # Pre-aggregate latency percentiles
-      - record: vdrive:http_latency_p95:seconds
+      - record: RawDrive:http_latency_p95:seconds
         expr: |
           histogram_quantile(0.95,
             sum(rate(traefik_service_request_duration_seconds_bucket[5m]))
@@ -2010,26 +2010,26 @@ groups:
           )
 
       # Pre-aggregate database metrics
-      - record: vdrive:db_connections:ratio
+      - record: RawDrive:db_connections:ratio
         expr: |
-          pg_stat_activity_count{datname="vdrive"}
+          pg_stat_activity_count{datname="RawDrive"}
           / pg_settings_max_connections
 
       # Pre-aggregate Kafka lag
-      - record: vdrive:kafka_lag:total
+      - record: RawDrive:kafka_lag:total
         expr: sum(kafka_consumergroup_lag) by (consumergroup, topic)
 ```
 
 **Dashboard Queries:**
 ```promql
 # Request rate by service (use recording rule)
-vdrive:http_requests:rate5m
+RawDrive:http_requests:rate5m
 
 # Error rate percentage
-vdrive:http_error_rate:ratio5m * 100
+RawDrive:http_error_rate:ratio5m * 100
 
 # P95 latency in milliseconds
-vdrive:http_latency_p95:seconds * 1000
+RawDrive:http_latency_p95:seconds * 1000
 
 # Active users (unique IPs in last hour)
 count(sum by (client_ip) (

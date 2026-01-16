@@ -1,6 +1,6 @@
 #!/bin/bash
 # ===========================================
-# vDrive Kubernetes Deployment Script
+# RawDrive Kubernetes Deployment Script
 # ===========================================
 # Usage: ./deploy-k8s.sh [dev|staging|prod]
 
@@ -19,7 +19,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 echo -e "${BLUE}=============================================${NC}"
-echo -e "${BLUE}vDrive Kubernetes Deployment${NC}"
+echo -e "${BLUE}RawDrive Kubernetes Deployment${NC}"
 echo -e "${BLUE}Environment: ${GREEN}$ENVIRONMENT${NC}"
 echo -e "${BLUE}=============================================${NC}"
 
@@ -93,23 +93,23 @@ PREFIX="${ENVIRONMENT}-"
 
 # Wait for PostgreSQL
 echo -e "  Waiting for PostgreSQL..."
-kubectl wait --for=condition=ready pod -l app=postgres -n vDrive --timeout=300s 2>/dev/null || true
+kubectl wait --for=condition=ready pod -l app=postgres -n RawDrive --timeout=300s 2>/dev/null || true
 
 # Wait for Redis
 echo -e "  Waiting for Redis..."
-kubectl wait --for=condition=ready pod -l app=redis -n vDrive --timeout=120s 2>/dev/null || true
+kubectl wait --for=condition=ready pod -l app=redis -n RawDrive --timeout=120s 2>/dev/null || true
 
 # Wait for Kafka
 echo -e "  Waiting for Kafka..."
-kubectl wait --for=condition=ready pod -l app=kafka -n vDrive --timeout=180s 2>/dev/null || true
+kubectl wait --for=condition=ready pod -l app=kafka -n RawDrive --timeout=180s 2>/dev/null || true
 
 # Wait for Traefik
 echo -e "  Waiting for Traefik..."
-kubectl wait --for=condition=available deployment/${PREFIX}traefik -n vDrive --timeout=120s 2>/dev/null || true
+kubectl wait --for=condition=available deployment/${PREFIX}traefik -n RawDrive --timeout=120s 2>/dev/null || true
 
 # Wait for Backend
 echo -e "  Waiting for Backend..."
-kubectl wait --for=condition=available deployment/${PREFIX}backend -n vDrive --timeout=180s 2>/dev/null || true
+kubectl wait --for=condition=available deployment/${PREFIX}backend -n RawDrive --timeout=180s 2>/dev/null || true
 
 echo -e "\n${GREEN}=============================================${NC}"
 echo -e "${GREEN}Deployment Complete!${NC}"
@@ -117,29 +117,29 @@ echo -e "${GREEN}=============================================${NC}"
 
 # Show status
 echo -e "\n${YELLOW}Deployment Status:${NC}"
-kubectl get pods -n vDrive -o wide
+kubectl get pods -n RawDrive -o wide
 
 echo -e "\n${YELLOW}Services:${NC}"
-kubectl get svc -n vDrive
+kubectl get svc -n RawDrive
 
 echo -e "\n${YELLOW}Ingress Routes:${NC}"
-kubectl get ingressroutes -n vDrive 2>/dev/null || echo "No IngressRoutes found"
+kubectl get ingressroutes -n RawDrive 2>/dev/null || echo "No IngressRoutes found"
 
 echo -e "\n${YELLOW}KEDA ScaledObjects:${NC}"
-kubectl get scaledobjects -n vDrive 2>/dev/null || echo "No ScaledObjects found"
+kubectl get scaledobjects -n RawDrive 2>/dev/null || echo "No ScaledObjects found"
 
 # Get Traefik LoadBalancer IP
 echo -e "\n${YELLOW}Access Information:${NC}"
-TRAEFIK_IP=$(kubectl get svc ${PREFIX}traefik -n vDrive -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null || echo "pending")
+TRAEFIK_IP=$(kubectl get svc ${PREFIX}traefik -n RawDrive -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null || echo "pending")
 if [ "$TRAEFIK_IP" != "pending" ] && [ -n "$TRAEFIK_IP" ]; then
     echo -e "  Traefik LoadBalancer IP: ${GREEN}$TRAEFIK_IP${NC}"
     echo -e "  API URL: ${GREEN}http://$TRAEFIK_IP/api/v1${NC}"
 else
-    echo -e "  Traefik LoadBalancer: ${YELLOW}Pending (use 'kubectl get svc -n vDrive' to check)${NC}"
+    echo -e "  Traefik LoadBalancer: ${YELLOW}Pending (use 'kubectl get svc -n RawDrive' to check)${NC}"
 fi
 
 echo -e "\n${BLUE}Useful Commands:${NC}"
-echo -e "  View logs:     kubectl logs -f deployment/${PREFIX}backend -n vDrive"
-echo -e "  Port forward:  kubectl port-forward svc/${PREFIX}backend 8000:8000 -n vDrive"
-echo -e "  Scale:         kubectl scale deployment/${PREFIX}backend --replicas=5 -n vDrive"
+echo -e "  View logs:     kubectl logs -f deployment/${PREFIX}backend -n RawDrive"
+echo -e "  Port forward:  kubectl port-forward svc/${PREFIX}backend 8000:8000 -n RawDrive"
+echo -e "  Scale:         kubectl scale deployment/${PREFIX}backend --replicas=5 -n RawDrive"
 echo -e "  Delete all:    kubectl delete -k $OVERLAY_DIR"

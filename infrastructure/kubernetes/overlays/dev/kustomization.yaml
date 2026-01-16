@@ -7,7 +7,7 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 metadata:
-  name: vDrive-dev
+  name: RawDrive-dev
 
 resources:
   - ../../
@@ -95,7 +95,7 @@ patches:
 
 # ConfigMap for dev-specific settings
 configMapGenerator:
-  - name: vDrive-config
+  - name: RawDrive-config
     literals:
       - APP_ENV=development
       - LOG_LEVEL=DEBUG

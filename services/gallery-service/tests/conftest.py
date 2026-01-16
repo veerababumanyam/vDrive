@@ -19,7 +19,7 @@ from src.app.core.database import Base, get_db
 from src.app.main import app
 
 # Test database URL (use separate test database)
-TEST_DATABASE_URL = settings.DATABASE_URL.replace("/vdrive", "/vdrive_test")
+TEST_DATABASE_URL = settings.DATABASE_URL.replace("/RawDrive", "/RawDrive_test")
 
 
 # Stub Workspaces model for testing (foreign key constraint)
@@ -41,6 +41,24 @@ class Workspace(Base):
         DateTime(timezone=True),
         default=datetime.utcnow,
         onupdate=datetime.utcnow,
+    )
+
+
+# Stub Users model for testing (foreign key constraint)
+class User(Base):
+    """Stub User model for testing foreign key constraints."""
+
+    __tablename__ = "users"
+
+    id: Mapped[str] = mapped_column(
+        UUID(as_uuid=False),
+        primary_key=True,
+        default=lambda: str(uuid4()),
+    )
+    email: Mapped[str] = mapped_column(String(255), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=datetime.utcnow,
     )
 
 

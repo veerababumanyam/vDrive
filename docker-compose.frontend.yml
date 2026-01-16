@@ -1,4 +1,4 @@
-# vDrive Website Service Docker Compose
+# RawDrive Website Service Docker Compose
 # Public marketing pages microservice
 #
 # Usage: docker compose -f docker-compose.frontend.yml up --build
@@ -7,7 +7,7 @@
 # ┌─────────────────────────────────────────────────────────────┐
 # │                     Traffic Flow                            │
 # ├─────────────────────────────────────────────────────────────┤
-# │  Visitors ──> Website (localhost:8020 / vdrive.io)         │
+# │  Visitors ──> Website (localhost:8020 / RawDrive.io)         │
 # │                    │                                        │
 # │                    ├── Click "Sign Up" ──> Frontend (app)  │
 # │                    └── Click "Login"   ──> Frontend (app)  │
@@ -16,15 +16,15 @@
 # └─────────────────────────────────────────────────────────────┘
 #
 # Services:
-# - Website (Docker):   http://localhost:8020  (vdrive.io)
+# - Website (Docker):   http://localhost:8020  (RawDrive.io)
 # - Frontend (Local):   http://localhost:5173  (npm run dev)
 
-name: vdrive-website
+name: RawDrive-website
 
 services:
   # ===================
   # Website Service - Public Marketing Pages
-  # Domain: vdrive.io, www.vdrive.io
+  # Domain: RawDrive.io, www.RawDrive.io
   # Purpose: SEO, conversion, public content, landing pages
   # Tech: Astro (static site generator)
   # ===================
@@ -35,7 +35,7 @@ services:
       args:
         SITE_URL: http://localhost:8020
         APP_URL: http://localhost:5173
-    container_name: vdrive-website
+    container_name: RawDrive-website
     ports:
       - "8020:8020"
     environment:
@@ -50,5 +50,5 @@ services:
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.website.rule=Host(`vdrive.io`) || Host(`www.vdrive.io`) || Host(`localhost`)"
+      - "traefik.http.routers.website.rule=Host(`RawDrive.io`) || Host(`www.RawDrive.io`) || Host(`localhost`)"
       - "traefik.http.services.website.loadbalancer.server.port=8020"

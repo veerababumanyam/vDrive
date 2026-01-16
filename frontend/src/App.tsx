@@ -29,6 +29,8 @@ import { WorkspaceSetupPage } from './pages/WorkspaceSetup';
 
 // Protected Pages
 import { DashboardPage } from './pages/Dashboard';
+import { ExportPage } from './pages/Export';
+import { MigrationPage } from './pages/Migration';
 
 // UI Components
 import { PlaceholderPage } from './components/ui/PlaceholderPage';
@@ -83,6 +85,22 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <DashboardPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/export"
+                element={
+                  <ProtectedRoute>
+                    <ExportPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/migration"
+                element={
+                  <ProtectedRoute>
+                    <MigrationPage />
                   </ProtectedRoute>
                 }
               />

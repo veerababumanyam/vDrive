@@ -4,7 +4,7 @@
 
 ## Overview
 
-vDrive implements comprehensive authentication and security measures to protect user accounts, data, and platform integrity. This document covers authentication mechanisms, security protocols, and best practices.
+RawDrive implements comprehensive authentication and security measures to protect user accounts, data, and platform integrity. This document covers authentication mechanisms, security protocols, and best practices.
 
 ## Purpose
 
@@ -239,7 +239,7 @@ Allow login via social providers.
 **OAuth Flow:**
 1. User clicks "Sign in with [Provider]"
 2. Redirect to provider's authorization page
-3. User authorizes vDrive
+3. User authorizes RawDrive
 4. Provider redirects back with authorization code
 5. Exchange code for access token
 6. Fetch user information
@@ -256,7 +256,7 @@ interface OAuthUserData {
   name: string,
   picture?: string,
   
-  // vDrive mapping
+  // RawDrive mapping
   userId: string,
   linkedAt: Date,
   provider: 'google' | 'facebook' | 'github' | 'microsoft',

@@ -3,11 +3,12 @@
 from typing import Optional
 
 import structlog
-from fastapi import APIRouter, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import select
 
+from ...core.auth import get_current_user, CurrentUser
 from ...core.database import AsyncSessionLocal
-from ...models import Upload
+from ...models import Upload, Asset
 from ...schemas.upload import UploadStatusResponse, UploadListResponse
 from ...storage.r2_tus_backend import get_r2_tus_backend
 
@@ -17,7 +18,10 @@ router = APIRouter()
 
 
 @router.get("/{upload_id}/status", response_model=UploadStatusResponse)
-async def get_upload_status(upload_id: str):
+async def get_upload_status(
+    upload_id: str,
+    current_user: CurrentUser = Depends(get_current_user),
+):
     """
     Get upload status (for polling).
 
@@ -28,8 +32,13 @@ async def get_upload_status(upload_id: str):
         Upload status with progress
     """
     try:
-        # Extract workspace_id from JWT (placeholder - needs auth middleware)
-        workspace_id = "default-workspace"  # TODO: Extract from JWT token
+        # Extract workspace_id from authenticated user
+        workspace_id = current_user.workspace_id
+        if not workspace_id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="No workspace assigned to user",
+            )
 
         async with AsyncSessionLocal() as db:
             # Query upload by ID and workspace (security check)
@@ -47,6 +56,12 @@ async def get_upload_status(upload_id: str):
                     detail="Upload not found or access denied",
                 )
 
+            # Query asset for this upload (if completed)
+            asset_result = await db.execute(
+                select(Asset).where(Asset.upload_id == upload.id)
+            )
+            asset = asset_result.scalar_one_or_none()
+
             return UploadStatusResponse(
                 id=upload.id,
                 filename=upload.filename,
@@ -55,6 +70,7 @@ async def get_upload_status(upload_id: str):
                 received_bytes=upload.received_bytes,
                 progress_percent=upload.progress_percent,
                 status=upload.status,
+                asset_id=asset.id if asset else None,
                 created_at=upload.created_at,
                 expires_at=upload.expires_at,
                 upload_url=upload.upload_url,
@@ -75,6 +91,7 @@ async def list_uploads(
     limit: int = Query(default=50, ge=1, le=100),
     offset: int = Query(default=0, ge=0),
     status_filter: Optional[str] = Query(default=None, alias="status"),
+    current_user: CurrentUser = Depends(get_current_user),
 ):
     """
     List workspace uploads with pagination.
@@ -88,8 +105,13 @@ async def list_uploads(
         Paginated list of uploads
     """
     try:
-        # Extract workspace_id from JWT (placeholder - needs auth middleware)
-        workspace_id = "default-workspace"  # TODO: Extract from JWT token
+        # Extract workspace_id from authenticated user
+        workspace_id = current_user.workspace_id
+        if not workspace_id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="No workspace assigned to user",
+            )
 
         async with AsyncSessionLocal() as db:
             # Build query
@@ -150,7 +172,10 @@ async def list_uploads(
 
 
 @router.delete("/{upload_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_upload(upload_id: str):
+async def delete_upload(
+    upload_id: str,
+    current_user: CurrentUser = Depends(get_current_user),
+):
     """
     Cancel/delete upload manually.
 
@@ -161,8 +186,13 @@ async def delete_upload(upload_id: str):
         204 on successful deletion
     """
     try:
-        # Extract workspace_id from JWT (placeholder - needs auth middleware)
-        workspace_id = "default-workspace"  # TODO: Extract from JWT token
+        # Extract workspace_id from authenticated user
+        workspace_id = current_user.workspace_id
+        if not workspace_id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="No workspace assigned to user",
+            )
 
         async with AsyncSessionLocal() as db:
             # Verify upload ownership

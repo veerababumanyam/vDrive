@@ -6,7 +6,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: zookeeper
-  namespace: vDrive
+  namespace: RawDrive
   labels:
     app: zookeeper
 spec:
@@ -84,7 +84,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: zookeeper
-  namespace: vDrive
+  namespace: RawDrive
 spec:
   type: ClusterIP
   ports:
@@ -99,7 +99,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: zookeeper-headless
-  namespace: vDrive
+  namespace: RawDrive
 spec:
   type: ClusterIP
   clusterIP: None
@@ -115,7 +115,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: kafka
-  namespace: vDrive
+  namespace: RawDrive
   labels:
     app: kafka
 spec:
@@ -200,7 +200,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: kafka
-  namespace: vDrive
+  namespace: RawDrive
 spec:
   type: ClusterIP
   ports:
@@ -215,7 +215,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: kafka-headless
-  namespace: vDrive
+  namespace: RawDrive
 spec:
   type: ClusterIP
   clusterIP: None
@@ -231,7 +231,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: kafka-topic-init
-  namespace: vDrive
+  namespace: RawDrive
 spec:
   ttlSecondsAfterFinished: 300
   template:

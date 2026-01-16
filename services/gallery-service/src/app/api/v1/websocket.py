@@ -110,12 +110,33 @@ async def gallery_websocket(
         async with async_session_factory() as db:
             # Authenticate if token provided
             is_authenticated = False
+            # Authenticate if token provided
+            is_authenticated = False
+            user_id = None
+
             if token:
-                is_valid, error_message = await verify_magic_link_token(
-                    token=token,
-                    gallery_id=gallery_id,
-                    db=db,
-                )
+                is_valid = False
+                error_message = "Authentication failed"
+
+                # 1. Try JWT Auth (Staff)
+                try:
+                    from ...core.auth import verify_token
+                    payload = verify_token(token, expected_type="access")
+                    user_id = payload.get("sub")
+                    is_authenticated = True
+                    is_valid = True
+                    logger.info(
+                        "WebSocket authenticated via JWT",
+                        gallery_id=gallery_id,
+                        user_id=user_id,
+                    )
+                except Exception:
+                    # 2. Try Magic Link Auth (Public)
+                    is_valid, error_message = await verify_magic_link_token(
+                        token=token,
+                        gallery_id=gallery_id,
+                        db=db,
+                    )
 
                 if not is_valid:
                     logger.warning(
@@ -126,17 +147,19 @@ async def gallery_websocket(
                     await websocket.close(code=4001, reason=error_message)
                     return
 
-                is_authenticated = True
-                logger.info(
-                    "WebSocket authenticated via magic link",
-                    gallery_id=gallery_id,
-                )
+                if not is_authenticated:
+                    # If we got here via magic link (is_valid=True) but not JWT (is_authenticated=False)
+                    is_authenticated = True
+                    logger.info(
+                        "WebSocket authenticated via magic link",
+                        gallery_id=gallery_id,
+                    )
 
         # Register connection
         connection = await websocket_manager.connect(
             websocket=websocket,
             gallery_id=gallery_id,
-            user_id=None,  # Anonymous for public galleries
+            user_id=user_id,
             is_authenticated=is_authenticated,
         )
 

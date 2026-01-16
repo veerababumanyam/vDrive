@@ -36,13 +36,13 @@ source venv/bin/activate  # or `venv\Scripts\activate` on Windows
 pip install -r requirements.txt
 
 # Set environment variables
-export DATABASE_URL=postgresql://postgres:postgres@localhost:5432/vdrive
+export DATABASE_URL=postgresql://postgres:postgres@localhost:5432/RawDrive
 export REDIS_URL=redis://localhost:6379/0
 export KAFKA_BOOTSTRAP_SERVERS=localhost:9092
 export R2_ENDPOINT=https://your-account.r2.cloudflarestorage.com
 export R2_ACCESS_KEY_ID=your_access_key
 export R2_SECRET_ACCESS_KEY=your_secret_key
-export R2_BUCKET_NAME=vdrive
+export R2_BUCKET_NAME=RawDrive
 export ENCRYPTION_MASTER_KEY=your_64_hex_char_key
 
 # Run service
@@ -149,7 +149,7 @@ pytest --cov=src tests/
 | `R2_ENDPOINT` | Yes | - | Cloudflare R2 endpoint |
 | `R2_ACCESS_KEY_ID` | Yes | - | R2 access key |
 | `R2_SECRET_ACCESS_KEY` | Yes | - | R2 secret key |
-| `R2_BUCKET_NAME` | Yes | `vdrive` | R2 bucket name |
+| `R2_BUCKET_NAME` | Yes | `RawDrive` | R2 bucket name |
 | `ENCRYPTION_MASTER_KEY` | Yes | - | 64-char hex key for AES-256 |
 | `GOOGLE_APPLICATION_CREDENTIALS` | No | - | GCV API credentials path |
 | `UPLOAD_MAX_SIZE` | No | `10737418240` | Max upload size (10GB) |
@@ -179,7 +179,7 @@ python -c "from cryptography.hazmat.primitives.kdf.hkdf import HKDF; print('OK')
 ### R2 Upload Failures
 ```bash
 # Test R2 connectivity
-aws s3 ls s3://vdrive/ \
+aws s3 ls s3://RawDrive/ \
   --endpoint-url $R2_ENDPOINT \
   --profile r2
 ```

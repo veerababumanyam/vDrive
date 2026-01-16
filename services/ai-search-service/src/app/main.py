@@ -197,7 +197,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator:
 
 # Create FastAPI application
 app = FastAPI(
-    title="vDrive AI Search Service",
+    title="RawDrive AI Search Service",
     description="Semantic search, RAG chat, and caption generation API",
     version=settings.SERVICE_VERSION,
     docs_url="/docs" if settings.APP_ENV != "production" else None,

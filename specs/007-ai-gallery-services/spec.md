@@ -6,7 +6,7 @@
 
 ## Overview
 
-This specification covers the implementation of AI-powered features for the vDrive photography platform, including face detection, semantic search, RAG-based chat, and real-time gallery updates.
+This specification covers the implementation of AI-powered features for the RawDrive photography platform, including face detection, semantic search, RAG-based chat, and real-time gallery updates.
 
 ## Goals
 

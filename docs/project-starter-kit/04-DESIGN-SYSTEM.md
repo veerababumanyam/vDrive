@@ -1,4 +1,4 @@
-# vDrive Design System
+# RawDrive Design System
 
 **Version:** 0.3.3 | **Last Updated:** January 2026
 
@@ -161,7 +161,7 @@ toast.loading('Processing...');
 
 ### Gradient Presets
 
-vDrive includes customizable gradient themes for galleries:
+RawDrive includes customizable gradient themes for galleries:
 
 | Theme | Primary | Secondary |
 |-------|---------|-----------|

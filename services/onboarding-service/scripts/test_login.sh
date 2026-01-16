@@ -1,19 +1,19 @@
 #!/bin/bash
-# Test Login Script for vDrive Onboarding Service
+# Test Login Script for RawDrive Onboarding Service
 #
 # Usage: ./test_login.sh [email] [password]
 #
-# Default test user: free@test.vdrive.in / Test@123
+# Default test user: free@test.RawDrive.in / Test@123
 
 set -e
 
 # Configuration
 API_BASE="${API_BASE:-http://localhost:8006/api/v1/onboarding}"
-EMAIL="${1:-free@test.vdrive.in}"
+EMAIL="${1:-free@test.RawDrive.in}"
 PASSWORD="${2:-Test@123}"
 
 echo "=============================================="
-echo "  vDrive Login Test"
+echo "  RawDrive Login Test"
 echo "=============================================="
 echo ""
 echo "API Base: $API_BASE"

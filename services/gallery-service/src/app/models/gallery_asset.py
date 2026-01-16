@@ -63,22 +63,29 @@ class GalleryAsset(Base):
     )
     pin_hash: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
 
-    # Tags for organization (PostgreSQL array)
-    tags: Mapped[list[str]] = mapped_column(
-        ARRAY(String),
-        nullable=False,
-        default=list,
-        server_default="{}",
+    # Sorting and visibility
+    sort_order: Mapped[int] = mapped_column(
+        Integer, nullable=False, default=0, server_default="0"
+    )
+    visible: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=True, server_default="true"
     )
 
-    # Interaction counts (denormalized for performance)
-    view_count: Mapped[int] = mapped_column(
+    # Metadata
+    title: Mapped[Optional[str]] = mapped_column(String(200), nullable=True)
+    description: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+
+    # Tags for organization (PostgreSQL array)
+    tags: Mapped[Optional[list[str]]] = mapped_column(
+        ARRAY(String(50)),
+        nullable=True,
+    )
+
+    # Interaction counts (matches migration schema)
+    favorites_count: Mapped[int] = mapped_column(
         Integer, nullable=False, default=0, server_default="0"
     )
-    favorite_count: Mapped[int] = mapped_column(
-        Integer, nullable=False, default=0, server_default="0"
-    )
-    download_count: Mapped[int] = mapped_column(
+    selections_count: Mapped[int] = mapped_column(
         Integer, nullable=False, default=0, server_default="0"
     )
 
@@ -127,13 +134,17 @@ class GalleryAsset(Base):
             "gallery_id": self.gallery_id,
             "sub_gallery_id": self.sub_gallery_id,
             "asset_id": self.asset_id,
+            "sort_order": self.sort_order,
+            "visible": self.visible,
             "is_private": self.is_private,
             "has_pin": self.pin_hash is not None,
-            "tags": self.tags,
+            "title": self.title,
+            "description": self.description,
+            "tags": self.tags or [],
             "stats": {
-                "views": self.view_count,
-                "favorites": self.favorite_count,
-                "downloads": self.download_count,
+                "views": 0,  # Views tracked at gallery level
+                "favorites": self.favorites_count,
+                "downloads": 0,  # Downloads tracked at gallery level
             },
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,

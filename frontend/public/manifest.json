@@ -1,6 +1,6 @@
 {
-  "name": "vDrive",
-  "short_name": "vDrive",
+  "name": "RawDrive",
+  "short_name": "RawDrive",
   "description": "Enterprise SaaS Photography Platform",
   "start_url": "/",
   "display": "standalone",

@@ -14,7 +14,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.app.core.config import settings
 from src.app.models.workspace import (
     BusinessType,
-    SubscriptionStatus,
     SubscriptionTier,
     Workspace,
 )
@@ -101,14 +100,14 @@ class WorkspaceRepository:
         self,
         name: str,
         slug: str,
+        owner_id: str,
         business_type: BusinessType,
         currency: str = "USD",
         timezone: str = "UTC",
         date_format: str = "YYYY-MM-DD",
         brand_color: Optional[str] = None,
         logo_url: Optional[str] = None,
-        subscription_tier: SubscriptionTier = SubscriptionTier.PRO,
-        subscription_status: SubscriptionStatus = SubscriptionStatus.TRIAL,
+        subscription_tier: str = "trial",
     ) -> Workspace:
         """
         Create a new workspace.
@@ -116,14 +115,14 @@ class WorkspaceRepository:
         Args:
             name: Workspace display name
             slug: URL-safe identifier (must be unique)
+            owner_id: ID of the user who owns this workspace
             business_type: Type of photography business
             currency: Currency code (default USD)
             timezone: IANA timezone (default UTC)
             date_format: Date display format
             brand_color: Hex brand color (optional)
             logo_url: Logo URL (optional)
-            subscription_tier: Subscription tier (default PRO for trial)
-            subscription_status: Subscription status (default TRIAL)
+            subscription_tier: Subscription tier (default "trial")
 
         Returns:
             Created Workspace instance
@@ -133,22 +132,19 @@ class WorkspaceRepository:
             days=settings.TRIAL_DURATION_DAYS
         )
 
-        # Calculate storage limit from config
-        storage_limit_bytes = settings.TRIAL_STORAGE_GB * 1024 * 1024 * 1024
-
         workspace = Workspace(
             name=name,
             slug=slug.lower(),
-            business_type=business_type,
+            owner_id=owner_id,
+            business_type=business_type.value if isinstance(business_type, BusinessType) else business_type,
             currency=currency,
             timezone=timezone,
             date_format=date_format,
             brand_color=brand_color,
             logo_url=logo_url,
             subscription_tier=subscription_tier,
-            subscription_status=subscription_status,
             trial_ends_at=trial_ends_at,
-            storage_limit_bytes=storage_limit_bytes,
+            storage_limit_gb=settings.TRIAL_STORAGE_GB,
             ai_credits=settings.TRIAL_AI_CREDITS,
         )
 

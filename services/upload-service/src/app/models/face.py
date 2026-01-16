@@ -7,7 +7,7 @@ from uuid import uuid4
 from sqlalchemy import (
     CheckConstraint,
     DateTime,
-    Decimal,
+    Numeric,
     ForeignKey,
     Index,
     String,
@@ -51,7 +51,7 @@ class Face(Base):
 
     # Face detection data
     bounding_box: Mapped[dict] = mapped_column(JSONB, nullable=False)
-    confidence: Mapped[float] = mapped_column(Decimal(5, 4), nullable=False)
+    confidence: Mapped[float] = mapped_column(Numeric(5, 4), nullable=False)
 
     # Face embedding for similarity search (512 dimensions)
     embedding: Mapped[Optional[list]] = mapped_column(Vector(512))
