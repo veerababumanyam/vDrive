@@ -1,1 +1,1 @@
-"""Middleware for Gallery Service"""
+"""Gallery Service middleware package."""

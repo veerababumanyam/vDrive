@@ -212,6 +212,12 @@ class AssetProcessor(BaseConsumer):
                 image_data=image_data,
             )
 
+            # Detect tags/labels (optional)
+            await self._detect_tags_full(
+                asset_id=asset_id,
+                image_data=image_data,
+            )
+
             # Update Asset record with derivative keys
             await self._update_asset_derivatives(asset_id, thumbnail_keys)
 
@@ -225,6 +231,7 @@ class AssetProcessor(BaseConsumer):
                 "lqip_generated": thumbnail_keys.get("lqip_base64") is not None,
                 "exif_extracted": True,
                 "faces_detected": True,
+                "tags_detected": True,
                 "processing_time_ms": 0,  # TODO: Track actual time
             }
 
@@ -494,8 +501,10 @@ class AssetProcessor(BaseConsumer):
     async def _detect_faces_full(
         self, asset_id: str, workspace_id: str, image_data: bytes
     ):
-        """Detect faces using Google Cloud Vision."""
+        """Detect faces using Google Cloud Vision and generate embeddings."""
         from ..services.face_service import get_face_service
+        from PIL import Image
+        import io
 
         logger.debug("Detecting faces", asset_id=asset_id)
 
@@ -513,11 +522,32 @@ class AssetProcessor(BaseConsumer):
                 logger.debug("No faces detected", asset_id=asset_id)
                 return
 
+            # Load original image for cropping faces
+            original_image = Image.open(io.BytesIO(image_data))
+            img_width, img_height = original_image.size
+
             # Store Face records in database
             async with get_db_session() as db:
                 face_ids = []
 
                 for face_data in faces:
+                    # Crop face from original image for embedding
+                    bbox = face_data["bounding_box"]
+                    face_crop = original_image.crop((
+                        bbox.get("x_min", 0),
+                        bbox.get("y_min", 0),
+                        bbox.get("x_max", img_width),
+                        bbox.get("y_max", img_height),
+                    ))
+
+                    # Encode cropped face to JPEG bytes
+                    face_buffer = io.BytesIO()
+                    face_crop.save(face_buffer, format="JPEG", quality=90)
+                    face_bytes = face_buffer.getvalue()
+
+                    # Generate face embedding
+                    embedding = face_service.generate_face_embedding(face_bytes)
+
                     face = Face(
                         asset_id=asset_id,
                         workspace_id=workspace_id,
@@ -526,10 +556,13 @@ class AssetProcessor(BaseConsumer):
                         landmarks=face_data.get("landmarks"),
                         attributes=face_data.get("attributes", {}),
                         detection_source="google_vision",
-                        embedding=None,  # Embedding generation happens separately
+                        embedding=embedding,
                     )
                     db.add(face)
                     face_ids.append(face.id)
+
+                    if embedding:
+                        logger.debug("Face embedding generated", face_id=face.id)
 
                 await db.commit()
 
@@ -563,6 +596,48 @@ class AssetProcessor(BaseConsumer):
         except Exception as e:
             logger.error("Failed to detect faces", asset_id=asset_id, error=str(e))
             # Don't raise - face detection is optional
+
+    async def _detect_tags_full(self, asset_id: str, image_data: bytes):
+        """Detect image tags/labels using Google Cloud Vision."""
+        from ..services.tag_service import get_tag_service
+        from ..models import AssetTag
+
+        logger.debug("Detecting tags", asset_id=asset_id)
+
+        try:
+            tag_service = get_tag_service()
+
+            if not tag_service.enabled:
+                logger.debug("Tag detection disabled, skipping")
+                return
+
+            # Detect tags
+            tags = await tag_service.detect_tags(image_data)
+
+            if not tags:
+                logger.debug("No tags detected", asset_id=asset_id)
+                return
+
+            # Store AssetTag records in database
+            async with get_db_session() as db:
+                for tag_data in tags:
+                    asset_tag = AssetTag(
+                        asset_id=asset_id,
+                        tag=tag_data["tag"],
+                        confidence=tag_data["confidence"],
+                        source="google_vision",
+                        mid=tag_data.get("mid"),
+                        topicality=tag_data.get("topicality"),
+                    )
+                    db.add(asset_tag)
+
+                await db.commit()
+
+            logger.info("Tags stored", asset_id=asset_id, tag_count=len(tags))
+
+        except Exception as e:
+            logger.error("Failed to detect tags", asset_id=asset_id, error=str(e))
+            # Don't raise - tag detection is optional
 
     async def _update_asset_derivatives(self, asset_id: str, derivative_keys: dict):
         """Update Asset record with derivative keys."""

@@ -1,18 +1,27 @@
-"""Redis connection and caching utilities for Gallery Service"""
+"""
+Redis client configuration for Gallery Service.
 
-from typing import Optional
+Provides async Redis client for caching, rate limiting, and session management.
+"""
+
+from typing import AsyncGenerator, Optional
 
 import redis.asyncio as redis
 from redis.asyncio import Redis
 
 from src.app.core.config import settings
 
-# Global Redis connection pool
+
+# Redis connection pool
 _redis_pool: Optional[Redis] = None
 
 
 async def init_redis() -> Redis:
-    """Initialize Redis connection pool."""
+    """
+    Initialize Redis connection pool.
+
+    Called on application startup.
+    """
     global _redis_pool
     _redis_pool = redis.from_url(
         settings.REDIS_URL,
@@ -23,79 +32,106 @@ async def init_redis() -> Redis:
     return _redis_pool
 
 
-async def get_redis() -> Optional[Redis]:
-    """Get Redis connection (returns None if unavailable)."""
-    global _redis_pool
-    if _redis_pool is None:
-        try:
-            await init_redis()
-        except Exception as e:
-            from src.app.core.logging import logger
-
-            logger.warning("Failed to connect to Redis", error=str(e))
-            return None
-    return _redis_pool
-
-
 async def close_redis() -> None:
-    """Close Redis connection pool."""
+    """
+    Close Redis connection pool.
+
+    Called on application shutdown.
+    """
     global _redis_pool
-    if _redis_pool is not None:
+    if _redis_pool:
         await _redis_pool.close()
         _redis_pool = None
 
 
+async def get_redis() -> AsyncGenerator[Redis, None]:
+    """
+    FastAPI dependency for Redis client.
+
+    Yields the shared Redis connection pool.
+    """
+    if _redis_pool is None:
+        await init_redis()
+    yield _redis_pool
+
+
+async def check_redis_connection() -> bool:
+    """
+    Health check for Redis connectivity.
+
+    Returns True if Redis is reachable, False otherwise.
+    """
+    try:
+        if _redis_pool is None:
+            return False
+        await _redis_pool.ping()
+        return True
+    except Exception:
+        return False
+
+
 class RedisKeys:
-    """Redis key patterns for Gallery Service."""
+    """
+    Centralized Redis key patterns.
 
-    # Rate limiting
-    RATE_LIMIT_IP = "rate_limit:ip:{ip}"
-    RATE_LIMIT_MAGIC_LINK = "rate_limit:link:{link_id}"
+    Ensures consistent key naming across the service.
+    """
 
-    # Caching
-    GALLERY_METADATA = "gallery:{gallery_id}:metadata"
-    GALLERY_STATS = "gallery:{gallery_id}:stats"
-    GALLERY_PHOTOS_PAGE = "gallery:{gallery_id}:photos:page:{cursor}"
+    # Rate limiting keys
+    RATE_LIMIT_UPLOAD = "rate_limit:upload:{workspace_id}"
+    RATE_LIMIT_WATERMARK = "rate_limit:watermark:{workspace_id}"
 
-    # Session state for PIN-unlocked photos
-    SESSION_UNLOCKED_PHOTOS = "session:{session_token}:unlocked"
+    # Gallery cache keys
+    GALLERY_CACHE = "gallery:cache:{gallery_id}"
+    GALLERY_PHOTOS_CACHE = "gallery:photos:cache:{gallery_id}"
 
-    # WebSocket room management
-    WEBSOCKET_ROOM = "ws:gallery:{gallery_id}:connections"
+    # Photo metadata cache keys
+    PHOTO_METADATA_CACHE = "photo:metadata:cache:{photo_id}"
 
-    # QR code caching
-    QR_CODE_CACHE = "qr:{link_id}:{size}:{color}:{logo}"
+    # Watermark processing keys
+    WATERMARK_BATCH_STATUS = "watermark:batch:status:{batch_id}"
+    WATERMARK_BATCH_PROGRESS = "watermark:batch:progress:{batch_id}"
 
-    @classmethod
-    def rate_limit_ip(cls, ip: str) -> str:
-        return cls.RATE_LIMIT_IP.format(ip=ip)
-
-    @classmethod
-    def rate_limit_magic_link(cls, link_id: str) -> str:
-        return cls.RATE_LIMIT_MAGIC_LINK.format(link_id=link_id)
+    # Thumbnail generation queue
+    THUMBNAIL_QUEUE = "thumbnail:queue"
+    THUMBNAIL_PROCESSING = "thumbnail:processing:{photo_id}"
 
     @classmethod
-    def gallery_metadata(cls, gallery_id: str) -> str:
-        return cls.GALLERY_METADATA.format(gallery_id=gallery_id)
+    def rate_limit_upload(cls, workspace_id: str) -> str:
+        """Get rate limit key for upload by workspace ID."""
+        return cls.RATE_LIMIT_UPLOAD.format(workspace_id=workspace_id)
 
     @classmethod
-    def gallery_stats(cls, gallery_id: str) -> str:
-        return cls.GALLERY_STATS.format(gallery_id=gallery_id)
+    def rate_limit_watermark(cls, workspace_id: str) -> str:
+        """Get rate limit key for watermark by workspace ID."""
+        return cls.RATE_LIMIT_WATERMARK.format(workspace_id=workspace_id)
 
     @classmethod
-    def gallery_photos_page(cls, gallery_id: str, cursor: str) -> str:
-        return cls.GALLERY_PHOTOS_PAGE.format(gallery_id=gallery_id, cursor=cursor)
+    def gallery_cache(cls, gallery_id: str) -> str:
+        """Get gallery cache key."""
+        return cls.GALLERY_CACHE.format(gallery_id=gallery_id)
 
     @classmethod
-    def session_unlocked_photos(cls, session_token: str) -> str:
-        return cls.SESSION_UNLOCKED_PHOTOS.format(session_token=session_token)
+    def gallery_photos_cache(cls, gallery_id: str) -> str:
+        """Get gallery photos cache key."""
+        return cls.GALLERY_PHOTOS_CACHE.format(gallery_id=gallery_id)
 
     @classmethod
-    def websocket_room(cls, gallery_id: str) -> str:
-        return cls.WEBSOCKET_ROOM.format(gallery_id=gallery_id)
+    def photo_metadata_cache(cls, photo_id: str) -> str:
+        """Get photo metadata cache key."""
+        return cls.PHOTO_METADATA_CACHE.format(photo_id=photo_id)
 
     @classmethod
-    def qr_code_cache(cls, link_id: str, size: int, color: str, logo: bool) -> str:
-        return cls.QR_CODE_CACHE.format(
-            link_id=link_id, size=size, color=color, logo="yes" if logo else "no"
-        )
+    def watermark_batch_status(cls, batch_id: str) -> str:
+        """Get watermark batch status key."""
+        return cls.WATERMARK_BATCH_STATUS.format(batch_id=batch_id)
+
+    @classmethod
+    def watermark_batch_progress(cls, batch_id: str) -> str:
+        """Get watermark batch progress key."""
+        return cls.WATERMARK_BATCH_PROGRESS.format(batch_id=batch_id)
+
+    @classmethod
+    def thumbnail_processing(cls, photo_id: str) -> str:
+        """Get thumbnail processing key."""
+        return cls.THUMBNAIL_PROCESSING.format(photo_id=photo_id)

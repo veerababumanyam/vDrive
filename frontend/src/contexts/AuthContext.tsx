@@ -66,7 +66,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   // SECURITY: Access tokens stored ONLY in memory, never localStorage
   // Refresh tokens stored in HttpOnly cookies by backend
   useEffect(() => {
-    const initializeAuth = () => {
+    const initializeAuth = async () => {
       try {
         // Check for OAuth callback tokens in URL fragment (from backend redirect)
         const fragment = window.location.hash.substring(1);
@@ -89,8 +89,22 @@ export function AuthProvider({ children }: AuthProviderProps) {
           const storedUser = localStorage.getItem('user');
 
           if (storedUser) {
-            setUser(JSON.parse(storedUser));
-            // Access token will be automatically refreshed if needed by interceptor
+            const userData = JSON.parse(storedUser);
+            setUser(userData);
+
+            // CRITICAL: Refresh access token from HttpOnly cookie
+            // Access tokens are never stored in localStorage for security
+            // We must call refresh to restore the session after page reload
+            try {
+              const refreshResponse = await authApi.refreshToken();
+              setAccessToken(refreshResponse.access_token);
+              setTokenInMemory(refreshResponse.access_token);
+            } catch (refreshError) {
+              // Refresh failed - session expired, clear user data
+              console.warn('Session expired, please log in again');
+              localStorage.removeItem('user');
+              setUser(null);
+            }
           }
         }
       } catch (error) {
@@ -114,14 +128,23 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       const response = await authApi.login(request);
 
+      // Construct user object from flat response
+      const userData: User = {
+        id: response.user_id,
+        email: response.email,
+        first_name: response.full_name?.split(' ')[0] || '',
+        last_name: response.full_name?.split(' ').slice(1).join(' ') || '',
+        email_verified: response.email_verified,
+      };
+
       // SECURITY: Store access token ONLY in memory (React state), never localStorage
       // Refresh token is automatically stored in HttpOnly cookie by backend
       // User data (non-sensitive) can be stored in localStorage for convenience
-      localStorage.setItem('user', JSON.stringify(response.user));
+      localStorage.setItem('user', JSON.stringify(userData));
 
       setAccessToken(response.access_token); // React state
       setTokenInMemory(response.access_token); // Axios interceptor access
-      setUser(response.user);
+      setUser(userData);
 
       return response;
     } catch (error) {

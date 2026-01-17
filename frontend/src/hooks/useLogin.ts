@@ -6,6 +6,7 @@
 import { useState, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { login as loginApi } from '../services/onboarding-api';
+import { setTokenInMemory } from '../services/authService';
 import type { ApiError } from '../types/onboarding';
 
 // ============================================
@@ -151,9 +152,21 @@ export function useLogin(options: UseLoginOptions = {}): UseLoginReturn {
         email_verified: response.email_verified,
       };
 
-      // Update global auth state
+      // DEBUG: Log login response for troubleshooting
+      console.log('[useLogin] Login successful, setting token...');
+      console.log('[useLogin] Access token present:', !!response.access_token);
+
+      // SECURITY: Store access token in memory (for axios interceptor)
+      setTokenInMemory(response.access_token);
+
+      // Save user to localStorage (for session persistence across page refresh)
+      localStorage.setItem('user', JSON.stringify(user));
+
+      // Update global auth state (React context)
       setUser(user);
       setAccessToken(response.access_token);
+
+      console.log('[useLogin] Token set complete');
 
 
 

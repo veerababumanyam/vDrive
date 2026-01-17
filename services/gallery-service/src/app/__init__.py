@@ -1,3 +1,1 @@
-"""RawDrive Gallery Service - FastAPI Application"""
-
-__version__ = "1.0.0"
+"""Gallery Service Application Package."""

@@ -8,6 +8,7 @@ from .asset import Asset, ProcessingStatus
 from .asset_metadata import AssetMetadata
 from .face import Face
 from .processing_task import ProcessingTask, TaskType, TaskStatus
+from .tag import AssetTag
 
 __all__ = [
     "Asset",
@@ -17,4 +18,6 @@ __all__ = [
     "ProcessingTask",
     "TaskType",
     "TaskStatus",
+    "AssetTag",
 ]
+

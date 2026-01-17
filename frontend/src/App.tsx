@@ -16,6 +16,7 @@ import { ThemeProvider } from './hooks/useTheme';
 
 // Auth Context & Components
 import { AuthProvider } from './contexts/AuthContext';
+import { WorkspaceProvider } from './contexts/WorkspaceContext';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 
 // Auth Pages
@@ -29,8 +30,9 @@ import { WorkspaceSetupPage } from './pages/WorkspaceSetup';
 
 // Protected Pages
 import { DashboardPage } from './pages/Dashboard';
-import { ExportPage } from './pages/Export';
-import { MigrationPage } from './pages/Migration';
+import { GallerySettingsPage } from './pages/GallerySettings';
+import { GalleryListPage } from './pages/GalleryList';
+import { GalleryCreatePage } from './pages/GalleryCreate';
 
 // UI Components
 import { PlaceholderPage } from './components/ui/PlaceholderPage';
@@ -53,7 +55,8 @@ function App() {
         <BrowserRouter>
           {/* T076: Wrap app with AuthProvider for authentication state */}
           <AuthProvider>
-            <Routes>
+            <WorkspaceProvider>
+              <Routes>
               {/* ============================================
                   Auth Routes - Sign In is the default
                   ============================================ */}
@@ -89,23 +92,31 @@ function App() {
                 }
               />
               <Route
-                path="/export"
+                path="/gallery/settings"
                 element={
                   <ProtectedRoute>
-                    <ExportPage />
+                    <GallerySettingsPage />
                   </ProtectedRoute>
                 }
               />
               <Route
-                path="/migration"
+                path="/galleries"
                 element={
                   <ProtectedRoute>
-                    <MigrationPage />
+                    <GalleryListPage />
                   </ProtectedRoute>
                 }
               />
               <Route
-                path="/galleries/*"
+                path="/galleries/new"
+                element={
+                  <ProtectedRoute>
+                    <GalleryCreatePage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/galleries/:id"
                 element={
                   <ProtectedRoute>
                     <PlaceholderPage />
@@ -142,7 +153,8 @@ function App() {
                   ============================================ */}
               {/* Unknown routes redirect to sign-in */}
               <Route path="*" element={<Navigate to="/signin" replace />} />
-            </Routes>
+              </Routes>
+            </WorkspaceProvider>
           </AuthProvider>
         </BrowserRouter>
       </ThemeProvider>

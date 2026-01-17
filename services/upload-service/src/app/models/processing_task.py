@@ -66,9 +66,9 @@ class ProcessingTask(Base):
         index=True,
     )
 
+    # Multi-tenancy (no FK - workspaces table is in onboarding-service)
     workspace_id: Mapped[str] = mapped_column(
         UUID(as_uuid=False),
-        ForeignKey("workspaces.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )

@@ -221,25 +221,56 @@ class FaceService:
         """
         Generate 512-dimensional face embedding for similarity matching.
 
-        Note: Google Cloud Vision doesn't provide embeddings directly.
-        This is a placeholder for future integration with a face recognition model
-        (e.g., FaceNet, ArcFace, or InsightFace).
+        Uses FaceNet (InceptionResnetV1) pretrained on VGGFace2 dataset.
 
         Args:
-            face_image: Cropped face image bytes
+            face_image: Cropped face image bytes (JPEG/PNG)
 
         Returns:
             512-dimensional embedding vector or None
         """
-        # TODO: Implement face embedding generation
-        # Options:
-        # 1. Use face_recognition library (dlib-based)
-        # 2. Use deepface library (multiple models)
-        # 3. Use custom trained model
-        # 4. Use another cloud service (AWS Rekognition, Azure Face API)
+        try:
+            from facenet_pytorch import InceptionResnetV1
+            from PIL import Image
+            import io
+            import torch
 
-        logger.debug("Face embedding generation not implemented")
-        return None
+            # Load model on first use (lazy initialization)
+            if not hasattr(self, '_facenet_model'):
+                self._facenet_model = InceptionResnetV1(pretrained='vggface2').eval()
+                logger.info("FaceNet model loaded for embedding generation")
+
+            # Load and preprocess face image
+            img = Image.open(io.BytesIO(face_image)).convert('RGB')
+
+            # Resize to 160x160 (FaceNet input size)
+            img = img.resize((160, 160), Image.Resampling.LANCZOS)
+
+            # Convert to tensor and normalize
+            from torchvision import transforms
+            preprocess = transforms.Compose([
+                transforms.ToTensor(),
+                transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]),
+            ])
+            img_tensor = preprocess(img).unsqueeze(0)  # Add batch dimension
+
+            # Generate embedding
+            with torch.no_grad():
+                embedding = self._facenet_model(img_tensor)
+
+            # Convert to list
+            embedding_list = embedding.squeeze().tolist()
+
+            logger.debug("Face embedding generated", embedding_dim=len(embedding_list))
+
+            return embedding_list
+
+        except ImportError:
+            logger.warning("facenet-pytorch not installed - face embedding disabled")
+            return None
+        except Exception as e:
+            logger.error("Failed to generate face embedding", error=str(e))
+            return None
 
 
 # Singleton instance

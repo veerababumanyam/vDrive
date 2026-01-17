@@ -18,7 +18,7 @@ interface AppLogoProps {
  * ```
  */
 export function AppLogo({ size = 'md', className = '' }: AppLogoProps) {
-  const { theme } = useTheme();
+  const { resolvedTheme } = useTheme();
 
   const sizeMap = {
     sm: 32,
@@ -26,7 +26,7 @@ export function AppLogo({ size = 'md', className = '' }: AppLogoProps) {
     lg: 64
   };
 
-  const logoSrc = theme === 'dark'
+  const logoSrc = resolvedTheme === 'dark'
     ? '/logo-dark-192x192.png'
     : '/logo-light-192x192.png';
 

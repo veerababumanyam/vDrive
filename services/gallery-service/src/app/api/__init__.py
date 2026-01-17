@@ -1,1 +1,1 @@
-"""API routes for Gallery Service"""
+"""Gallery Service API package."""

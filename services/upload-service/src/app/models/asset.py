@@ -49,9 +49,10 @@ class Asset(Base):
     )
 
     # Multi-tenancy
+    # NOTE: No ForeignKey constraint - workspaces table is in onboarding-service database
+    # In microservices architecture, cross-database FKs are not possible
     workspace_id: Mapped[str] = mapped_column(
         UUID(as_uuid=False),
-        ForeignKey("workspaces.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )

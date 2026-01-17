@@ -8,9 +8,10 @@ import axios from 'axios';
 import { getTokenFromMemory } from './authService';
 
 // API Configuration
-const UPLOAD_API_URL = import.meta.env.VITE_UPLOAD_API_URL || '/api/v1/files';
+// IMPORTANT: Trailing slash is required to prevent 307 redirect which strips Authorization header
+const UPLOAD_API_URL = import.meta.env.VITE_UPLOAD_API_URL || '/api/v1/files/';
 // Note: In development, this might need to point to the upload service port directly
-// or be routed via nginx. For now assuming /api/v1/files is proxied correctly.
+// or be routed via nginx. For now assuming /api/v1/files/ is proxied correctly.
 
 // Types
 export interface UploadStatus {
@@ -55,6 +56,11 @@ export function createTusUpload(
   onError: (error: Error) => void
 ): tus.Upload {
   const token = getTokenFromMemory();
+
+  // DEBUG: Log token presence for troubleshooting 401 errors
+  console.log('[TUS Upload] Token present:', !!token);
+  console.log('[TUS Upload] Token first 20 chars:', token ? token.substring(0, 20) + '...' : 'null');
+  console.log('[TUS Upload] File:', file.name, 'Workspace:', workspaceId);
 
   // Create upload
   const upload = new tus.Upload(file, {

@@ -1,1 +1,1 @@
-"""Core configuration and infrastructure modules"""
+# Core module - Configuration, Security, Database

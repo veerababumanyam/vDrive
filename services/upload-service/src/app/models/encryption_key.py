@@ -27,10 +27,9 @@ class EncryptionKey(Base):
     # Primary key (format: ws-{workspace_id}-v{version})
     id: Mapped[str] = mapped_column(String(100), primary_key=True)
 
-    # Foreign key
+    # Multi-tenancy (no FK - workspaces table is in onboarding-service)
     workspace_id: Mapped[str] = mapped_column(
         UUID(as_uuid=False),
-        ForeignKey("workspaces.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )

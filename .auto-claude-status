@@ -1,25 +1,25 @@
 {
   "active": true,
-  "spec": "001-bulk-export-migration-tools",
+  "spec": "003-batch-watermark-application",
   "state": "building",
   "subtasks": {
-    "completed": 21,
-    "total": 23,
+    "completed": 19,
+    "total": 21,
     "in_progress": 1,
     "failed": 0
   },
   "phase": {
-    "current": "Integration & Docker Setup",
+    "current": "Integration & E2E Testing",
     "id": null,
-    "total": 4
+    "total": 3
   },
   "workers": {
     "active": 0,
     "max": 1
   },
   "session": {
-    "number": 23,
-    "started_at": "2026-01-16T11:06:05.250310"
+    "number": 18,
+    "started_at": "2026-01-17T10:16:41.180956"
   },
-  "last_update": "2026-01-16T12:27:07.709458"
+  "last_update": "2026-01-17T11:17:29.500616"
 }

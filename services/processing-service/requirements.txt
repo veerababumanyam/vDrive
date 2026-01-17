@@ -17,6 +17,7 @@ ExifRead==3.0.0
 
 # AI
 google-cloud-vision==3.5.0
+facenet-pytorch==2.5.3
 
 # Database
 sqlalchemy[asyncio]==2.0.23

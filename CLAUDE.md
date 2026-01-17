@@ -24,11 +24,15 @@ RawDrive/
 ├── packages/           # Shared npm packages (@RawDrive/shared-*)
 ├── frontend/           # React 19 + TypeScript + Vite (app.RawDrive.io)
 ├── backend/            # Python 3.11 + FastAPI + SQLAlchemy
-├── services/           # Microservices (11 services)
+├── services/           # Microservices (8 services)
 │   ├── website/        # Astro public website (www.RawDrive.io)
-│   ├── billing-service/
 │   ├── gallery-service/
-│   └── ...
+│   ├── upload-service/
+│   ├── export-service/
+│   ├── onboarding-service/
+│   ├── ai-search-service/
+│   ├── face-service/
+│   └── processing-service/
 ├── infrastructure/     # Docker, Kubernetes, Traefik
 ├── docs/               # Documentation
 ├── specs/              # Feature specifications
@@ -268,15 +272,33 @@ R2_SECRET_ACCESS_KEY=<cloudflare-r2-secret>
 
 ## Service Ports
 
-| Service | Port | Domain |
-|---------|------|--------|
-| Website | 8020 | www.RawDrive.io |
-| Frontend | 3000/80 | app.RawDrive.io |
-| Backend | 8000 | app.RawDrive.io/api |
-| Gallery | 8004 | - |
-| Billing | 8005 | - |
-| Upload | 8008 | - |
-| Bulk-Export | 8023 | - |
+### Application Services
+| Service | Port | Description |
+|---------|------|-------------|
+| Website | 8020 | Astro public website (www.RawDrive.io) |
+| Frontend | 3000 | React app (app.RawDrive.io) |
+| Backend | 8000 | FastAPI core API |
+| Face Service | 8002 | Face detection & recognition |
+| Gallery Service | 8004 | Gallery management |
+| Onboarding Service | 8006 | User onboarding flows |
+| Upload Service | 8008 | File upload handling |
+| AI Search Service | 8009 | AI-powered search |
+| Processing Service | 8010 | Image processing workers |
+| Export Service | 8023 | Bulk export functionality |
+
+### Infrastructure Services
+| Service | Port | Purpose |
+|---------|------|---------|
+| PostgreSQL | 5432 | Primary database |
+| Redis | 6379 | Cache & message broker |
+| Kafka | 9092 | Event streaming |
+| Zookeeper | 2181 | Kafka coordination |
+| Traefik | 80/443/8080 | API gateway & dashboard |
+| Prometheus | 9090 | Metrics collection |
+| Grafana | 3001 | Dashboards |
+| Loki | 3100 | Log aggregation |
+| Kafka UI | 8081 | Kafka admin interface |
+| Flower | 5555 | Celery monitoring |
 
 ## Docker Development (IMPORTANT)
 
@@ -296,7 +318,7 @@ infrastructure/docker/docker-compose.dev.yml  # Dev-specific overrides (keep thi
 | Category | Services |
 |----------|----------|
 | **Core Application** | `frontend`, `backend`, `website` |
-| **Microservices** | `onboarding-service` |
+| **Microservices** | `gallery-service`, `upload-service`, `export-service`, `onboarding-service`, `ai-search-service`, `face-service`, `processing-service` |
 | **Data Stores** | `postgres`, `redis`, `kafka`, `zookeeper` |
 | **Routing** | `traefik` |
 | **Monitoring** | `prometheus`, `grafana`, `loki`, `promtail`, `alertmanager` |
@@ -305,4 +327,4 @@ infrastructure/docker/docker-compose.dev.yml  # Dev-specific overrides (keep thi
 
 
 ## Recent Changes
-- 008-face-service: Added [if applicable, e.g., PostgreSQL, CoreData, files or N/A]
+- 008-face-service: Face detection and recognition service (port 8002)

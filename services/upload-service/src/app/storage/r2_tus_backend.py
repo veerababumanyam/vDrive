@@ -7,6 +7,7 @@ from uuid import uuid4
 
 import structlog
 from sqlalchemy import select
+from sqlalchemy.orm.attributes import flag_modified
 
 from ..core.config import settings
 from ..core.database import AsyncSessionLocal
@@ -185,6 +186,10 @@ class R2TUSStorageBackend:
                 new_offset = offset + len(chunk_data)
                 upload.received_bytes = new_offset
                 upload.parts_metadata = parts_metadata
+
+                # IMPORTANT: SQLAlchemy doesn't detect in-place dict mutations
+                # Must explicitly mark JSON column as modified for changes to persist
+                flag_modified(upload, "parts_metadata")
 
                 # Update status to uploading after first chunk
                 if upload.status == UploadStatus.CREATED.value:

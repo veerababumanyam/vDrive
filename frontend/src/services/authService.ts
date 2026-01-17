@@ -26,15 +26,12 @@ export interface LoginRequest {
 export interface LoginResponse {
   access_token: string;
   token_type: string;
-  expires_in: number;
-  user: {
-    id: string;
-    email: string;
-    first_name: string;
-    last_name: string;
-    avatar_url?: string;
-    email_verified: boolean;
-  };
+  user_id: string;
+  email: string;
+  full_name: string;
+  email_verified: boolean;
+  has_workspace: boolean;
+  workspace_id?: string;
 }
 
 export interface RefreshResponse {
@@ -65,6 +62,8 @@ let memoryAccessToken: string | null = null;
  * @internal - Only for use by AuthContext
  */
 export function setTokenInMemory(token: string | null): void {
+  // DEBUG: Log when token is set
+  console.log('[Auth] setTokenInMemory called:', token ? `token set (${token.substring(0, 20)}...)` : 'token cleared');
   memoryAccessToken = token;
 }
 
