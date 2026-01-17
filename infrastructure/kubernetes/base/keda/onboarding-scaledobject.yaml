@@ -2,7 +2,7 @@ apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
 metadata:
   name: onboarding-service-scaledobject
-  namespace: vdrive
+  namespace: RawDrive
   labels:
     app: onboarding-service
     component: autoscaler
@@ -73,6 +73,6 @@ apiVersion: keda.sh/v1alpha1
 kind: TriggerAuthentication
 metadata:
   name: prometheus-trigger-auth
-  namespace: vdrive
+  namespace: RawDrive
 spec:
   secretTargetRef: []

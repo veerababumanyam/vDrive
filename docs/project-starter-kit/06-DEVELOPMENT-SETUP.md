@@ -1,4 +1,4 @@
-# vDrive Development Setup
+# RawDrive Development Setup
 
 **Version:** 0.3.3 | **Last Updated:** January 2026
 
@@ -55,7 +55,7 @@ cd frontend && pnpm dev  # Start frontend on http://localhost:5173
 ```
 
 **Test Login:**
-- Email: `free@test.vDrive.in`
+- Email: `free@test.RawDrive.in`
 - Password: `Test@123`
 
 ---
@@ -65,8 +65,8 @@ cd frontend && pnpm dev  # Start frontend on http://localhost:5173
 ### Step 1: Clone Repository
 
 ```bash
-git clone https://github.com/vDrive/vDrive.git
-cd vDrive
+git clone https://github.com/RawDrive/RawDrive.git
+cd RawDrive
 ```
 
 ### Step 2: Start Docker Services
@@ -82,20 +82,20 @@ docker compose -f infrastructure/docker/docker-compose.yml up -d
 ### Step 3: Install Backend Dependencies
 
 ```bash
-docker exec vDrive-backend pip install psycopg2-binary
+docker exec RawDrive-backend pip install psycopg2-binary
 ```
 
 ### Step 4: Run Database Migrations
 
 ```bash
-docker exec vDrive-backend bash -c "cd /app && alembic upgrade head"
+docker exec RawDrive-backend bash -c "cd /app && alembic upgrade head"
 ```
 
 ### Step 5: Seed Test Users
 
 ```bash
-docker exec -e DATABASE_URL="postgresql://vDrive:vDrive@postgres:5432/vDrive" \
-  vDrive-backend python seed_all_test_users.py
+docker exec -e DATABASE_URL="postgresql://RawDrive:RawDrive@postgres:5432/RawDrive" \
+  RawDrive-backend python seed_all_test_users.py
 ```
 
 ### Step 6: Build Shared Packages
@@ -160,11 +160,11 @@ All test users have password: `Test@123`
 
 | Email | Plan | Storage | Galleries |
 |-------|------|---------|-----------|
-| `free@test.vDrive.in` | Free | 1GB | 3 |
-| `starter@test.vDrive.in` | Starter | 10GB | 10 |
-| `professional@test.vDrive.in` | Professional | 100GB | 50 |
-| `business@test.vDrive.in` | Business | 1TB | 200 |
-| `enterprise@test.vDrive.in` | Enterprise | Unlimited | Unlimited |
+| `free@test.RawDrive.in` | Free | 1GB | 3 |
+| `starter@test.RawDrive.in` | Starter | 10GB | 10 |
+| `professional@test.RawDrive.in` | Professional | 100GB | 50 |
+| `business@test.RawDrive.in` | Business | 1TB | 200 |
+| `enterprise@test.RawDrive.in` | Enterprise | Unlimited | Unlimited |
 
 Full list: `docs/TEST_USERS.md`
 
@@ -188,23 +188,23 @@ docker compose -f infrastructure/docker/docker-compose.yml logs -f backend
 docker compose -f infrastructure/docker/docker-compose.yml restart backend
 
 # Execute command in container
-docker exec vDrive-backend bash
+docker exec RawDrive-backend bash
 ```
 
 ### Database Commands
 
 ```bash
 # Run migrations
-docker exec vDrive-backend alembic upgrade head
+docker exec RawDrive-backend alembic upgrade head
 
 # Create new migration
-docker exec vDrive-backend alembic revision --autogenerate -m "description"
+docker exec RawDrive-backend alembic revision --autogenerate -m "description"
 
 # Downgrade migration
-docker exec vDrive-backend alembic downgrade -1
+docker exec RawDrive-backend alembic downgrade -1
 
 # Clear Redis cache
-docker exec vDrive-redis redis-cli FLUSHALL
+docker exec RawDrive-redis redis-cli FLUSHALL
 ```
 
 ### Frontend Commands
@@ -223,14 +223,14 @@ pnpm preview   # Preview production build
 
 ```bash
 # Run tests
-docker exec vDrive-backend pytest
+docker exec RawDrive-backend pytest
 
 # Run tests with coverage
-docker exec vDrive-backend pytest --cov=src
+docker exec RawDrive-backend pytest --cov=src
 
 # Run linting
-docker exec vDrive-backend ruff check src
-docker exec vDrive-backend mypy src
+docker exec RawDrive-backend ruff check src
+docker exec RawDrive-backend mypy src
 ```
 
 ### Type Generation
@@ -256,7 +256,7 @@ Create `.env` file in project root:
 
 ```bash
 # Database
-DATABASE_URL=postgresql://vDrive:vDrive@localhost:5432/vDrive
+DATABASE_URL=postgresql://RawDrive:RawDrive@localhost:5432/RawDrive
 REDIS_URL=redis://localhost:6379/0
 
 # Authentication
@@ -266,7 +266,7 @@ JWT_REFRESH_SECRET=your-refresh-secret
 # Storage (Cloudflare R2)
 R2_ACCESS_KEY_ID=your-r2-access-key
 R2_SECRET_ACCESS_KEY=your-r2-secret
-R2_BUCKET_NAME=vDrive-assets
+R2_BUCKET_NAME=RawDrive-assets
 R2_ENDPOINT_URL=https://your-account.r2.cloudflarestorage.com
 ```
 
@@ -296,7 +296,7 @@ GOOGLE_CLIENT_SECRET=your-google-client-secret
 ## Project Structure Overview
 
 ```
-vDrive/
+RawDrive/
 ├── packages/                 # Shared npm packages
 │   ├── shared-types/        # Domain types
 │   ├── shared-constants/    # Configuration
@@ -362,10 +362,10 @@ docker compose logs --tail=100 backend
 
 ```bash
 # Drop and recreate
-docker exec vDrive-postgres psql -U vDrive -c "DROP DATABASE vDrive;"
-docker exec vDrive-postgres psql -U vDrive -c "CREATE DATABASE vDrive;"
-docker exec vDrive-backend alembic upgrade head
-docker exec vDrive-backend python seed_all_test_users.py
+docker exec RawDrive-postgres psql -U RawDrive -c "DROP DATABASE RawDrive;"
+docker exec RawDrive-postgres psql -U RawDrive -c "CREATE DATABASE RawDrive;"
+docker exec RawDrive-backend alembic upgrade head
+docker exec RawDrive-backend python seed_all_test_users.py
 ```
 
 ---

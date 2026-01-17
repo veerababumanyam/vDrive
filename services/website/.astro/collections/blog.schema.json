@@ -44,7 +44,7 @@
         },
         "author": {
           "type": "string",
-          "default": "vDrive Team"
+          "default": "RawDrive Team"
         },
         "authorImage": {
           "type": "string"

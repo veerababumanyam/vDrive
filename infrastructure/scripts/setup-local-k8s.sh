@@ -6,7 +6,7 @@
 
 set -e
 
-CLUSTER_NAME="vDrive-dev"
+CLUSTER_NAME="RawDrive-dev"
 K3D_VERSION="v5.6.0"
 
 # Colors
@@ -17,7 +17,7 @@ BLUE='\033[0;34m'
 NC='\033[0m'
 
 echo -e "${BLUE}=============================================${NC}"
-echo -e "${BLUE}vDrive Local Kubernetes Setup${NC}"
+echo -e "${BLUE}RawDrive Local Kubernetes Setup${NC}"
 echo -e "${BLUE}=============================================${NC}"
 
 # Detect OS
@@ -97,9 +97,9 @@ echo -e "${GREEN}✓ Cluster created${NC}"
 # Set kubectl context
 kubectl config use-context "k3d-$CLUSTER_NAME"
 
-# Create vDrive namespace
-echo -e "\n${YELLOW}Creating vDrive namespace...${NC}"
-kubectl create namespace vDrive --dry-run=client -o yaml | kubectl apply -f -
+# Create RawDrive namespace
+echo -e "\n${YELLOW}Creating RawDrive namespace...${NC}"
+kubectl create namespace RawDrive --dry-run=client -o yaml | kubectl apply -f -
 
 # Install KEDA
 echo -e "\n${YELLOW}Installing KEDA...${NC}"
@@ -125,7 +125,7 @@ echo -e "\n${YELLOW}Nodes:${NC}"
 kubectl get nodes
 
 echo -e "\n${BLUE}Next Steps:${NC}"
-echo -e "  1. Deploy vDrive: ./infrastructure/scripts/deploy-k8s.sh dev"
+echo -e "  1. Deploy RawDrive: ./infrastructure/scripts/deploy-k8s.sh dev"
 echo -e "  2. Access services via localhost ports"
 echo -e "  3. Delete cluster: k3d cluster delete $CLUSTER_NAME"
 

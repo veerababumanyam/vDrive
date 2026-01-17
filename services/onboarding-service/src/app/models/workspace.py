@@ -9,12 +9,13 @@ from enum import Enum
 from typing import TYPE_CHECKING, List, Optional
 from uuid import uuid4
 
-from sqlalchemy import BigInteger, DateTime, Enum as SQLEnum, Integer, String, func
+from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.app.core.database import Base, GUID
 
 if TYPE_CHECKING:
+    from src.app.models.user import User
     from src.app.models.workspace_member import WorkspaceMember
 
 
@@ -31,20 +32,11 @@ class BusinessType(str, Enum):
 class SubscriptionTier(str, Enum):
     """Subscription tier levels."""
 
+    TRIAL = "trial"
     FREE = "free"
     PRO = "pro"
     BUSINESS = "business"
     ENTERPRISE = "enterprise"
-
-
-class SubscriptionStatus(str, Enum):
-    """Subscription status states."""
-
-    ACTIVE = "active"
-    TRIAL = "trial"
-    PAST_DUE = "past_due"
-    CANCELLED = "cancelled"
-    EXPIRED = "expired"
 
 
 class Workspace(Base):
@@ -52,6 +44,7 @@ class Workspace(Base):
     Workspace model.
 
     Core multi-tenant isolation unit with business settings and subscription info.
+    Matches migration schema: 20260114_0000_001_initial_schema.py
     """
 
     __tablename__ = "workspaces"
@@ -65,21 +58,29 @@ class Workspace(Base):
 
     # Identity
     name: Mapped[str] = mapped_column(
-        String(255),
+        String(100),
         nullable=False,
     )
     slug: Mapped[str] = mapped_column(
-        String(100),
+        String(50),
         unique=True,
         nullable=False,
         index=True,
     )
 
-    # Business settings
-    business_type: Mapped[BusinessType] = mapped_column(
-        SQLEnum(BusinessType, name="business_type"),
+    # Owner (FK to users table)
+    owner_id: Mapped[str] = mapped_column(
+        GUID(),
+        ForeignKey("users.id", ondelete="CASCADE"),
         nullable=False,
-        default=BusinessType.OTHER,
+        index=True,
+    )
+
+    # Business settings (stored as string to match migration)
+    business_type: Mapped[str] = mapped_column(
+        String(20),
+        nullable=False,
+        default="other",
     )
 
     # Regional settings
@@ -100,51 +101,48 @@ class Workspace(Base):
     )
 
     # Branding
+    logo_url: Mapped[Optional[str]] = mapped_column(
+        String(500),
+        nullable=True,
+    )
     brand_color: Mapped[Optional[str]] = mapped_column(
         String(7),  # Hex color: #RRGGBB
         nullable=True,
     )
-    logo_url: Mapped[Optional[str]] = mapped_column(
-        String(512),
-        nullable=True,
-    )
 
-    # Subscription
-    subscription_tier: Mapped[SubscriptionTier] = mapped_column(
-        SQLEnum(SubscriptionTier, name="subscription_tier"),
+    # Subscription (stored as string to match migration)
+    subscription_tier: Mapped[str] = mapped_column(
+        String(20),
         nullable=False,
-        default=SubscriptionTier.FREE,
-    )
-    subscription_status: Mapped[SubscriptionStatus] = mapped_column(
-        SQLEnum(SubscriptionStatus, name="subscription_status"),
-        nullable=False,
-        default=SubscriptionStatus.TRIAL,
+        default="trial",
     )
     trial_ends_at: Mapped[Optional[datetime]] = mapped_column(
         DateTime(timezone=True),
         nullable=True,
     )
 
-    # Limits
-    storage_limit_bytes: Mapped[int] = mapped_column(
-        BigInteger,
+    # Limits (match migration column names)
+    storage_limit_gb: Mapped[int] = mapped_column(
+        Integer,
         nullable=False,
-        default=100 * 1024 * 1024 * 1024,  # 100 GB default
-    )
-    storage_used_bytes: Mapped[int] = mapped_column(
-        BigInteger,
-        nullable=False,
-        default=0,
+        default=100,
     )
     ai_credits: Mapped[int] = mapped_column(
         Integer,
         nullable=False,
         default=500,
     )
-    ai_credits_used: Mapped[int] = mapped_column(
+    max_team_members: Mapped[int] = mapped_column(
         Integer,
         nullable=False,
-        default=0,
+        default=3,
+    )
+
+    # Status
+    is_active: Mapped[bool] = mapped_column(
+        Boolean,
+        nullable=False,
+        default=True,
     )
 
     # Timestamps
@@ -161,6 +159,11 @@ class Workspace(Base):
     )
 
     # Relationships
+    owner: Mapped["User"] = relationship(
+        "User",
+        back_populates="owned_workspaces",
+        lazy="selectin",
+    )
     members: Mapped[List["WorkspaceMember"]] = relationship(
         "WorkspaceMember",
         back_populates="workspace",
@@ -169,26 +172,14 @@ class Workspace(Base):
     )
 
     @property
-    def storage_used_gb(self) -> float:
-        """Return storage used in GB."""
-        return self.storage_used_bytes / (1024 * 1024 * 1024)
-
-    @property
-    def storage_limit_gb(self) -> float:
-        """Return storage limit in GB."""
-        return self.storage_limit_bytes / (1024 * 1024 * 1024)
-
-    @property
-    def storage_percent_used(self) -> float:
-        """Return percentage of storage used."""
-        if self.storage_limit_bytes == 0:
-            return 0.0
-        return (self.storage_used_bytes / self.storage_limit_bytes) * 100
+    def storage_limit_bytes(self) -> int:
+        """Return storage limit in bytes for compatibility."""
+        return self.storage_limit_gb * 1024 * 1024 * 1024
 
     @property
     def is_trial(self) -> bool:
         """Check if workspace is in trial."""
-        return self.subscription_status == SubscriptionStatus.TRIAL
+        return self.subscription_tier == "trial"
 
     def __repr__(self) -> str:
         return f"<Workspace {self.slug}>"

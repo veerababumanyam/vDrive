@@ -8,7 +8,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: celery-worker
-  namespace: vDrive
+  namespace: RawDrive
   labels:
     app: celery-worker
     app.kubernetes.io/name: celery-worker
@@ -24,10 +24,10 @@ spec:
         app: celery-worker
         app.kubernetes.io/name: celery-worker
     spec:
-      serviceAccountName: vDrive-service
+      serviceAccountName: RawDrive-service
       containers:
         - name: celery-worker
-          image: ghcr.io/vDrive/backend:latest
+          image: ghcr.io/RawDrive/backend:latest
           imagePullPolicy: Always
           command: ["celery"]
           args:
@@ -40,9 +40,9 @@ spec:
             - "default,thumbnails,notifications"
           envFrom:
             - configMapRef:
-                name: vDrive-config
+                name: RawDrive-config
             - secretRef:
-                name: vDrive-secrets
+                name: RawDrive-secrets
           env:
             - name: SERVICE_NAME
               value: "celery-worker"
@@ -67,14 +67,14 @@ spec:
             periodSeconds: 30
             timeoutSeconds: 10
       imagePullSecrets:
-        - name: vDrive-registry
+        - name: RawDrive-registry
 ---
 # Celery Worker - AI/ML Tasks (heavier workloads)
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: celery-worker-ai
-  namespace: vDrive
+  namespace: RawDrive
   labels:
     app: celery-worker-ai
     app.kubernetes.io/name: celery-worker-ai
@@ -90,10 +90,10 @@ spec:
         app: celery-worker-ai
         app.kubernetes.io/name: celery-worker-ai
     spec:
-      serviceAccountName: vDrive-service
+      serviceAccountName: RawDrive-service
       containers:
         - name: celery-worker-ai
-          image: ghcr.io/vDrive/backend:latest
+          image: ghcr.io/RawDrive/backend:latest
           imagePullPolicy: Always
           command: ["celery"]
           args:
@@ -106,9 +106,9 @@ spec:
             - "ai,face_detection,smart_curate"
           envFrom:
             - configMapRef:
-                name: vDrive-config
+                name: RawDrive-config
             - secretRef:
-                name: vDrive-secrets
+                name: RawDrive-secrets
           env:
             - name: SERVICE_NAME
               value: "celery-worker-ai"
@@ -120,14 +120,14 @@ spec:
               cpu: "2000m"
               memory: "4Gi"
       imagePullSecrets:
-        - name: vDrive-registry
+        - name: RawDrive-registry
 ---
 # Celery Beat - Scheduled Tasks
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: celery-beat
-  namespace: vDrive
+  namespace: RawDrive
   labels:
     app: celery-beat
     app.kubernetes.io/name: celery-beat
@@ -143,10 +143,10 @@ spec:
         app: celery-beat
         app.kubernetes.io/name: celery-beat
     spec:
-      serviceAccountName: vDrive-service
+      serviceAccountName: RawDrive-service
       containers:
         - name: celery-beat
-          image: ghcr.io/vDrive/backend:latest
+          image: ghcr.io/RawDrive/backend:latest
           imagePullPolicy: Always
           command: ["celery"]
           args:
@@ -156,9 +156,9 @@ spec:
             - "--loglevel=INFO"
           envFrom:
             - configMapRef:
-                name: vDrive-config
+                name: RawDrive-config
             - secretRef:
-                name: vDrive-secrets
+                name: RawDrive-secrets
           env:
             - name: SERVICE_NAME
               value: "celery-beat"
@@ -170,14 +170,14 @@ spec:
               cpu: "200m"
               memory: "256Mi"
       imagePullSecrets:
-        - name: vDrive-registry
+        - name: RawDrive-registry
 ---
 # Flower - Celery Monitoring Dashboard
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: flower
-  namespace: vDrive
+  namespace: RawDrive
   labels:
     app: flower
     app.kubernetes.io/name: flower
@@ -208,7 +208,7 @@ spec:
             - name: FLOWER_BASIC_AUTH
               valueFrom:
                 secretKeyRef:
-                  name: vDrive-secrets
+                  name: RawDrive-secrets
                   key: FLOWER_AUTH
                   optional: true
           resources:
@@ -223,7 +223,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: flower
-  namespace: vDrive
+  namespace: RawDrive
 spec:
   type: ClusterIP
   ports:

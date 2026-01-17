@@ -53,7 +53,7 @@ The system shall provide native API connectors/drivers for the following storage
 8.  **NoSQL Connectors:** (MongoDB GridFS, Azure Cosmos DB).
 
 ### 3.2. Storage Configuration & Security
-* **FR-02.1 (Credential Management):** The application shall securely store storage credentials (SAS tokens, Access Keys, Service Principals) using a dedicated secrets/key-management mechanism (e.g., customer KMS/Key Vault, or a self-managed Vault for vDrive-hosted deployments).
+* **FR-02.1 (Credential Management):** The application shall securely store storage credentials (SAS tokens, Access Keys, Service Principals) using a dedicated secrets/key-management mechanism (e.g., customer KMS/Key Vault, or a self-managed Vault for RawDrive-hosted deployments).
 * **FR-02.2 (Data Sovereignty Routing):** The system shall verify that data uploaded by a user in "Location A" is physically written to the storage bucket mapped to "Region A" without crossing borders, unless explicitly authorized.
 
 ---
@@ -113,7 +113,7 @@ Since the client owns the storage, the application must manage the *relationship
 | **Data Retention** | Automate lifecycle based on labels. | App sends API delete commands to S3/Blob after X years. |
 | **Legal Hold** | Prevent deletion during litigation. | App applies "Object Lock" or "Immutable Blob" settings on the storage provider side. |
 | **Audit Trails** | comprehensive logging. | Logs access within the App AND cross-references with Storage Access Logs (e.g., AWS CloudTrail integration). |
-| **Encryption Keys** | Customer Managed Keys (CMK). | App uses the customer-managed key service (e.g., AWS KMS / Azure Key Vault / GCP KMS) or a self-managed Vault/HSM-backed key store in vDrive-hosted environments for envelope encryption. The app never stores customer master keys in plaintext. |
+| **Encryption Keys** | Customer Managed Keys (CMK). | App uses the customer-managed key service (e.g., AWS KMS / Azure Key Vault / GCP KMS) or a self-managed Vault/HSM-backed key store in RawDrive-hosted environments for envelope encryption. The app never stores customer master keys in plaintext. |
 | **Immutability** | WORM (Write Once Read Many). | Support for WORM storage buckets for "Regulatory" labeled events. |
 
 ---

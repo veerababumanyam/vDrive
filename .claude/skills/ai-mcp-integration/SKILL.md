@@ -1,14 +1,14 @@
 ---
 name: ai-mcp-integration
 aliases: [ai, mcp, llm, agents, face-detection, smart-tagging, embeddings, gemini]
-description: AI and MCP (Model Context Protocol) integration patterns for vDrive. Use when working with the ai-service, implementing AI features, or building MCP tools.
+description: AI and MCP (Model Context Protocol) integration patterns for RawDrive. Use when working with the ai-service, implementing AI features, or building MCP tools.
 ---
 
 # AI & MCP Integration Guidelines
 
 ## Overview
 
-vDrive's AI Service provides:
+RawDrive's AI Service provides:
 - **Face Recognition**: Detect faces, generate embeddings, cluster people
 - **Photo Curation**: Quality scoring, auto-selection
 - **Semantic Search**: Natural language search using CLIP
@@ -33,7 +33,7 @@ The service uses **configurable LLM providers** via environment variables. Never
 from typing import Annotated
 from fastmcp import FastMCP
 
-mcp_server = FastMCP(name="vDrive-ai", version="1.0.0")
+mcp_server = FastMCP(name="RawDrive-ai", version="1.0.0")
 
 @mcp_server.tool()
 async def detect_faces(

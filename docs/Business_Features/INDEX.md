@@ -1,8 +1,8 @@
-# vDrive Business Features Documentation - Complete Index
+# RawDrive Business Features Documentation - Complete Index
 
 ## Overview
 
-This comprehensive documentation provides business-focused analysis of all vDrive features, their value propositions, technical architecture, integrations, and scalability considerations for handling 5,000+ concurrent connections.
+This comprehensive documentation provides business-focused analysis of all RawDrive features, their value propositions, technical architecture, integrations, and scalability considerations for handling 5,000+ concurrent connections.
 
 > **Reference Documentation**:
 > - `.kiro/steering/product.md` - Product overview
@@ -18,7 +18,7 @@ This comprehensive documentation provides business-focused analysis of all vDriv
 
 ### 1. **Overview & Architecture** 
 📄 [01_OVERVIEW.md](01_OVERVIEW.md)
-- Executive overview of vDrive platform
+- Executive overview of RawDrive platform
 - Key architectural principles
 - Feature integration map
 - Concurrent connection architecture (5,000+)
@@ -422,7 +422,7 @@ This comprehensive documentation provides business-focused analysis of all vDriv
 ### 16. **Calendar Integrations & Booking Management**
 📄 [16_CALENDAR_BOOKINGS.md](16_CALENDAR_BOOKINGS.md)
 
-**Business Value**: Transform vDrive into a revenue-generating hub by enabling self-service bookings, calendar sync, and deposit collection without manual back-and-forth.
+**Business Value**: Transform RawDrive into a revenue-generating hub by enabling self-service bookings, calendar sync, and deposit collection without manual back-and-forth.
 
 **Key Capabilities**:
 - Availability management (working hours, buffers, block-out dates)
@@ -447,7 +447,7 @@ This comprehensive documentation provides business-focused analysis of all vDriv
 ### 17. **API & Integrations**
 📄 [17_API_INTEGRATIONS.md](17_API_INTEGRATIONS.md)
 
-**Business Value**: Expose vDrive as a platform for studios, enterprises, and developers by providing programmatic access, webhooks, and MCP tools for AI agents.
+**Business Value**: Expose RawDrive as a platform for studios, enterprises, and developers by providing programmatic access, webhooks, and MCP tools for AI agents.
 
 **Key Capabilities**:
 - REST API for galleries, clients, invitations, analytics, and more
@@ -523,7 +523,7 @@ This comprehensive documentation provides business-focused analysis of all vDriv
 ### 18. **Digital Album (Design Studio)**
 📄 [18_DIGITAL_ALBUM_DESIGN.md](18_DIGITAL_ALBUM_DESIGN.md)
 
-**Business Value**: Drive high-margin revenue by letting photographers design, proof, and export print-ready albums directly from vDrive galleries.
+**Business Value**: Drive high-margin revenue by letting photographers design, proof, and export print-ready albums directly from RawDrive galleries.
 
 **Key Capabilities**:
 - Lab presets and custom sizes with live bleed/gutter validation
@@ -570,7 +570,7 @@ This comprehensive documentation provides business-focused analysis of all vDriv
 ### 17. **API & Integrations**
 📄 [17_API_INTEGRATIONS.md](17_API_INTEGRATIONS.md)
 
-**Business Value**: Extends the platform's capabilities by allowing third-party tools and custom workflows to integrate securely, fostering an ecosystem around vDrive.
+**Business Value**: Extends the platform's capabilities by allowing third-party tools and custom workflows to integrate securely, fostering an ecosystem around RawDrive.
 
 **Key Capabilities**:
 - REST API for core resources
@@ -835,7 +835,7 @@ Company Profile
 
 **Last Updated**: January 5, 2026  
 **Version**: 2.0  
-**Owner**: vDrive Product Team
+**Owner**: RawDrive Product Team
 
 ### Update Schedule
 - Quarterly: Feature updates and new capabilities

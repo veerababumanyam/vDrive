@@ -2,7 +2,7 @@
 
 ## Overview
 
-Onboarding flows define the step-by-step processes for new users to get started with vDrive. This document covers photographer signup, payment processing, tier activation, and initial setup workflows.
+Onboarding flows define the step-by-step processes for new users to get started with RawDrive. This document covers photographer signup, payment processing, tier activation, and initial setup workflows.
 
 ## Purpose
 
@@ -76,7 +76,7 @@ User verifies email address.
 
 **Email Template:**
 ```
-Subject: Verify your vDrive email
+Subject: Verify your RawDrive email
 
 Hi [Name],
 
@@ -86,7 +86,7 @@ Click the link below to verify your email:
 This link expires in 24 hours.
 
 Thanks,
-vDrive Team
+RawDrive Team
 ```
 
 **Error Handling:**
@@ -187,8 +187,8 @@ interface StripeCheckout {
     }
   ],
   mode: 'subscription',
-  successUrl: 'https://vDrive.com/onboarding/success',
-  cancelUrl: 'https://vDrive.com/onboarding/payment',
+  successUrl: 'https://RawDrive.com/onboarding/success',
+  cancelUrl: 'https://RawDrive.com/onboarding/payment',
 }
 ```
 
@@ -227,7 +227,7 @@ User sees success message and next steps.
 
 **Success Page:**
 ```
-✓ Welcome to vDrive!
+✓ Welcome to RawDrive!
 
 Your account is ready. Here's what's next:
 
@@ -252,11 +252,11 @@ Your account is ready. Here's what's next:
 
 **Welcome Email:**
 ```
-Subject: Welcome to vDrive!
+Subject: Welcome to RawDrive!
 
 Hi [Name],
 
-Your vDrive account is ready! Here's what you can do:
+Your RawDrive account is ready! Here's what you can do:
 
 ✓ Upload and organize photos
 ✓ Share galleries with clients
@@ -266,10 +266,10 @@ Your vDrive account is ready! Here's what you can do:
 
 Get started: [Dashboard Link]
 
-Questions? Contact us at support@vDrive.com
+Questions? Contact us at support@RawDrive.com
 
 Welcome aboard!
-vDrive Team
+RawDrive Team
 ```
 
 ---
@@ -286,7 +286,7 @@ Subject: [Photographer] shared a gallery with you
 
 Hi [Client Name],
 
-[Photographer] shared a gallery with you on vDrive.
+[Photographer] shared a gallery with you on RawDrive.
 
 View Gallery: [Gallery Link]
 
@@ -294,7 +294,7 @@ If you don't have an account, create one:
 [Sign Up Link]
 
 Thanks,
-vDrive
+RawDrive
 ```
 
 **User Actions:**
@@ -420,7 +420,7 @@ New features available:
 Explore new features: [Dashboard Link]
 
 Thanks,
-vDrive Team
+RawDrive Team
 ```
 
 ---
@@ -478,9 +478,9 @@ Features disabled:
 
 Your data is safe and will be preserved.
 
-Need help? Contact support@vDrive.com
+Need help? Contact support@RawDrive.com
 
-vDrive Team
+RawDrive Team
 ```
 
 ---
@@ -524,7 +524,7 @@ Why are you cancelling?
 
 **Cancellation Email:**
 ```
-Subject: Your vDrive subscription has been cancelled
+Subject: Your RawDrive subscription has been cancelled
 
 Hi [Name],
 
@@ -537,7 +537,7 @@ To reactivate: [Reactivate Link]
 
 We'd love to hear your feedback: [Survey Link]
 
-vDrive Team
+RawDrive Team
 ```
 
 ---
@@ -568,7 +568,7 @@ User reactivates cancelled subscription.
 
 **Reactivation Email:**
 ```
-Subject: Welcome back to vDrive!
+Subject: Welcome back to RawDrive!
 
 Hi [Name],
 
@@ -580,7 +580,7 @@ Renewal Date: [Date]
 Get started: [Dashboard Link]
 
 Thanks for coming back!
-vDrive Team
+RawDrive Team
 ```
 
 ---

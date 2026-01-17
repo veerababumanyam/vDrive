@@ -1,7 +1,7 @@
 Alembic Migration Directory
 ===========================
 
-This directory contains database migrations for the vDrive Onboarding Service.
+This directory contains database migrations for the RawDrive Onboarding Service.
 
 Usage
 -----

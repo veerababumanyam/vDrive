@@ -5,7 +5,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: traefik
-  namespace: vDrive
+  namespace: RawDrive
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -69,4 +69,4 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: traefik
-    namespace: vDrive
+    namespace: RawDrive

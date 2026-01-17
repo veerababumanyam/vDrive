@@ -1,7 +1,7 @@
 ---
 name: storage
 aliases: [uploads, r2, byos, s3, files, assets, object-storage]
-description: Storage and upload patterns for vDrive. Use when implementing file uploads, working with R2/BYOS storage, or managing assets.
+description: Storage and upload patterns for RawDrive. Use when implementing file uploads, working with R2/BYOS storage, or managing assets.
 ---
 
 # Storage & Uploads

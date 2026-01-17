@@ -1,8 +1,8 @@
 {
-  "name": "@vDrive/website",
+  "name": "@RawDrive/website",
   "type": "module",
   "version": "0.1.0",
-  "description": "vDrive public website - marketing, blog, and documentation",
+  "description": "RawDrive public website - marketing, blog, and documentation",
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",

@@ -1,0 +1,23 @@
+Alembic Database Migrations for Export Service
+
+This directory contains Alembic migrations for the Export Service database schema.
+
+## Running Migrations
+
+# Apply all pending migrations
+alembic upgrade head
+
+# Rollback one migration
+alembic downgrade -1
+
+# Show current migration version
+alembic current
+
+# Generate new migration
+alembic revision --autogenerate -m "description"
+
+## Migration Files
+
+- env.py: Alembic environment configuration with async support
+- script.py.mako: Template for generating new migration files
+- versions/: Individual migration files

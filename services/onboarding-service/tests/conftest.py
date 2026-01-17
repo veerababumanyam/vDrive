@@ -260,7 +260,7 @@ def mock_turnstile_response() -> dict:
     return {
         "success": True,
         "challenge_ts": "2024-01-15T10:30:00.000Z",
-        "hostname": "app.vdrive.io",
+        "hostname": "app.RawDrive.io",
     }
 
 

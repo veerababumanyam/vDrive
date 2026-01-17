@@ -4,7 +4,7 @@
 
 ## Overview
 
-vDrive provides comprehensive calendar integration and booking management features that enable photographers to manage their schedule, accept bookings, and synchronize with popular calendar applications. The system supports multiple calendar providers and automated booking workflows.
+RawDrive provides comprehensive calendar integration and booking management features that enable photographers to manage their schedule, accept bookings, and synchronize with popular calendar applications. The system supports multiple calendar providers and automated booking workflows.
 
 ## Purpose
 
@@ -326,7 +326,7 @@ interface GoogleCalendarIntegration {
 ```
 
 **Sync Features:**
-- One-way sync (vDrive → Google)
+- One-way sync (RawDrive → Google)
 - Two-way sync (bidirectional)
 - Automatic sync
 - Manual sync
@@ -483,7 +483,7 @@ interface BookingWidget {
 Dedicated booking page.
 
 **Booking Page URL:**
-- `https://vDrive.com/book/[username]`
+- `https://RawDrive.com/book/[username]`
 - `https://[custom-domain].com/book`
 
 **Page Features:**

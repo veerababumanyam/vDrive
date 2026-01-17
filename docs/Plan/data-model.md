@@ -1,8 +1,8 @@
-# vDrive Data Model - Complete Schema
+# RawDrive Data Model - Complete Schema
 
 **Version:** 2.0.0 | **Last Updated:** January 2026
 
-This document defines the complete database schema for the vDrive platform, including SQLAlchemy models, relationships, constraints, and multi-tenancy rules.
+This document defines the complete database schema for the RawDrive platform, including SQLAlchemy models, relationships, constraints, and multi-tenancy rules.
 
 ---
 

@@ -1,4 +1,4 @@
-# vDrive SaaS - Complete Development Roadmap & Architecture Guide
+# RawDrive SaaS - Complete Development Roadmap & Architecture Guide
 
 **Version 1.0** | **Date: Dec 17, 2025** | **Owner: [Your Name]**
 
@@ -19,7 +19,7 @@
 
 ## Product Vision {#product-vision}
 
-**vDrive** is a multi-tenant SaaS for photographers and corporate teams to:
+**RawDrive** is a multi-tenant SaaS for photographers and corporate teams to:
 - Create beautiful photo/video galleries with client proofing
 - Design print/digital albums with lab-ready exports
 - Manage clients, bookings, and payments (India-first)

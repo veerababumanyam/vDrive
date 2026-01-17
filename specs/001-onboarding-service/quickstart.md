@@ -9,7 +9,7 @@
 - Python 3.11+
 - PostgreSQL 16 (via Docker or local)
 - Redis 7 (via Docker or local)
-- Access to vDrive .env configuration
+- Access to RawDrive .env configuration
 
 ## Quick Start (Docker)
 
@@ -52,7 +52,7 @@ APP_ENV=development
 LOG_LEVEL=debug
 
 # Database
-DATABASE_URL=postgresql+asyncpg://vdrive:vdrive@localhost:5432/vdrive
+DATABASE_URL=postgresql+asyncpg://RawDrive:RawDrive@localhost:5432/RawDrive
 
 # Redis
 REDIS_URL=redis://localhost:6379/0
@@ -106,7 +106,7 @@ pip install -r requirements-dev.txt
 cd backend
 
 # Run migrations including new onboarding_states table
-docker exec vdrive-backend alembic upgrade head
+docker exec RawDrive-backend alembic upgrade head
 
 # Or locally
 alembic upgrade head
@@ -154,7 +154,7 @@ docker compose up -d postgres-test
 pytest tests/integration/ -v
 
 # Run with test database URL
-DATABASE_URL=postgresql+asyncpg://test:test@localhost:5433/test_vdrive pytest tests/integration/
+DATABASE_URL=postgresql+asyncpg://test:test@localhost:5433/test_RawDrive pytest tests/integration/
 ```
 
 ### Load Testing
@@ -244,15 +244,15 @@ curl http://localhost:8006/metrics
 cd services/onboarding-service
 
 # Build image
-docker build -t vdrive/onboarding-service:latest .
+docker build -t RawDrive/onboarding-service:latest .
 
 # Run container
 docker run -d \
   --name onboarding-service \
   -p 8006:8006 \
   --env-file .env \
-  --network vdrive-network \
-  vdrive/onboarding-service:latest
+  --network RawDrive-network \
+  RawDrive/onboarding-service:latest
 ```
 
 ## Verification Checklist
@@ -274,7 +274,7 @@ After setup, verify:
 
 ```bash
 # Check logs
-docker logs vdrive-onboarding-service
+docker logs RawDrive-onboarding-service
 
 # Common issues:
 # - DATABASE_URL not set or incorrect
@@ -292,7 +292,7 @@ docker ps | grep postgres
 psql $DATABASE_URL -c "SELECT 1"
 
 # Check migrations ran
-docker exec vdrive-backend alembic current
+docker exec RawDrive-backend alembic current
 ```
 
 ### JWT validation fails
@@ -312,10 +312,10 @@ python -c "from src.app.core.security import create_access_token; print(create_a
 docker ps | grep kafka
 
 # List topics
-docker exec vdrive-kafka kafka-topics.sh --list --bootstrap-server localhost:9092
+docker exec RawDrive-kafka kafka-topics.sh --list --bootstrap-server localhost:9092
 
 # Consume events (debug)
-docker exec vdrive-kafka kafka-console-consumer.sh \
+docker exec RawDrive-kafka kafka-console-consumer.sh \
   --bootstrap-server localhost:9092 \
   --topic user.registered \
   --from-beginning

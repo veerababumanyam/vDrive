@@ -1,16 +1,16 @@
 ---
 # Frontend App Deployment
-# Main application at app.vdrive.io
+# Main application at app.RawDrive.io
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: frontend
-  namespace: vDrive
+  namespace: RawDrive
   labels:
     app: frontend
     app.kubernetes.io/name: frontend
     app.kubernetes.io/component: frontend
-    app.kubernetes.io/part-of: vDrive
+    app.kubernetes.io/part-of: RawDrive
 spec:
   replicas: 2
   selector:
@@ -29,7 +29,7 @@ spec:
       annotations:
         prometheus.io/scrape: "false"
     spec:
-      serviceAccountName: vDrive-service
+      serviceAccountName: RawDrive-service
       securityContext:
         runAsNonRoot: true
         runAsUser: 101
@@ -37,7 +37,7 @@ spec:
         fsGroup: 101
       containers:
         - name: frontend
-          image: ghcr.io/vDrive/frontend:latest
+          image: ghcr.io/RawDrive/frontend:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 80
@@ -77,7 +77,7 @@ spec:
               drop:
                 - ALL
       imagePullSecrets:
-        - name: vDrive-registry
+        - name: RawDrive-registry
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -97,7 +97,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: frontend
-  namespace: vDrive
+  namespace: RawDrive
   labels:
     app: frontend
     app.kubernetes.io/name: frontend

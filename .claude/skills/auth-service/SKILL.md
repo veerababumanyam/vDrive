@@ -7,7 +7,7 @@ description: Authentication architecture, JWT tokens, sessions, security pattern
 
 ## Overview
 
-vDrive uses a secure, enterprise-grade authentication system with:
+RawDrive uses a secure, enterprise-grade authentication system with:
 - **Backend**: Python FastAPI + Redis sessions + JWT tokens
 - **Frontend**: React + memory-only token storage + automatic refresh
 - **Security**: Rate limiting, account lockout, Argon2id password hashing, token rotation
@@ -493,6 +493,73 @@ On every refresh request, backend:
 
 This prevents token reuse attacks.
 
+## Cross-Service JWT Requirements
+
+### CRITICAL: JWT Algorithm Consistency
+
+**All RawDrive services MUST use the same JWT algorithm and secret.**
+
+| Setting | Value | Location |
+|---------|-------|----------|
+| Algorithm | `HS256` | All service configs |
+| Secret | `JWT_SECRET` env var | Same value across ALL services |
+
+**Service Configuration Files:**
+- `services/onboarding-service/src/app/core/security.py` - JWT_ALGORITHM
+- `services/gallery-service/src/app/core/config.py` - JWT_ALGORITHM
+- `services/upload-service/src/app/core/config.py` - JWT_ALGORITHM
+- (Any new service) - Must match HS256
+
+**Why This Matters:**
+- Tokens created by onboarding-service must be validated by gallery-service
+- If algorithms differ, validation fails with "alg value not allowed"
+- This causes silent 401s that trigger logout
+
+**Verification Checklist for New Services:**
+1. [ ] JWT_ALGORITHM set to "HS256" (not EdDSA, RS256, etc.)
+2. [ ] JWT_SECRET environment variable configured
+3. [ ] Same JWT_SECRET value as onboarding-service
+4. [ ] Test: Login via onboarding-service, call new service endpoint
+
+### Token Refresh Endpoint Requirements
+
+When implementing `/auth/refresh` endpoint, ensure:
+
+1. **Read refresh token from HttpOnly cookie** (not request body)
+   ```python
+   token = request.cookies.get("refresh_token")
+   ```
+
+2. **Verify token type** is "refresh" (not "access")
+   ```python
+   payload = verify_token(token, expected_type="refresh")
+   ```
+
+3. **Include workspace_id** in new access token
+   ```python
+   workspace_result = await db.execute(
+       select(WorkspaceMember.workspace_id)
+       .where(WorkspaceMember.user_id == user.id)
+   )
+   ```
+
+4. **Rotate refresh token** (create new one, set in cookie)
+   ```python
+   response.set_cookie(
+       key="refresh_token",
+       value=new_refresh_token,
+       httponly=True,
+       secure=True,
+       samesite="lax",
+   )
+   ```
+
+**Common Mistakes:**
+- Stub endpoint that always returns 401
+- Not including workspace_id (causes 403 in other services)
+- Reading token from request body (should be cookie)
+- Not rotating refresh token (security risk)
+
 ## Multi-Tenancy Patterns
 
 ### 1. JWT Claims for Workspaces
@@ -707,7 +774,7 @@ done
 # Expected: 6th request returns 429 with Retry-After header
 
 # 6. Check audit log
-docker compose exec postgres psql -U vdrive -d vdrive_onboarding \
+docker compose exec postgres psql -U RawDrive -d RawDrive_onboarding \
   -c "SELECT event_type, result, email_attempted FROM auth_audit_log ORDER BY timestamp DESC LIMIT 10;"
 
 # Expected: See LOGIN_SUCCESS, LOGIN_FAILED, LOGOUT events

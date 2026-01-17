@@ -1,6 +1,6 @@
-# vDrive Claude Code Skills
+# RawDrive Claude Code Skills
 
-This directory contains specialized skills that Claude Code auto-loads based on context. Skills provide domain-specific knowledge, patterns, and best practices for the vDrive codebase.
+This directory contains specialized skills that Claude Code auto-loads based on context. Skills provide domain-specific knowledge, patterns, and best practices for the RawDrive codebase.
 
 ## How Skills Work
 
@@ -74,7 +74,7 @@ This directory contains specialized skills that Claude Code auto-loads based on 
 | Write documentation | `doc-coauthoring` |
 | Commit code properly | `git-workflow` |
 
-### vDrive Tech Stack
+### RawDrive Tech Stack
 
 | Layer | Technology |
 |-------|------------|

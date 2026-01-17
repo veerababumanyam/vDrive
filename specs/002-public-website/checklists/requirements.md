@@ -1,4 +1,4 @@
-# Specification Quality Checklist: vDrive Public Website
+# Specification Quality Checklist: RawDrive Public Website
 
 **Purpose**: Validate specification completeness and quality before proceeding to planning
 **Created**: 2026-01-13

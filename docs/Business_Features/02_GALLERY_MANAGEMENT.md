@@ -9,7 +9,7 @@
 
 ## Business Value Proposition
 
-Gallery Management is the core feature of vDrive, enabling photographers and studios to deliver beautiful, fast-loading galleries to clients with complete control over sharing, access, and client interactions. Galleries are the primary delivery surface where staff create and curate content inside a **workspace**, then share with clients via a **Client Portal** using **Magic Links** and explicit access policies.
+Gallery Management is the core feature of RawDrive, enabling photographers and studios to deliver beautiful, fast-loading galleries to clients with complete control over sharing, access, and client interactions. Galleries are the primary delivery surface where staff create and curate content inside a **workspace**, then share with clients via a **Client Portal** using **Magic Links** and explicit access policies.
 
 ### Key Business Benefits
 - **Client Engagement**: Beautiful, mobile-first gallery experience increases client satisfaction

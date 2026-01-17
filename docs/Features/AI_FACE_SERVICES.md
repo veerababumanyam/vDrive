@@ -26,7 +26,7 @@
 
 ## 1. Overview
 
-vDrive's AI services provide intelligent features for photo management, curation, and client experience enhancement. These services are designed as independent microservices that integrate with the gallery system.
+RawDrive's AI services provide intelligent features for photo management, curation, and client experience enhancement. These services are designed as independent microservices that integrate with the gallery system.
 
 ### Goals
 

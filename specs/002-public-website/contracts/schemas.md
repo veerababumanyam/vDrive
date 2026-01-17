@@ -1,4 +1,4 @@
-# JSON-LD Schemas: vDrive Public Website
+# JSON-LD Schemas: RawDrive Public Website
 
 **Feature**: 002-public-website
 **Date**: 2026-01-13
@@ -12,23 +12,23 @@ This document defines the JSON-LD structured data schemas for SEO and AI agent o
 ## 1. Organization Schema
 
 **Used on**: All pages (via BaseLayout)
-**Purpose**: Identify vDrive as the organization behind the website
+**Purpose**: Identify RawDrive as the organization behind the website
 
 ```json
 {
   "@context": "https://schema.org",
   "@type": "Organization",
-  "@id": "https://www.vdrive.io/#organization",
-  "name": "vDrive",
-  "url": "https://www.vdrive.io",
+  "@id": "https://www.RawDrive.io/#organization",
+  "name": "RawDrive",
+  "url": "https://www.RawDrive.io",
   "logo": {
     "@type": "ImageObject",
-    "url": "https://www.vdrive.io/logo.png",
+    "url": "https://www.RawDrive.io/logo.png",
     "width": 512,
     "height": 512
   },
   "description": "AI-powered photography platform for professional photographers. Manage galleries, deliver photos, and grow your business.",
-  "email": "info@vdrive.in",
+  "email": "info@RawDrive.in",
   "telephone": "+49-178-5220533",
   "address": {
     "@type": "PostalAddress",
@@ -38,10 +38,10 @@ This document defines the JSON-LD structured data schemas for SEO and AI agent o
     "addressCountry": "DE"
   },
   "sameAs": [
-    "https://instagram.com/vdrive",
-    "https://twitter.com/vdrive",
-    "https://linkedin.com/company/vdrive",
-    "https://youtube.com/vdrive"
+    "https://instagram.com/RawDrive",
+    "https://twitter.com/RawDrive",
+    "https://linkedin.com/company/RawDrive",
+    "https://youtube.com/RawDrive"
   ]
 }
 ```
@@ -57,18 +57,18 @@ This document defines the JSON-LD structured data schemas for SEO and AI agent o
 {
   "@context": "https://schema.org",
   "@type": "WebSite",
-  "@id": "https://www.vdrive.io/#website",
-  "name": "vDrive",
-  "url": "https://www.vdrive.io",
+  "@id": "https://www.RawDrive.io/#website",
+  "name": "RawDrive",
+  "url": "https://www.RawDrive.io",
   "description": "Professional Photography Client Galleries Made Simple",
   "publisher": {
-    "@id": "https://www.vdrive.io/#organization"
+    "@id": "https://www.RawDrive.io/#organization"
   },
   "potentialAction": {
     "@type": "SearchAction",
     "target": {
       "@type": "EntryPoint",
-      "urlTemplate": "https://www.vdrive.io/search?q={search_term_string}"
+      "urlTemplate": "https://www.RawDrive.io/search?q={search_term_string}"
     },
     "query-input": "required name=search_term_string"
   }
@@ -87,17 +87,17 @@ This document defines the JSON-LD structured data schemas for SEO and AI agent o
 {
   "@context": "https://schema.org",
   "@type": "Product",
-  "name": "vDrive Free",
-  "description": "Get started with vDrive - 1GB storage, 3 galleries, 5 clients",
+  "name": "RawDrive Free",
+  "description": "Get started with RawDrive - 1GB storage, 3 galleries, 5 clients",
   "brand": {
-    "@id": "https://www.vdrive.io/#organization"
+    "@id": "https://www.RawDrive.io/#organization"
   },
   "offers": {
     "@type": "Offer",
     "price": "0",
     "priceCurrency": "INR",
     "availability": "https://schema.org/InStock",
-    "url": "https://app.vdrive.io/sign-up?plan=free"
+    "url": "https://app.RawDrive.io/sign-up?plan=free"
   }
 }
 ```
@@ -107,10 +107,10 @@ This document defines the JSON-LD structured data schemas for SEO and AI agent o
 {
   "@context": "https://schema.org",
   "@type": "Product",
-  "name": "vDrive Starter",
+  "name": "RawDrive Starter",
   "description": "For photographers starting out - 10GB storage, 10 galleries, 20 clients, AI-powered tagging",
   "brand": {
-    "@id": "https://www.vdrive.io/#organization"
+    "@id": "https://www.RawDrive.io/#organization"
   },
   "offers": {
     "@type": "Offer",
@@ -118,7 +118,7 @@ This document defines the JSON-LD structured data schemas for SEO and AI agent o
     "priceCurrency": "INR",
     "priceValidUntil": "2026-12-31",
     "availability": "https://schema.org/InStock",
-    "url": "https://app.vdrive.io/sign-up?plan=starter"
+    "url": "https://app.RawDrive.io/sign-up?plan=starter"
   }
 }
 ```
@@ -128,10 +128,10 @@ This document defines the JSON-LD structured data schemas for SEO and AI agent o
 {
   "@context": "https://schema.org",
   "@type": "Product",
-  "name": "vDrive Professional",
+  "name": "RawDrive Professional",
   "description": "Most popular choice - 100GB storage, 50 galleries, 100 clients, print album designer, custom domain",
   "brand": {
-    "@id": "https://www.vdrive.io/#organization"
+    "@id": "https://www.RawDrive.io/#organization"
   },
   "offers": {
     "@type": "Offer",
@@ -139,7 +139,7 @@ This document defines the JSON-LD structured data schemas for SEO and AI agent o
     "priceCurrency": "INR",
     "priceValidUntil": "2026-12-31",
     "availability": "https://schema.org/InStock",
-    "url": "https://app.vdrive.io/sign-up?plan=professional"
+    "url": "https://app.RawDrive.io/sign-up?plan=professional"
   }
 }
 ```
@@ -149,10 +149,10 @@ This document defines the JSON-LD structured data schemas for SEO and AI agent o
 {
   "@context": "https://schema.org",
   "@type": "Product",
-  "name": "vDrive Business",
+  "name": "RawDrive Business",
   "description": "For agencies and studios - 1TB storage, 200 galleries, 500 clients, white-label branding, API access",
   "brand": {
-    "@id": "https://www.vdrive.io/#organization"
+    "@id": "https://www.RawDrive.io/#organization"
   },
   "offers": {
     "@type": "Offer",
@@ -160,7 +160,7 @@ This document defines the JSON-LD structured data schemas for SEO and AI agent o
     "priceCurrency": "INR",
     "priceValidUntil": "2026-12-31",
     "availability": "https://schema.org/InStock",
-    "url": "https://app.vdrive.io/sign-up?plan=business"
+    "url": "https://app.RawDrive.io/sign-up?plan=business"
   }
 }
 ```
@@ -179,7 +179,7 @@ This document defines the JSON-LD structured data schemas for SEO and AI agent o
   "mainEntity": [
     {
       "@type": "Question",
-      "name": "How do I get started with vDrive?",
+      "name": "How do I get started with RawDrive?",
       "acceptedAnswer": {
         "@type": "Answer",
         "text": "Sign up for a free account, upload your photos, and create your first gallery. You can upgrade to a paid plan anytime to unlock more features."
@@ -187,7 +187,7 @@ This document defines the JSON-LD structured data schemas for SEO and AI agent o
     },
     {
       "@type": "Question",
-      "name": "Can I try vDrive for free?",
+      "name": "Can I try RawDrive for free?",
       "acceptedAnswer": {
         "@type": "Answer",
         "text": "Yes! Our Free plan includes 1GB storage, 3 galleries, and 5 clients. No credit card required."
@@ -250,7 +250,7 @@ This document defines the JSON-LD structured data schemas for SEO and AI agent o
     "name": "{{author}}"
   },
   "publisher": {
-    "@id": "https://www.vdrive.io/#organization"
+    "@id": "https://www.RawDrive.io/#organization"
   },
   "mainEntityOfPage": {
     "@type": "WebPage",
@@ -275,13 +275,13 @@ This document defines the JSON-LD structured data schemas for SEO and AI agent o
       "@type": "ListItem",
       "position": 1,
       "name": "Home",
-      "item": "https://www.vdrive.io"
+      "item": "https://www.RawDrive.io"
     },
     {
       "@type": "ListItem",
       "position": 2,
       "name": "{{sectionName}}",
-      "item": "https://www.vdrive.io/{{section}}"
+      "item": "https://www.RawDrive.io/{{section}}"
     },
     {
       "@type": "ListItem",

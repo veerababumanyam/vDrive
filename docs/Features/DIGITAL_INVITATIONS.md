@@ -1,6 +1,6 @@
 # Digital Invitations Feature
 
-vDrive's Digital Invitations system allows photographers to create beautiful, customizable event invitations with integrated RSVP management.
+RawDrive's Digital Invitations system allows photographers to create beautiful, customizable event invitations with integrated RSVP management.
 
 ## Overview
 

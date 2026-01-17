@@ -1,0 +1,754 @@
+openapi: 3.1.0
+info:
+  title: Face Service API
+  description: |
+    Face detection, recognition, and people management API for RawDrive.
+
+    Provides automatic face detection using Google Cloud Vision, ArcFace embeddings
+    for similarity matching, DBSCAN clustering for person grouping, and "Find Me"
+    selfie search functionality.
+  version: 1.0.0
+  contact:
+    name: RawDrive Engineering
+    email: engineering@rawdrive.io
+
+servers:
+  - url: http://localhost:8002/api/v1
+    description: Local development
+  - url: https://app.rawdrive.io/api/v1/faces
+    description: Production (via Traefik)
+
+tags:
+  - name: Faces
+    description: Face detection and retrieval operations
+  - name: People
+    description: Person group management (view, name, merge, split)
+  - name: Find Me
+    description: Client selfie search functionality
+
+paths:
+  /faces/{asset_id}:
+    get:
+      summary: Get faces in asset
+      description: Retrieve all detected faces for a specific image asset
+      operationId: getFacesByAsset
+      tags: [Faces]
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/AssetIdPath'
+        - $ref: '#/components/parameters/WorkspaceIdQuery'
+      responses:
+        '200':
+          description: List of faces in the asset
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FacesListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /faces:
+    get:
+      summary: List faces
+      description: List all faces in workspace with optional filtering by group
+      operationId: listFaces
+      tags: [Faces]
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/WorkspaceIdQuery'
+        - name: group_id
+          in: query
+          description: Filter by person group ID
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Offset'
+      responses:
+        '200':
+          description: Paginated list of faces
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FacesListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /faces/{face_id}/detail:
+    get:
+      summary: Get face detail
+      description: Retrieve detailed information about a specific face
+      operationId: getFaceDetail
+      tags: [Faces]
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: face_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/WorkspaceIdQuery'
+      responses:
+        '200':
+          description: Face details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FaceResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /people:
+    get:
+      summary: List people
+      description: List all person groups in workspace with optional name filtering
+      operationId: listPeople
+      tags: [People]
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/WorkspaceIdQuery'
+        - name: name_filter
+          in: query
+          description: Filter by name (partial match)
+          schema:
+            type: string
+            maxLength: 255
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Offset'
+      responses:
+        '200':
+          description: Paginated list of people (sorted by face count descending)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PeopleListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /people/{group_id}:
+    get:
+      summary: Get person detail
+      description: Retrieve detailed information about a person group
+      operationId: getPersonDetail
+      tags: [People]
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/GroupIdPath'
+        - $ref: '#/components/parameters/WorkspaceIdQuery'
+        - name: include_faces
+          in: query
+          description: Include all faces in the response
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: Person details with optional faces
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FaceGroupDetailResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    patch:
+      summary: Update person name
+      description: Assign or update the name of a person group
+      operationId: updatePersonName
+      tags: [People]
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/GroupIdPath'
+        - $ref: '#/components/parameters/WorkspaceIdQuery'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GroupNameUpdate'
+      responses:
+        '200':
+          description: Updated person group
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FaceGroupResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /people/{group_id}/photos:
+    get:
+      summary: Get person's photos
+      description: Retrieve all unique assets containing this person
+      operationId: getPersonPhotos
+      tags: [People]
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/GroupIdPath'
+        - $ref: '#/components/parameters/WorkspaceIdQuery'
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Offset'
+      responses:
+        '200':
+          description: Paginated list of photos containing this person
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PhotosForPersonResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /people/merge:
+    post:
+      summary: Merge person groups
+      description: Merge multiple person groups into a single target group
+      operationId: mergePeople
+      tags: [People]
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/WorkspaceIdQuery'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MergeRequest'
+      responses:
+        '200':
+          description: Merge result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MergeResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /people/split:
+    post:
+      summary: Split faces from group
+      description: Move selected faces from one group to a new group
+      operationId: splitPeople
+      tags: [People]
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/WorkspaceIdQuery'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SplitRequest'
+      responses:
+        '200':
+          description: Split result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SplitResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /find-me:
+    post:
+      summary: Find Me - selfie search
+      description: |
+        Upload a selfie to find photos of yourself in a gallery.
+
+        The system will:
+        1. Detect the face in the uploaded selfie
+        2. Generate an embedding
+        3. Search for similar faces across the workspace
+        4. Return matching photos ranked by similarity
+      operationId: findMe
+      tags: [Find Me]
+      parameters:
+        - $ref: '#/components/parameters/WorkspaceIdQuery'
+        - name: limit
+          in: query
+          description: Maximum results to return
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 200
+            default: 50
+        - name: threshold
+          in: query
+          description: Minimum similarity score (0.0-1.0)
+          schema:
+            type: number
+            format: float
+            minimum: 0.1
+            maximum: 1.0
+            default: 0.6
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - selfie
+              properties:
+                selfie:
+                  type: string
+                  format: binary
+                  description: Selfie image (max 5MB, image/* MIME types)
+      responses:
+        '200':
+          description: Matching photos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FindMeResponse'
+        '400':
+          description: Invalid selfie (no face detected, wrong format, too large)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token from onboarding-service
+
+  parameters:
+    WorkspaceIdQuery:
+      name: workspace_id
+      in: query
+      required: true
+      description: Workspace ID for multi-tenancy
+      schema:
+        type: string
+        format: uuid
+
+    AssetIdPath:
+      name: asset_id
+      in: path
+      required: true
+      description: Asset ID
+      schema:
+        type: string
+        format: uuid
+
+    GroupIdPath:
+      name: group_id
+      in: path
+      required: true
+      description: Person group ID
+      schema:
+        type: string
+        format: uuid
+
+    Limit:
+      name: limit
+      in: query
+      description: Maximum results to return
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 200
+        default: 50
+
+    Offset:
+      name: offset
+      in: query
+      description: Number of results to skip
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+
+  schemas:
+    BoundingBox:
+      type: object
+      description: Normalized bounding box coordinates (0.0-1.0)
+      required:
+        - x
+        - y
+        - width
+        - height
+      properties:
+        x:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 1
+          description: X coordinate of top-left corner
+        y:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 1
+          description: Y coordinate of top-left corner
+        width:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 1
+          description: Width as fraction of image
+        height:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 1
+          description: Height as fraction of image
+
+    Landmarks:
+      type: object
+      description: Facial landmarks with normalized coordinates
+      additionalProperties:
+        type: array
+        items:
+          type: number
+          format: float
+        minItems: 2
+        maxItems: 2
+      example:
+        left_eye: [0.35, 0.4]
+        right_eye: [0.65, 0.4]
+        nose_tip: [0.5, 0.55]
+
+    FaceResponse:
+      type: object
+      required:
+        - id
+        - asset_id
+        - bounding_box
+        - confidence
+        - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        asset_id:
+          type: string
+          format: uuid
+        bounding_box:
+          $ref: '#/components/schemas/BoundingBox'
+        confidence:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 1
+          description: Detection confidence score
+        group_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Person group this face belongs to
+        landmarks:
+          $ref: '#/components/schemas/Landmarks'
+        created_at:
+          type: string
+          format: date-time
+
+    FacesListResponse:
+      type: object
+      required:
+        - faces
+        - total
+      properties:
+        faces:
+          type: array
+          items:
+            $ref: '#/components/schemas/FaceResponse'
+        total:
+          type: integer
+          minimum: 0
+
+    FaceGroupResponse:
+      type: object
+      required:
+        - id
+        - workspace_id
+        - face_count
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        workspace_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          maxLength: 255
+          nullable: true
+          description: User-assigned name (null shows as "Person #abc123")
+        representative_face_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Best face for display (closest to cluster centroid)
+        face_count:
+          type: integer
+          minimum: 0
+          description: Number of faces in this group
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    FaceGroupDetailResponse:
+      allOf:
+        - $ref: '#/components/schemas/FaceGroupResponse'
+        - type: object
+          properties:
+            faces:
+              type: array
+              items:
+                $ref: '#/components/schemas/FaceResponse'
+              description: Included when include_faces=true
+
+    PeopleListResponse:
+      type: object
+      required:
+        - people
+        - total
+      properties:
+        people:
+          type: array
+          items:
+            $ref: '#/components/schemas/FaceGroupResponse'
+        total:
+          type: integer
+          minimum: 0
+
+    PhotosForPersonResponse:
+      type: object
+      required:
+        - person
+        - photos
+        - total
+      properties:
+        person:
+          $ref: '#/components/schemas/FaceGroupResponse'
+        photos:
+          type: array
+          items:
+            type: object
+            required:
+              - asset_id
+              - face_id
+              - bounding_box
+            properties:
+              asset_id:
+                type: string
+                format: uuid
+              face_id:
+                type: string
+                format: uuid
+              bounding_box:
+                $ref: '#/components/schemas/BoundingBox'
+        total:
+          type: integer
+          minimum: 0
+
+    GroupNameUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 255
+          nullable: true
+          description: Set to null to clear the name
+
+    MergeRequest:
+      type: object
+      required:
+        - source_group_ids
+        - target_group_id
+      properties:
+        source_group_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          minItems: 1
+          description: Groups to merge into target
+        target_group_id:
+          type: string
+          format: uuid
+          description: Group to merge into
+
+    MergeResponse:
+      type: object
+      required:
+        - merged
+        - faces_moved
+        - target_group_id
+      properties:
+        merged:
+          type: integer
+          description: Number of groups merged
+        faces_moved:
+          type: integer
+          description: Total faces moved to target
+        target_group_id:
+          type: string
+          format: uuid
+
+    SplitRequest:
+      type: object
+      required:
+        - group_id
+        - face_ids
+      properties:
+        group_id:
+          type: string
+          format: uuid
+          description: Group to split from
+        face_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          minItems: 1
+          description: Faces to move to new group
+
+    SplitResponse:
+      type: object
+      required:
+        - new_group_id
+        - faces_moved
+        - remaining_in_original
+      properties:
+        new_group_id:
+          type: string
+          format: uuid
+          description: Newly created group
+        faces_moved:
+          type: integer
+          description: Faces moved to new group
+        remaining_in_original:
+          type: integer
+          description: Faces remaining in original group
+
+    FindMeMatch:
+      type: object
+      required:
+        - asset_id
+        - face_id
+        - similarity
+        - bounding_box
+      properties:
+        asset_id:
+          type: string
+          format: uuid
+        face_id:
+          type: string
+          format: uuid
+        group_id:
+          type: string
+          format: uuid
+          nullable: true
+        similarity:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 1
+          description: Cosine similarity score
+        bounding_box:
+          $ref: '#/components/schemas/BoundingBox'
+
+    FindMeResponse:
+      type: object
+      required:
+        - matches
+        - total
+      properties:
+        matches:
+          type: array
+          items:
+            $ref: '#/components/schemas/FindMeMatch'
+        total:
+          type: integer
+          minimum: 0
+        person_group_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: Single group ID if all matches belong to same person
+
+    Error:
+      type: object
+      required:
+        - error
+        - message
+      properties:
+        error:
+          type: string
+          description: Error code
+          example: NO_FACE_DETECTED
+        message:
+          type: string
+          description: Human-readable error message
+          example: No face detected in the uploaded image
+
+  responses:
+    Unauthorized:
+      description: Missing or invalid JWT token
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: UNAUTHORIZED
+            message: Invalid or expired token
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: NOT_FOUND
+            message: Face group not found
+
+    BadRequest:
+      description: Invalid request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: INVALID_REQUEST
+            message: At least one source group is required

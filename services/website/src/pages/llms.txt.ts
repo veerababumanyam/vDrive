@@ -1,7 +1,7 @@
 /**
  * Dynamic llms.txt Endpoint
  *
- * Generates structured content for AI agents/LLMs to understand the vDrive platform.
+ * Generates structured content for AI agents/LLMs to understand the RawDrive platform.
  * This endpoint can be extended to include dynamic content like:
  * - Latest blog posts
  * - Current pricing (from data file)
@@ -55,13 +55,13 @@ export const GET: APIRoute = async () => {
   // Format documentation sections
   const docsSection = docSections.map((section) => `- ${section}`).join('\n');
 
-  const content = `# vDrive - Professional Photography Client Galleries
+  const content = `# RawDrive - Professional Photography Client Galleries
 
-> vDrive is an AI-powered photography platform that helps professional photographers manage, deliver, and sell their work. Built for wedding photographers, portrait studios, and event photographers.
+> RawDrive is an AI-powered photography platform that helps professional photographers manage, deliver, and sell their work. Built for wedding photographers, portrait studios, and event photographers.
 
 ## Product Overview
 
-vDrive provides:
+RawDrive provides:
 - **AI-Powered Gallery Management**: Automatically tag, sort, and organize thousands of photos
 - **Beautiful Client Portals**: Branded galleries with magic links and password protection
 - **Face Recognition**: Let clients find themselves in hundreds of photos instantly
@@ -112,24 +112,24 @@ ${blogSection}
 
 ## Technical Details
 
-- **Platform**: Web-based (app.vdrive.io), mobile-responsive
+- **Platform**: Web-based (app.RawDrive.io), mobile-responsive
 - **Storage**: Cloudflare R2 with global CDN
 - **Security**: AES-256 encryption, TLS 1.3, SOC 2 compliant
 - **API**: REST API available on Business+ plans
 
 ## Links
 
-- Website: https://www.vdrive.io
-- Features: https://www.vdrive.io/features
-- Pricing: https://www.vdrive.io/pricing
-- Documentation: https://www.vdrive.io/docs
-- Blog: https://www.vdrive.io/blog
-- Sign Up: https://app.vdrive.io/sign-up
-- Contact: support@vdrive.io
+- Website: https://www.RawDrive.io
+- Features: https://www.RawDrive.io/features
+- Pricing: https://www.RawDrive.io/pricing
+- Documentation: https://www.RawDrive.io/docs
+- Blog: https://www.RawDrive.io/blog
+- Sign Up: https://app.RawDrive.io/sign-up
+- Contact: support@RawDrive.io
 
 ## Company
 
-vDrive is headquartered in India and serves photographers worldwide. Founded in 2024, we're committed to helping photographers save time and impress their clients with beautiful, AI-powered galleries.
+RawDrive is headquartered in India and serves photographers worldwide. Founded in 2024, we're committed to helping photographers save time and impress their clients with beautiful, AI-powered galleries.
 
 ---
 Last updated: ${new Date().toISOString().split('T')[0]}

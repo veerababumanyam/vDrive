@@ -1,7 +1,7 @@
 ---
 name: git-workflow
 aliases: [git, commits, branches, pr, pull-request, version-control]
-description: Git workflow conventions for vDrive. Use when creating commits, branches, pull requests, or reviewing code changes.
+description: Git workflow conventions for RawDrive. Use when creating commits, branches, pull requests, or reviewing code changes.
 ---
 
 # Git Workflow

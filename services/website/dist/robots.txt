@@ -1,16 +1,16 @@
-# vDrive Website Robots.txt
+# RawDrive Website Robots.txt
 # Professional Photography Client Gallery Platform
 
 User-agent: *
 Allow: /
 
 # Sitemaps
-Sitemap: https://www.vdrive.io/sitemap-index.xml
+Sitemap: https://www.RawDrive.io/sitemap-index.xml
 
 # LLM/AI Context File
 # See https://llmstxt.org for specification
 # This file helps AI assistants understand our product
-LLMsTxt: https://www.vdrive.io/llms.txt
+LLMsTxt: https://www.RawDrive.io/llms.txt
 
 # AI Crawlers - Explicitly Allow
 # These help AI models learn about our product

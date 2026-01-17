@@ -1,14 +1,14 @@
 ---
 name: infrastructure
 aliases: [traefik, keda, prometheus, kafka, kubernetes, docker, monitoring, autoscaling, observability]
-description: Infrastructure, observability, and autoscaling guidelines for vDrive. Use when working with Traefik, KEDA, Prometheus, Kafka, Kubernetes, or Docker configurations.
+description: Infrastructure, observability, and autoscaling guidelines for RawDrive. Use when working with Traefik, KEDA, Prometheus, Kafka, Kubernetes, or Docker configurations.
 ---
 
 # Infrastructure & Observability
 
 ## Architecture Overview
 
-vDrive uses a modern cloud-native infrastructure stack:
+RawDrive uses a modern cloud-native infrastructure stack:
 
 | Component | Technology | Purpose |
 |-----------|------------|---------|
@@ -71,7 +71,7 @@ http:
 http:
   routers:
     api-router:
-      rule: "Host(`api.vDrive.ai`) || PathPrefix(`/api`)"
+      rule: "Host(`api.RawDrive.ai`) || PathPrefix(`/api`)"
       entryPoints:
         - websecure
       service: backend-service
@@ -106,10 +106,10 @@ metrics:
 apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
 metadata:
-  name: vDrive-backend-scaler
+  name: RawDrive-backend-scaler
 spec:
   scaleTargetRef:
-    name: vDrive-backend
+    name: RawDrive-backend
   minReplicaCount: 2
   maxReplicaCount: 100
   triggers:
@@ -119,7 +119,7 @@ spec:
         serverAddress: http://prometheus:9090
         threshold: "100"
         query: |
-          sum(rate(traefik_service_requests_total{service=~"vDrive-backend.*"}[1m]))
+          sum(rate(traefik_service_requests_total{service=~"RawDrive-backend.*"}[1m]))
 
     # Scale on latency
     - type: prometheus
@@ -227,10 +227,10 @@ kubectl apply -f https://raw.githubusercontent.com/traefik/traefik/v3.0/docs/con
 kubectl apply -k infrastructure/kubernetes/base/
 
 # Check KEDA ScaledObjects
-kubectl get scaledobjects -n vDrive
+kubectl get scaledobjects -n RawDrive
 
 # Check HPA status (managed by KEDA)
-kubectl get hpa -n vDrive
+kubectl get hpa -n RawDrive
 ```
 
 ## Monitoring Checklist

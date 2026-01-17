@@ -1,4 +1,4 @@
-# Quickstart: vDrive Public Website
+# Quickstart: RawDrive Public Website
 
 **Feature**: 002-public-website
 **Date**: 2026-01-13
@@ -99,7 +99,7 @@ services/website/
 title: "Your Post Title"
 description: "Brief description for SEO"
 pubDate: 2026-01-13
-author: "vDrive Team"
+author: "RawDrive Team"
 image: "/blog/your-image.jpg"
 tags: ["Photography", "Tips"]
 ---
@@ -236,8 +236,8 @@ Output is generated in `dist/`.
 ### Docker
 
 ```bash
-docker build -t vdrive-website .
-docker run -p 8020:8020 vdrive-website
+docker build -t RawDrive-website .
+docker run -p 8020:8020 RawDrive-website
 ```
 
 ## Troubleshooting

@@ -10,7 +10,7 @@
 
 ## Business Value Proposition
 
-Company Profile & Branding serves as the central branding authority across all client-facing surfaces in vDrive. This system provides a single-entry configuration that propagates to galleries, public profiles, headers/footers, and generates vCard/QR codes for business cards while powering AI-generated legal policies and SEO-optimized schema markup.
+Company Profile & Branding serves as the central branding authority across all client-facing surfaces in RawDrive. This system provides a single-entry configuration that propagates to galleries, public profiles, headers/footers, and generates vCard/QR codes for business cards while powering AI-generated legal policies and SEO-optimized schema markup.
 
 ### Key Business Benefits
 - **Brand Consistency**: Single source of truth for all branding

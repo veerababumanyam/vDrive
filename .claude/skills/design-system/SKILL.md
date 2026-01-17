@@ -1,10 +1,10 @@
 ---
 name: design-system
 aliases: [ui, styling, tokens, theme, colors, components, tailwind, css, responsive, mobile-first]
-description: Design system guidelines for vDrive. Use when styling components, using color tokens, implementing themes, responsive layouts, or following UI patterns. Mobile-first, futuristic design system.
+description: Design system guidelines for RawDrive. Use when styling components, using color tokens, implementing themes, responsive layouts, or following UI patterns. Mobile-first, futuristic design system.
 ---
 
-# vDrive Design System
+# RawDrive Design System
 
 A **mobile-first, futuristic** design system for a premium photography SaaS platform.
 

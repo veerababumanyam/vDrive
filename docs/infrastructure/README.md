@@ -1,6 +1,6 @@
-# vDrive Infrastructure Documentation
+# RawDrive Infrastructure Documentation
 
-This folder contains comprehensive documentation for the vDrive infrastructure setup, including Docker Compose, Kubernetes, and monitoring configurations.
+This folder contains comprehensive documentation for the RawDrive infrastructure setup, including Docker Compose, Kubernetes, and monitoring configurations.
 
 ## Documentation Index
 

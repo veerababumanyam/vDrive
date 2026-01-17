@@ -4,7 +4,7 @@
 
 ## Overview
 
-This document outlines the visual language, technical requirements for the frontend, and the design system principles for vDrive. The goal is to create a premium, "wow-factor" aesthetic using the best open-source tools available.
+This document outlines the visual language, technical requirements for the frontend, and the design system principles for RawDrive. The goal is to create a premium, "wow-factor" aesthetic using the best open-source tools available.
 
 ---
 

@@ -2,7 +2,7 @@
 
 ## Overview
 
-vDrive uses Traefik v3 as the API Gateway with:
+RawDrive uses Traefik v3 as the API Gateway with:
 - Priority-based routing
 - Rate limiting per endpoint
 - CORS configuration
@@ -77,7 +77,7 @@ entryPoints:
 providers:
   docker:
     exposedByDefault: false
-    network: vDrive-network
+    network: RawDrive-network
   file:
     filename: /etc/traefik/dynamic.yaml
 
@@ -162,7 +162,7 @@ cors-headers:
       - Authorization
       - X-Requested-With
     accessControlAllowOriginList:
-      - "https://app.vDrive.com"
+      - "https://app.RawDrive.com"
       - "http://localhost:5173"
     accessControlMaxAge: 86400
     accessControlAllowCredentials: true
@@ -214,7 +214,7 @@ apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
   name: backend-api
-  namespace: vDrive
+  namespace: RawDrive
 spec:
   entryPoints:
     - websecure
@@ -238,7 +238,7 @@ spec:
 
 ### Kubernetes
 ```bash
-kubectl port-forward svc/traefik 8080:8080 -n vDrive
+kubectl port-forward svc/traefik 8080:8080 -n RawDrive
 ```
 
 ## Prometheus Metrics
@@ -272,7 +272,7 @@ triggers:
 certificatesResolvers:
   letsencrypt:
     acme:
-      email: admin@vDrive.com
+      email: admin@RawDrive.com
       storage: /letsencrypt/acme.json
       httpChallenge:
         entryPoint: web
@@ -319,7 +319,7 @@ Check rate limit status in response headers:
 docker compose logs traefik
 
 # Kubernetes
-kubectl logs -f deployment/traefik -n vDrive
+kubectl logs -f deployment/traefik -n RawDrive
 ```
 
 ## Adding New Routes

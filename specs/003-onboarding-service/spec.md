@@ -9,7 +9,7 @@
 
 ### User Story 1 - New Photographer Registration (Priority: P1)
 
-A professional photographer discovers vDrive and wants to create an account to manage their photography business. They access the registration page on their mobile device, enter their credentials, complete bot verification, receive a verification email, and confirm their account to begin setting up their workspace.
+A professional photographer discovers RawDrive and wants to create an account to manage their photography business. They access the registration page on their mobile device, enter their credentials, complete bot verification, receive a verification email, and confirm their account to begin setting up their workspace.
 
 **Why this priority**: Account creation is the fundamental gateway to the platform. Without registration, no other features are accessible. This is the critical conversion point from visitor to paying customer.
 
@@ -41,9 +41,9 @@ A photographer wants to quickly create an account using their existing Google ac
 
 **Acceptance Scenarios**:
 
-1. **Given** a visitor on the registration page, **When** they tap "Sign up with Google" and authorize vDrive access, **Then** the system creates a user account using Google's email and name, marks the email as verified, and redirects to workspace setup.
+1. **Given** a visitor on the registration page, **When** they tap "Sign up with Google" and authorize RawDrive access, **Then** the system creates a user account using Google's email and name, marks the email as verified, and redirects to workspace setup.
 
-2. **Given** a Google user whose email already exists in vDrive (created via email registration), **When** they attempt to sign up with Google, **Then** the system links the Google account to the existing account and logs the user in.
+2. **Given** a Google user whose email already exists in RawDrive (created via email registration), **When** they attempt to sign up with Google, **Then** the system links the Google account to the existing account and logs the user in.
 
 3. **Given** a Google OAuth authorization attempt, **When** the user denies access or authorization fails, **Then** the system displays a user-friendly error message explaining what happened and offers alternative signup methods.
 

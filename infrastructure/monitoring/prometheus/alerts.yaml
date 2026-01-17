@@ -1,7 +1,7 @@
 # ===========================================
 # Prometheus Alert Rules
 # ===========================================
-# vDrive Alerting Configuration
+# RawDrive Alerting Configuration
 
 groups:
   # ===========================================

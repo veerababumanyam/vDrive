@@ -1,4 +1,4 @@
-# vDrive ULTIMATE Development Stack
+# RawDrive ULTIMATE Development Stack
 # Usage: docker compose -f infrastructure/docker/docker-compose.dev.yml up -d
 #
 # This stack includes EVERYTHING:
@@ -10,7 +10,7 @@
 #
 # SINGLE NODE CONFIGURATION (No HA Duplicates)
 
-name: vDrive-dev
+name: RawDrive-dev
 
 services:
   # ===================
@@ -18,31 +18,31 @@ services:
   # ===================
   postgres:
     image: timescale/timescaledb-ha:pg16
-    container_name: vDrive-postgres
+    container_name: RawDrive-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-vDrive}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-vDrive_dev_password}
-      POSTGRES_DB: ${POSTGRES_DB:-vDrive}
+      POSTGRES_USER: ${POSTGRES_USER:-RawDrive}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-RawDrive_dev_password}
+      POSTGRES_DB: ${POSTGRES_DB:-RawDrive}
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/home/postgres/pgdata/data
       - ../scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-vDrive} -d ${POSTGRES_DB:-vDrive}" ]
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-RawDrive} -d ${POSTGRES_DB:-RawDrive}" ]
       interval: 10s
       timeout: 5s
       retries: 5
     networks:
-      - vDrive-network
+      - RawDrive-network
 
   # ===================
   # Redis 7
   # ===================
   redis:
     image: redis:7-alpine
-    container_name: vDrive-redis
+    container_name: RawDrive-redis
     restart: unless-stopped
     command: redis-server --appendonly yes --maxmemory 512mb --maxmemory-policy allkeys-lru
     ports:
@@ -55,14 +55,14 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - vDrive-network
+      - RawDrive-network
 
   # ===================
   # Zookeeper
   # ===================
   zookeeper:
     image: confluentinc/cp-zookeeper:7.5.0
-    container_name: vDrive-zookeeper
+    container_name: RawDrive-zookeeper
     restart: unless-stopped
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
@@ -78,14 +78,14 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - vDrive-network
+      - RawDrive-network
 
   # ===================
   # Kafka
   # ===================
   kafka:
     image: confluentinc/cp-kafka:7.5.0
-    container_name: vDrive-kafka
+    container_name: RawDrive-kafka
     restart: unless-stopped
     depends_on:
       zookeeper:
@@ -111,31 +111,31 @@ services:
       timeout: 10s
       retries: 5
     networks:
-      - vDrive-network
+      - RawDrive-network
 
   # ===================
   # Kafka UI
   # ===================
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
-    container_name: vDrive-kafka-ui
+    container_name: RawDrive-kafka-ui
     restart: unless-stopped
     environment:
-      KAFKA_CLUSTERS_0_NAME: vDrive
+      KAFKA_CLUSTERS_0_NAME: RawDrive
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
       KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
       DYNAMIC_CONFIG_ENABLED: "true"
     ports:
       - "8081:8080"
     networks:
-      - vDrive-network
+      - RawDrive-network
 
   # ===================
   # Minio (S3 Compatible Storage)
   # ===================
   minio:
     image: minio/minio:latest
-    container_name: vDrive-minio
+    container_name: RawDrive-minio
     restart: unless-stopped
     environment:
       MINIO_ACCESS_KEY: minioadmin
@@ -152,14 +152,14 @@ services:
       timeout: 20s
       retries: 3
     networks:
-      - vDrive-network
+      - RawDrive-network
 
   # ===================
   # Milvus (Vector DB) Dependencies: Etcd
   # ===================
   etcd:
     image: quay.io/coreos/etcd:v3.5.5
-    container_name: vDrive-etcd
+    container_name: RawDrive-etcd
     restart: unless-stopped
     environment:
       - ETCD_AUTO_COMPACTION_MODE=revision
@@ -169,14 +169,14 @@ services:
       - etcd_data:/etcd
     command: etcd -advertise-client-urls=http://127.0.0.1:2379 -listen-client-urls=http://0.0.0.0:2379 --data-dir /etcd
     networks:
-      - vDrive-network
+      - RawDrive-network
 
   # ===================
   # Milvus (Vector DB)
   # ===================
   milvus:
     image: milvusdb/milvus:v2.3.0
-    container_name: vDrive-milvus
+    container_name: RawDrive-milvus
     restart: unless-stopped
     command: [ "milvus", "run", "standalone" ]
     environment:
@@ -191,14 +191,14 @@ services:
       - etcd
       - minio
     networks:
-      - vDrive-network
+      - RawDrive-network
 
   # ===================
   # Traefik (API Gateway)
   # ===================
   traefik:
     image: traefik:v3.0
-    container_name: vDrive-traefik
+    container_name: RawDrive-traefik
     restart: unless-stopped
     command:
       - "--api.insecure=true"
@@ -213,7 +213,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
-      - vDrive-network
+      - RawDrive-network
     depends_on:
       postgres:
         condition: service_healthy
@@ -225,7 +225,7 @@ services:
   # ===================
   prometheus:
     image: prom/prometheus:v2.47.0
-    container_name: vDrive-prometheus
+    container_name: RawDrive-prometheus
     restart: unless-stopped
     command:
       - "--config.file=/etc/prometheus/prometheus.yaml"
@@ -238,11 +238,11 @@ services:
       - ../monitoring/prometheus/prometheus.yaml:/etc/prometheus/prometheus.yaml:ro
       - prometheus_data:/prometheus
     networks:
-      - vDrive-network
+      - RawDrive-network
 
   grafana:
     image: grafana/grafana:10.2.0
-    container_name: vDrive-grafana
+    container_name: RawDrive-grafana
     restart: unless-stopped
     environment:
       GF_SECURITY_ADMIN_USER: admin
@@ -257,11 +257,11 @@ services:
       - ../monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
       - grafana_data:/var/lib/grafana
     networks:
-      - vDrive-network
+      - RawDrive-network
 
   loki:
     image: grafana/loki:3.0.0
-    container_name: vDrive-loki
+    container_name: RawDrive-loki
     restart: unless-stopped
     command: -config.file=/etc/loki/loki-config.yaml
     ports:
@@ -270,11 +270,11 @@ services:
       - ../monitoring/loki/loki-config.yaml:/etc/loki/loki-config.yaml:ro
       - loki_data:/loki
     networks:
-      - vDrive-network
+      - RawDrive-network
 
   promtail:
     image: grafana/promtail:3.0.0
-    container_name: vDrive-promtail
+    container_name: RawDrive-promtail
     restart: unless-stopped
     command: -config.file=/etc/promtail/promtail-config.yaml
     volumes:
@@ -282,11 +282,11 @@ services:
       - /var/log:/var/log:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
-      - vDrive-network
+      - RawDrive-network
 
   alertmanager:
     image: prom/alertmanager:v0.27.0
-    container_name: vDrive-alertmanager
+    container_name: RawDrive-alertmanager
     restart: unless-stopped
     command:
       - '--config.file=/etc/alertmanager/alertmanager.yaml'
@@ -296,51 +296,51 @@ services:
       - ../monitoring/alertmanager/alertmanager.yaml:/etc/alertmanager/alertmanager.yaml:ro
       - alertmanager_data:/alertmanager
     networks:
-      - vDrive-network
+      - RawDrive-network
 
   # ===================
   # Exporters & Tools
   # ===================
   redis-exporter:
     image: oliver006/redis_exporter:latest
-    container_name: vDrive-redis-exporter
+    container_name: RawDrive-redis-exporter
     environment:
       REDIS_ADDR: redis://redis:6379
     ports:
       - "9121:9121"
     networks:
-      - vDrive-network
+      - RawDrive-network
 
   postgres-exporter:
     image: prometheuscommunity/postgres-exporter:latest
-    container_name: vDrive-postgres-exporter
+    container_name: RawDrive-postgres-exporter
     environment:
-      DATA_SOURCE_NAME: "postgresql://${POSTGRES_USER:-vDrive}:${POSTGRES_PASSWORD:-vDrive_dev_password}@postgres:5432/${POSTGRES_DB:-vDrive}?sslmode=disable"
+      DATA_SOURCE_NAME: "postgresql://${POSTGRES_USER:-RawDrive}:${POSTGRES_PASSWORD:-RawDrive_dev_password}@postgres:5432/${POSTGRES_DB:-RawDrive}?sslmode=disable"
     ports:
       - "9187:9187"
     networks:
-      - vDrive-network
+      - RawDrive-network
 
   kafka-exporter:
     image: danielqsj/kafka-exporter:latest
-    container_name: vDrive-kafka-exporter
+    container_name: RawDrive-kafka-exporter
     command:
       - "--kafka.server=kafka:29092"
     ports:
       - "9308:9308"
     networks:
-      - vDrive-network
+      - RawDrive-network
 
   flower:
     image: mher/flower:latest
-    container_name: vDrive-flower
+    container_name: RawDrive-flower
     environment:
       CELERY_BROKER_URL: redis://redis:6379/1
       FLOWER_PORT: 5555
     ports:
       - "5555:5555"
     networks:
-      - vDrive-network
+      - RawDrive-network
   # ===================
   # Apps (Single Node)
   # ===================
@@ -352,16 +352,16 @@ services:
       args:
         SITE_URL: ${WEBSITE_URL:-http://localhost:8020}
         APP_URL: ${APP_URL:-http://localhost:5173}
-    image: ghcr.io/vdrive/website:${VERSION:-latest}
-    container_name: vDrive-website
+    image: ghcr.io/rawdrive/website:${VERSION:-latest}
+    container_name: RawDrive-website
     ports:
       - "${WEBSITE_PORT:-8020}:8020"
     environment:
       APP_URL: ${APP_URL:-http://localhost:5173}
     networks:
-      - vDrive-network
+      - RawDrive-network
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8020/"]
+      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8020/" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -374,14 +374,14 @@ services:
       args:
         VITE_API_URL: ${API_URL:-http://localhost:8000/api}
         VITE_APP_URL: ${APP_URL:-http://localhost:3000}
-    image: ghcr.io/vdrive/frontend:${VERSION:-latest}
-    container_name: vDrive-frontend
+    image: ghcr.io/rawdrive/frontend:${VERSION:-latest}
+    container_name: RawDrive-frontend
     ports:
       - "${FRONTEND_PORT:-3000}:80"
     networks:
-      - vDrive-network
+      - RawDrive-network
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80/health"]
+      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80/health" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -391,14 +391,14 @@ services:
   #   build:
   #     context: ../../backend
   #     dockerfile: Dockerfile
-  #   image: ghcr.io/vdrive/backend:${VERSION:-latest}
-  #   container_name: vDrive-backend
+  #   image: ghcr.io/rawdrive/backend:${VERSION:-latest}
+  #   container_name: RawDrive-backend
   #   ports:
   #     - "${BACKEND_PORT:-8000}:8000"
   #   environment:
   #     SERVICE_NAME: backend
   #     PORT: "8000"
-  #     DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-vDrive}:${POSTGRES_PASSWORD:-vDrive_dev_password}@postgres:5432/${POSTGRES_DB:-vDrive}
+  #     DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-RawDrive}:${POSTGRES_PASSWORD:-RawDrive_dev_password}@postgres:5432/${POSTGRES_DB:-RawDrive}
   #     REDIS_URL: redis://redis:6379/0
   #     KAFKA_BOOTSTRAP_SERVERS: kafka:29092
   #     JWT_PRIVATE_KEY: ${JWT_PRIVATE_KEY}
@@ -406,7 +406,7 @@ services:
   #     JWT_ALGORITHM: EdDSA
   #     MILVUS_URI: http://milvus:19530
   #   networks:
-  #     - vDrive-network
+  #     - RawDrive-network
   #   depends_on:
   #     postgres:
   #       condition: service_healthy
@@ -420,49 +420,114 @@ services:
     build:
       context: ../../services/onboarding-service
       dockerfile: Dockerfile
-    image: ghcr.io/vdrive/onboarding-service:${VERSION:-latest}
-    container_name: vDrive-onboarding
+    image: ghcr.io/rawdrive/onboarding-service:${VERSION:-latest}
+    container_name: RawDrive-onboarding
     ports:
       - "${ONBOARDING_SERVICE_PORT:-8006}:8006"
     environment:
       SERVICE_NAME: onboarding-service
       PORT: "8006"
-      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-vDrive}:${POSTGRES_PASSWORD:-vDrive_dev_password}@postgres:5432/${POSTGRES_DB:-vDrive}
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-RawDrive}:${POSTGRES_PASSWORD:-RawDrive_dev_password}@postgres:5432/${POSTGRES_DB:-RawDrive}
       REDIS_URL: redis://redis:6379/0
       KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      JWT_SECRET: ${JWT_SECRET}
     networks:
-      - vDrive-network
+      - RawDrive-network
     depends_on:
       postgres:
         condition: service_healthy
 
+  # Gallery Service
+  gallery-service:
+    build:
+      context: ../../services/gallery-service
+      dockerfile: Dockerfile
+    image: ghcr.io/rawdrive/gallery-service:${VERSION:-latest}
+    container_name: RawDrive-gallery
+    ports:
+      - "${GALLERY_SERVICE_PORT:-8004}:8004"
+    environment:
+      SERVICE_NAME: gallery-service
+      PORT: "8004"
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-RawDrive}:${POSTGRES_PASSWORD:-RawDrive_dev_password}@postgres:5432/${POSTGRES_DB:-RawDrive}
+      REDIS_URL: redis://redis:6379/0
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      R2_ACCESS_KEY_ID: ${R2_ACCESS_KEY_ID}
+      R2_SECRET_ACCESS_KEY: ${R2_SECRET_ACCESS_KEY}
+      R2_BUCKET_NAME: ${R2_BUCKET_NAME:-RawDrive}
+      R2_ENDPOINT: ${R2_ENDPOINT}
+      JWT_SECRET: ${JWT_SECRET}
+    networks:
+      - RawDrive-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+
+  # Upload Service
+  upload-service:
+    build:
+      context: ../../services/upload-service
+      dockerfile: Dockerfile
+    image: ghcr.io/rawdrive/upload-service:${VERSION:-latest}
+    container_name: RawDrive-upload
+    ports:
+      - "${UPLOAD_SERVICE_PORT:-8008}:8008"
+    environment:
+      SERVICE_NAME: upload-service
+      SERVICE_VERSION: "1.0.0"
+      APP_ENV: ${APP_ENV:-development}
+      PORT: "8008"
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-RawDrive}:${POSTGRES_PASSWORD:-RawDrive_dev_password}@postgres:5432/${POSTGRES_DB:-RawDrive}
+      REDIS_URL: redis://redis:6379/0
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      R2_ACCESS_KEY_ID: ${R2_ACCESS_KEY_ID}
+      R2_SECRET_ACCESS_KEY: ${R2_SECRET_ACCESS_KEY}
+      R2_BUCKET_NAME: ${R2_BUCKET_NAME:-RawDrive}
+      R2_ENDPOINT: ${R2_ENDPOINT}
+      JWT_SECRET: ${JWT_SECRET}
+      ENCRYPTION_MASTER_KEY: ${ENCRYPTION_MASTER_KEY}
+      TUS_MAX_SIZE: ${TUS_MAX_SIZE:-10737418240}
+    networks:
+      - RawDrive-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+
 networks:
-  vDrive-network:
+  RawDrive-network:
     driver: bridge
-    name: vDrive-network
+    name: RawDrive-network
 
 volumes:
   postgres_data:
-    name: vDrive-postgres-data
+    name: RawDrive-postgres-data
   redis_data:
-    name: vDrive-redis-data
+    name: RawDrive-redis-data
   zookeeper_data:
-    name: vDrive-zookeeper-data
+    name: RawDrive-zookeeper-data
   zookeeper_log:
-    name: vDrive-zookeeper-log
+    name: RawDrive-zookeeper-log
   kafka_data:
-    name: vDrive-kafka-data
+    name: RawDrive-kafka-data
   prometheus_data:
-    name: vDrive-prometheus-data
+    name: RawDrive-prometheus-data
   grafana_data:
-    name: vDrive-grafana-data
+    name: RawDrive-grafana-data
   alertmanager_data:
-    name: vDrive-alertmanager-data
+    name: RawDrive-alertmanager-data
   loki_data:
-    name: vDrive-loki-data
+    name: RawDrive-loki-data
   minio_data:
-    name: vDrive-minio-data
+    name: RawDrive-minio-data
   etcd_data:
-    name: vDrive-etcd-data
+    name: RawDrive-etcd-data
   milvus_data:
-    name: vDrive-milvus-data
+    name: RawDrive-milvus-data

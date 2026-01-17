@@ -1,6 +1,6 @@
-# vDrive Business Features Documentation
+# RawDrive Business Features Documentation
 
-This folder contains comprehensive business-focused documentation for all vDrive features, written from a business analyst perspective.
+This folder contains comprehensive business-focused documentation for all RawDrive features, written from a business analyst perspective.
 
 ## Quick Navigation
 

@@ -9,7 +9,7 @@
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { RegistrationForm } from '../components/onboarding/RegistrationForm';
 import { ThemeToggle } from '../components/onboarding/ThemeToggle';
-import { handleGoogleCallback } from '../components/onboarding/GoogleOAuthButton';
+import { handleGoogleCallback } from '../services/google-oauth';
 import { useEffect, useState, useCallback } from 'react';
 import { cn } from '../lib/utils';
 import { useBreakpoint, useHaptic, usePrefersReducedMotion, useSafeArea } from '../hooks/useMobile';
@@ -73,6 +73,15 @@ function CheckCircleIcon({ className }: { className?: string }) {
   );
 }
 
+// Pre-generated particle data - generated once at module load to avoid impure render
+const REGISTER_PARTICLES = [...Array(25)].map((_, i) => ({
+  id: i,
+  left: `${Math.random() * 100}%`,
+  top: `${Math.random() * 100}%`,
+  animationDuration: `${6 + Math.random() * 4}s`,
+  animationDelay: `${Math.random() * 5}s`,
+}));
+
 // Futuristic particle effect component
 function ParticleEffect() {
   const prefersReducedMotion = usePrefersReducedMotion();
@@ -81,15 +90,15 @@ function ParticleEffect() {
 
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {[...Array(25)].map((_, i) => (
+      {REGISTER_PARTICLES.map((particle) => (
         <div
-          key={i}
+          key={particle.id}
           className="absolute w-1 h-1 rounded-full bg-accent-400/30 dark:bg-accent-400/20"
           style={{
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
-            animation: `float ${6 + Math.random() * 4}s ease-in-out infinite`,
-            animationDelay: `${Math.random() * 5}s`,
+            left: particle.left,
+            top: particle.top,
+            animation: `float ${particle.animationDuration} ease-in-out infinite`,
+            animationDelay: particle.animationDelay,
           }}
         />
       ))}
@@ -156,22 +165,27 @@ export function RegisterPage() {
     const state = searchParams.get('state');
 
     if (code && state) {
-      setIsProcessingOAuth(true);
-      handleGoogleCallback().then((result) => {
-        setIsProcessingOAuth(false);
-        if (result.success) {
-          haptic.success();
-          // Navigate based on whether it's a new user
-          if (result.isNewUser) {
-            navigate('/onboarding/workspace');
+      // Use requestAnimationFrame to avoid sync setState in effect
+      const frame = requestAnimationFrame(() => {
+        setIsProcessingOAuth(true);
+        handleGoogleCallback().then((result) => {
+          setIsProcessingOAuth(false);
+          if (result.success) {
+            haptic.success();
+            // Navigate based on whether it's a new user
+            if (result.isNewUser) {
+              navigate('/onboarding/workspace');
+            } else {
+              navigate('/dashboard');
+            }
           } else {
-            navigate('/dashboard');
+            haptic.error();
+            setOauthError(result.error || 'OAuth failed');
           }
-        } else {
-          haptic.error();
-          setOauthError(result.error || 'OAuth failed');
-        }
+        });
       });
+
+      return () => cancelAnimationFrame(frame);
     }
   }, [searchParams, navigate, haptic]);
 
@@ -252,7 +266,7 @@ export function RegisterPage() {
             )}
           >
             <AppLogo size="md" />
-            <span className="text-2xl font-bold text-neutral-900 dark:text-white">vDrive</span>
+            <span className="text-2xl font-bold text-neutral-900 dark:text-white">RawDrive</span>
           </a>
 
           {/* Headline - with staggered entrance and gradient text */}
@@ -275,7 +289,7 @@ export function RegisterPage() {
               !prefersReducedMotion && "animate-fade-in-up stagger-2"
             )}
           >
-            Join thousands of photographers who use vDrive to manage, showcase,
+            Join thousands of photographers who use RawDrive to manage, showcase,
             and deliver their work with stunning galleries.
           </p>
 
@@ -321,7 +335,7 @@ export function RegisterPage() {
               </div>
               <div>
                 <p className="text-sm font-medium text-neutral-900 dark:text-white">10,000+ photographers</p>
-                <p className="text-xs text-neutral-500 dark:text-white/50">have joined vDrive this month</p>
+                <p className="text-xs text-neutral-500 dark:text-white/50">have joined RawDrive this month</p>
               </div>
             </div>
           </div>
@@ -346,7 +360,7 @@ export function RegisterPage() {
           {/* Mobile Logo with enhanced styling */}
           <div className="lg:hidden flex flex-col items-center gap-3 mb-10">
             <AppLogo size="lg" />
-            <span className="text-2xl font-bold text-neutral-900 dark:text-white mt-2">vDrive</span>
+            <span className="text-2xl font-bold text-neutral-900 dark:text-white mt-2">RawDrive</span>
             <p className="text-neutral-500 dark:text-white/60 text-center text-sm">
               Start your creative journey
             </p>

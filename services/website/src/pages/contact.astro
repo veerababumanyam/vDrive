@@ -3,7 +3,7 @@ import BaseLayout from '@/components/layout/BaseLayout.astro';
 import JsonLd from '@/components/seo/JsonLd.astro';
 import { generateBreadcrumbSchema, generateOrganizationSchema } from '@/utils/schema';
 
-const APP_URL = import.meta.env.APP_URL || 'https://app.vdrive.io';
+const APP_URL = import.meta.env.APP_URL || 'https://app.RawDrive.io';
 
 // Get plan from URL params for pre-selection
 const url = Astro.url;
@@ -30,7 +30,7 @@ const contactReasons = [
 
 <BaseLayout
   title="Contact Us"
-  description="Get in touch with the vDrive team. Contact us for enterprise sales, demos, partnerships, or support."
+  description="Get in touch with the RawDrive team. Contact us for enterprise sales, demos, partnerships, or support."
 >
   <JsonLd slot="head" schema={schemas} />
 
@@ -43,7 +43,7 @@ const contactReasons = [
             Let's talk about your needs
           </h1>
           <p class="mt-6 text-lg text-neutral-600 dark:text-warm-400">
-            Have questions about vDrive? Want to discuss enterprise solutions?
+            Have questions about RawDrive? Want to discuss enterprise solutions?
             We'd love to hear from you.
           </p>
         </div>
@@ -228,7 +228,7 @@ const contactReasons = [
                   <svg class="h-5 w-5 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
-                  <span>hello@vdrive.io</span>
+                  <span>hello@RawDrive.io</span>
                 </li>
                 <li class="flex items-center gap-3 text-neutral-600 dark:text-warm-400">
                   <svg class="h-5 w-5 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
@@ -251,7 +251,7 @@ const contactReasons = [
               <div class="rounded-2xl bg-gradient-to-r from-primary-600 to-accent-600 p-8 text-white">
                 <h2 class="text-xl font-semibold">Enterprise Inquiry</h2>
                 <p class="mt-2 text-primary-100">
-                  Thank you for your interest in vDrive Enterprise. Our team will review your requirements and get back to you within 24 hours.
+                  Thank you for your interest in RawDrive Enterprise. Our team will review your requirements and get back to you within 24 hours.
                 </p>
                 <ul class="mt-4 space-y-2 text-sm text-primary-100">
                   <li class="flex items-center gap-2">

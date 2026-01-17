@@ -1,7 +1,7 @@
 """
 Database connection and session management for Onboarding Service.
 
-Provides async SQLAlchemy engine and session factory following vDrive patterns.
+Provides async SQLAlchemy engine and session factory following RawDrive patterns.
 """
 
 from contextlib import asynccontextmanager

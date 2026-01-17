@@ -2,7 +2,7 @@
 @config "../tailwind.config.js";
 
 /* ============================================
-   vDrive Global Styles - Futuristic Glass
+   RawDrive Global Styles - Futuristic Glass
    ============================================ */
 
 /* CSS Custom Properties */
@@ -151,6 +151,51 @@
     border-radius: 1rem;
   }
 
+  /* Apple-style premium glass - higher blur, saturate for vibrancy */
+  .glass-apple {
+    @apply bg-white/8 backdrop-blur-2xl border border-white/20 rounded-3xl;
+    backdrop-filter: blur(40px) saturate(180%);
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
+    box-shadow:
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.1),
+      0 20px 25px -5px rgba(0, 0, 0, 0.1),
+      0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  }
+
+  .glass-apple:hover {
+    @apply border-white/30;
+    box-shadow:
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.15),
+      0 25px 30px -5px rgba(0, 0, 0, 0.15),
+      0 10px 10px -5px rgba(0, 0, 0, 0.06);
+  }
+
+  /* Frosted overlay for modals/lightboxes */
+  .overlay-frosted {
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(40px) saturate(180%);
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
+  }
+
+  /* Elevated glass card with subtle glow */
+  .glass-elevated {
+    @apply bg-white/10 backdrop-blur-2xl border border-white/15 rounded-2xl;
+    backdrop-filter: blur(30px) saturate(150%);
+    -webkit-backdrop-filter: blur(30px) saturate(150%);
+    box-shadow:
+      0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 2px 4px -1px rgba(0, 0, 0, 0.06),
+      0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+  }
+
+  .glass-elevated:hover {
+    box-shadow:
+      0 10px 15px -3px rgba(0, 0, 0, 0.1),
+      0 4px 6px -2px rgba(0, 0, 0, 0.05),
+      0 0 0 1px rgba(255, 255, 255, 0.08) inset,
+      0 0 30px -5px rgba(14, 165, 233, 0.2);
+  }
+
   /* Gradient text */
   .gradient-text {
     @apply bg-gradient-to-r from-primary-500 to-accent-500 dark:from-primary-400 dark:to-accent-500 bg-clip-text text-transparent;
@@ -283,12 +328,124 @@
 
 /* Utility layer */
 @layer utilities {
-  /* Animation delays */
+  /* Animation delays for stagger effects */
   .animation-delay-100 { animation-delay: 100ms; }
   .animation-delay-200 { animation-delay: 200ms; }
   .animation-delay-300 { animation-delay: 300ms; }
   .animation-delay-400 { animation-delay: 400ms; }
   .animation-delay-500 { animation-delay: 500ms; }
+
+  /* Shimmer animation for premium loading states */
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+
+  .animate-shimmer {
+    animation: shimmer 2s ease-in-out infinite;
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.1) 50%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    background-size: 200% 100%;
+  }
+
+  /* Light mode shimmer */
+  [data-theme="light"] .animate-shimmer,
+  .light .animate-shimmer {
+    background: linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0) 0%,
+      rgba(0, 0, 0, 0.05) 50%,
+      rgba(0, 0, 0, 0) 100%
+    );
+    background-size: 200% 100%;
+  }
+
+  /* Float animation for empty states */
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  /* Fade-in-scale for stagger animations */
+  @keyframes fade-in-scale {
+    0% {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .animate-fade-in-scale {
+    animation: fade-in-scale 0.3s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+  }
+
+  /* Fade in */
+  @keyframes fade-in {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.2s ease-out forwards;
+  }
+
+  /* Bounce scale for selection feedback */
+  @keyframes bounce-scale {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+    100% { transform: scale(1); }
+  }
+
+  .animate-bounce-scale {
+    animation: bounce-scale 0.2s ease-out;
+  }
+
+  /* Slide up for modals/sheets */
+  @keyframes slide-up {
+    0% {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-slide-up {
+    animation: slide-up 0.3s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+  }
+
+  /* Slide down for toasts/notifications */
+  @keyframes slide-down {
+    0% {
+      opacity: 0;
+      transform: translateX(-50%) translateY(-16px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  }
+
+  .animate-slide-down {
+    animation: slide-down 0.3s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+  }
 
   /* Scrollbar hide */
   .scrollbar-hide {

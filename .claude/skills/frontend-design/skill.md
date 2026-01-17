@@ -1,12 +1,12 @@
 ---
 name: frontend-design
 aliases: [ui-design, frontend, react-components, pages, premium-ui, cinematic, landing-page, glassmorphism, mobile-first, futuristic]
-description: Create distinctive, production-grade, mobile-first, futuristic frontend interfaces with high design quality for vDrive. Use this skill when the user asks to build web components, pages, or applications. Generates creative, polished code that avoids generic AI aesthetics while leveraging vDrive's design system.
+description: Create distinctive, production-grade, mobile-first, futuristic frontend interfaces with high design quality for RawDrive. Use this skill when the user asks to build web components, pages, or applications. Generates creative, polished code that avoids generic AI aesthetics while leveraging RawDrive's design system.
 ---
 
-# vDrive Frontend Design Skill
+# RawDrive Frontend Design Skill
 
-Create **distinctive, production-grade, futuristic, mobile-first** frontend interfaces that avoid generic "AI slop" aesthetics. vDrive is a **premium photography SaaS platform**. Every interface should feel:
+Create **distinctive, production-grade, futuristic, mobile-first** frontend interfaces that avoid generic "AI slop" aesthetics. RawDrive is a **premium photography SaaS platform**. Every interface should feel:
 
 - **Futuristic** - Cutting-edge visual effects and interactions
 - **Mobile-First** - Touch-optimized, gesture-driven, native app feel

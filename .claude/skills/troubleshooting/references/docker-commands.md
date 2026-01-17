@@ -1,6 +1,6 @@
 # Docker Commands Reference
 
-Quick reference for Docker debugging commands in vDrive.
+Quick reference for Docker debugging commands in RawDrive.
 
 ## Service Management
 
@@ -64,9 +64,9 @@ docker compose exec [service] bash                     # Open shell
 docker compose exec [service] env                      # View env vars
 
 # Database (PostgreSQL)
-docker compose exec postgres psql -U vDrive -d vDrive  # Shell
-docker compose exec postgres psql -U vDrive -c '\dt'   # List tables
-docker compose exec postgres psql -U vDrive -d vDrive -c 'SELECT count(*) FROM pg_stat_activity;'
+docker compose exec postgres psql -U RawDrive -d RawDrive  # Shell
+docker compose exec postgres psql -U RawDrive -c '\dt'   # List tables
+docker compose exec postgres psql -U RawDrive -d RawDrive -c 'SELECT count(*) FROM pg_stat_activity;'
 
 # Redis
 docker compose exec redis redis-cli                    # CLI
@@ -102,7 +102,7 @@ lsof -i :8000                                          # Check port usage
 
 # Container restarting
 docker compose logs --tail=200 [service]               # View crash logs
-docker update --restart=no vDrive-[service]            # Stop auto-restart
+docker update --restart=no RawDrive-[service]            # Stop auto-restart
 
 # Network issues
 docker compose exec [service] ping postgres            # Test connectivity

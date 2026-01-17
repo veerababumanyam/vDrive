@@ -6,7 +6,7 @@
 
 ## Business Value Proposition
 
-vDrive is built with a deep understanding of the diverse and culturally rich Indian market. Unlike generic global platforms, vDrive offers first-class support for regional languages, local payment methods, and cultural nuances essential for Indian weddings and events. This "India-First" approach (while maintaining global standards) is a key competitive differentiator.
+RawDrive is built with a deep understanding of the diverse and culturally rich Indian market. Unlike generic global platforms, RawDrive offers first-class support for regional languages, local payment methods, and cultural nuances essential for Indian weddings and events. This "India-First" approach (while maintaining global standards) is a key competitive differentiator.
 
 ### Key Business Benefits
 - **Market Penetration**: Accessible to non-English speaking clients and Tier 2/3 cities.
@@ -18,7 +18,7 @@ vDrive is built with a deep understanding of the diverse and culturally rich Ind
 
 ## Language Support
 
-vDrive currently supports **12 Indian Languages** plus English. This multi-language support extends across various touchpoints.
+RawDrive currently supports **12 Indian Languages** plus English. This multi-language support extends across various touchpoints.
 
 ### Supported Languages
 | Language | Code | Script | Direction |

@@ -1,4 +1,4 @@
-# vDrive Security Guidelines
+# RawDrive Security Guidelines
 
 **Version:** 0.3.3 | **Last Updated:** January 2026
 
@@ -180,7 +180,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://app.vDrive.com"],
+    allow_origins=["https://app.RawDrive.com"],
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE"],
     allow_headers=["*"],

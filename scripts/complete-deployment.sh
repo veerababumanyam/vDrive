@@ -1,9 +1,9 @@
 #!/bin/bash
-# vDrive Deployment Completion Script
+# RawDrive Deployment Completion Script
 # Run this script when Docker registry network issue is resolved
 #
 # Prerequisites: Docker registry connectivity restored
-# Location: /Users/v13478/Desktop/vDrive/scripts/complete-deployment.sh
+# Location: /Users/v13478/Desktop/RawDrive/scripts/complete-deployment.sh
 # Usage: bash scripts/complete-deployment.sh
 
 set -e  # Exit on error
@@ -12,7 +12,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 echo "=================================================="
-echo "vDrive Deployment Completion Script"
+echo "RawDrive Deployment Completion Script"
 echo "=================================================="
 echo ""
 
@@ -45,9 +45,9 @@ cd "$PROJECT_ROOT/infrastructure/docker"
 
 # Step 1: Verify infrastructure is running
 print_info "Step 1: Verifying infrastructure services..."
-POSTGRES_STATUS=$(docker ps --filter "name=vDrive-postgres" --format "{{.Status}}" | grep -c "Up" || echo "0")
-REDIS_STATUS=$(docker ps --filter "name=vDrive-redis" --format "{{.Status}}" | grep -c "Up" || echo "0")
-KAFKA_STATUS=$(docker ps --filter "name=vDrive-kafka" --format "{{.Status}}" | grep -c "Up" || echo "0")
+POSTGRES_STATUS=$(docker ps --filter "name=RawDrive-postgres" --format "{{.Status}}" | grep -c "Up" || echo "0")
+REDIS_STATUS=$(docker ps --filter "name=RawDrive-redis" --format "{{.Status}}" | grep -c "Up" || echo "0")
+KAFKA_STATUS=$(docker ps --filter "name=RawDrive-kafka" --format "{{.Status}}" | grep -c "Up" || echo "0")
 
 if [ "$POSTGRES_STATUS" = "0" ] || [ "$REDIS_STATUS" = "0" ] || [ "$KAFKA_STATUS" = "0" ]; then
     print_error "Infrastructure not running. Starting now..."
@@ -110,7 +110,7 @@ print_success "Onboarding service migrations completed"
 
 # Verify migrations
 print_info "Verifying migrations..."
-MIGRATION_COUNT=$(docker compose exec postgres psql -U vDrive -d vDrive -t -c "SELECT COUNT(*) FROM alembic_version;" | tr -d ' ')
+MIGRATION_COUNT=$(docker compose exec postgres psql -U RawDrive -d RawDrive -t -c "SELECT COUNT(*) FROM alembic_version;" | tr -d ' ')
 if [ "$MIGRATION_COUNT" -ge "2" ]; then
     print_success "Migrations verified ($MIGRATION_COUNT version records found)"
 else
@@ -160,7 +160,7 @@ fi
 
 # Step 6: Verify database tables
 print_info "Step 6: Verifying database schema..."
-TABLE_COUNT=$(docker compose exec postgres psql -U vDrive -d vDrive -t -c "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'app';" | tr -d ' ')
+TABLE_COUNT=$(docker compose exec postgres psql -U RawDrive -d RawDrive -t -c "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'app';" | tr -d ' ')
 if [ "$TABLE_COUNT" -ge "30" ]; then
     print_success "Database schema verified ($TABLE_COUNT tables in 'app' schema)"
 else
@@ -189,10 +189,10 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
         print_error "Test user seeding failed (non-critical)"
     }
     print_success "Test users seeded (password: Test@123)"
-    echo "  - free@test.vdrive.in"
-    echo "  - starter@test.vdrive.in"
-    echo "  - professional@test.vdrive.in"
-    echo "  - superadmin@test.vdrive.in"
+    echo "  - free@test.RawDrive.in"
+    echo "  - starter@test.RawDrive.in"
+    echo "  - professional@test.RawDrive.in"
+    echo "  - superadmin@test.RawDrive.in"
 fi
 
 # Final status

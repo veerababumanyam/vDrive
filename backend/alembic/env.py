@@ -1,5 +1,5 @@
 """
-Alembic environment configuration for vDrive.
+Alembic environment configuration for RawDrive.
 
 This module configures Alembic for async SQLAlchemy with PostgreSQL.
 Supports both sync (for autogenerate) and async (for migrations) operations.
@@ -43,7 +43,7 @@ def get_url() -> str:
     if settings:
         return settings.DATABASE_URL
     # Fallback for local development
-    return "postgresql://vDrive:vDrive_dev_password@localhost:5432/vDrive"
+    return "postgresql://RawDrive:RawDrive_dev_password@localhost:5432/RawDrive"
 
 
 def run_migrations_offline() -> None:

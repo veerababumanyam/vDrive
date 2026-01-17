@@ -1,4 +1,4 @@
-# Research: vDrive Public Website
+# Research: RawDrive Public Website
 
 **Feature**: 002-public-website
 **Date**: 2026-01-13
@@ -16,10 +16,10 @@
 
 **Format**:
 ```text
-# vDrive - AI-Powered Photography Platform
+# RawDrive - AI-Powered Photography Platform
 
 ## Overview
-vDrive is a SaaS platform for professional photographers to manage client galleries, deliver photos, and sell prints with AI-powered features.
+RawDrive is a SaaS platform for professional photographers to manage client galleries, deliver photos, and sell prints with AI-powered features.
 
 ## Key Pages
 - /: Landing page with product overview
@@ -29,9 +29,9 @@ vDrive is a SaaS platform for professional photographers to manage client galler
 - /docs: User documentation and API guides
 
 ## Contact
-- Website: https://www.vdrive.io
-- App: https://app.vdrive.io
-- Email: info@vdrive.in
+- Website: https://www.RawDrive.io
+- App: https://app.RawDrive.io
+- Email: info@RawDrive.in
 ```
 
 **Alternatives Considered**:
@@ -53,8 +53,8 @@ vDrive is a SaaS platform for professional photographers to manage client galler
 **Schemas to Implement**:
 
 1. **Organization** (on all pages):
-   - name: "vDrive"
-   - url: "https://www.vdrive.io"
+   - name: "RawDrive"
+   - url: "https://www.RawDrive.io"
    - logo, sameAs (social links)
 
 2. **Product** (on pricing page):

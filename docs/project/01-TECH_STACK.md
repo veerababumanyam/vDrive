@@ -1,8 +1,8 @@
-# vDrive Technology Stack
+# RawDrive Technology Stack
 
 ## Overview
 
-vDrive is built on a modern, scalable technology stack designed to handle 20,000+ photographer customers with high performance, reliability, and security. This document outlines all technologies, frameworks, and services used in the platform.
+RawDrive is built on a modern, scalable technology stack designed to handle 20,000+ photographer customers with high performance, reliability, and security. This document outlines all technologies, frameworks, and services used in the platform.
 
 ## Architecture Overview
 
@@ -87,7 +87,7 @@ vDrive is built on a modern, scalable technology stack designed to handle 20,000
 └────────────────────────────────────────────────────────────────────────┘
 ```
 
-Note: vDrive’s default hosted stack uses **Cloudflare R2** for managed object storage and **Cloudflare CDN/WAF** at the edge.
+Note: RawDrive’s default hosted stack uses **Cloudflare R2** for managed object storage and **Cloudflare CDN/WAF** at the edge.
 
 ### Mermaid Architecture Diagram
 

@@ -6,7 +6,7 @@
 
 ## Business Value Proposition
 
-The Notifications & Communication module is the central nervous system of the vDrive platform, ensuring timely and relevant information flow between photographers, their clients, and the system. It moves beyond simple email alerts to provide a comprehensive engagement layer that drives user action, confirms critical workflows, and keeps all stakeholders aligned.
+The Notifications & Communication module is the central nervous system of the RawDrive platform, ensuring timely and relevant information flow between photographers, their clients, and the system. It moves beyond simple email alerts to provide a comprehensive engagement layer that drives user action, confirms critical workflows, and keeps all stakeholders aligned.
 
 ### Key Business Benefits
 - **Increased Engagement**: Timely notifications drive users back to the platform.

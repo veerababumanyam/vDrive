@@ -6,7 +6,7 @@
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { LoginForm } from '../components/onboarding/LoginForm';
 import { ThemeToggle } from '../components/onboarding/ThemeToggle';
-import { handleGoogleCallback } from '../components/onboarding/GoogleOAuthButton';
+import { handleGoogleCallback } from '../services/google-oauth';
 import { useEffect, useState } from 'react';
 import { cn } from '../lib/utils';
 import { AppLogo } from '../components/ui/AppLogo';
@@ -105,20 +105,25 @@ export function LoginPage() {
     const state = searchParams.get('state');
 
     if (code && state) {
-      setIsProcessingOAuth(true);
-      handleGoogleCallback().then((result) => {
-        setIsProcessingOAuth(false);
-        if (result.success) {
-          // Navigate based on whether it's a new user
-          if (result.isNewUser) {
-            navigate('/onboarding/workspace');
+      // Use requestAnimationFrame to avoid sync setState in effect
+      const frame = requestAnimationFrame(() => {
+        setIsProcessingOAuth(true);
+        handleGoogleCallback().then((result) => {
+          setIsProcessingOAuth(false);
+          if (result.success) {
+            // Navigate based on whether it's a new user
+            if (result.isNewUser) {
+              navigate('/onboarding/workspace');
+            } else {
+              navigate('/dashboard');
+            }
           } else {
-            navigate('/dashboard');
+            setOauthError(result.error || 'OAuth failed');
           }
-        } else {
-          setOauthError(result.error || 'OAuth failed');
-        }
+        });
       });
+
+      return () => cancelAnimationFrame(frame);
     }
   }, [searchParams, navigate]);
 
@@ -173,7 +178,7 @@ export function LoginPage() {
           {/* Logo - with entrance animation */}
           <a href="/" className="inline-flex items-center gap-3 mb-12 animate-fade-in-scale">
             <AppLogo size="md" />
-            <span className="text-2xl font-bold text-neutral-900 dark:text-white">vDrive</span>
+            <span className="text-2xl font-bold text-neutral-900 dark:text-white">RawDrive</span>
           </a>
 
           {/* Headline - with staggered entrance */}
@@ -217,7 +222,7 @@ export function LoginPage() {
           {/* Mobile Logo */}
           <div className="lg:hidden flex items-center justify-center gap-3 mb-8">
             <AppLogo size="md" />
-            <span className="text-2xl font-bold text-neutral-900 dark:text-white">vDrive</span>
+            <span className="text-2xl font-bold text-neutral-900 dark:text-white">RawDrive</span>
           </div>
 
           {/* OAuth Error */}

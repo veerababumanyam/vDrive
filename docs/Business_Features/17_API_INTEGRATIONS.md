@@ -7,13 +7,13 @@
 
 ## Business Value Proposition
 
-The API & Integrations module opens vDrive to the wider ecosystem of photography and business tools. By providing a robust, secure, and documented API, vDrive transitions from a standalone tool to a platform that can serve as the central hub for a photography business, integrating with editing software, CRMs, and custom workflows.
+The API & Integrations module opens RawDrive to the wider ecosystem of photography and business tools. By providing a robust, secure, and documented API, RawDrive transitions from a standalone tool to a platform that can serve as the central hub for a photography business, integrating with editing software, CRMs, and custom workflows.
 
 ### Key Business Benefits
 - **Ecosystem Lock-in**: Deep integrations make it harder for customers to switch platforms.
 - **Enterprise Appeal**: Large studios require API access for custom automation and reporting.
 - **Partner Network**: Enables third-party developers to build plugins and extensions.
-- **Workflow Automation**: Saves photographers time by connecting disparate tools (e.g., Lightroom -> vDrive).
+- **Workflow Automation**: Saves photographers time by connecting disparate tools (e.g., Lightroom -> RawDrive).
 - **AI Readiness**: Native support for MCP (Model Context Protocol) makes the platform AI-agent friendly.
 
 ---
@@ -22,7 +22,7 @@ The API & Integrations module opens vDrive to the wider ecosystem of photography
 
 ### Primary Users
 1. **Developer / Integrator**
-   - Builds custom connections between vDrive and other systems.
+   - Builds custom connections between RawDrive and other systems.
    - Uses the API for bulk operations or data migration.
 
 2. **Enterprise Studio IT**

@@ -1,14 +1,14 @@
 openapi: 3.1.0
 info:
-  title: vDrive Search & AI API
+  title: RawDrive Search & AI API
   description: Semantic search, RAG queries, smart curation, and AI assistant
   version: 1.0.0
   contact:
-    name: vDrive API Support
-    email: api@vdrive.io
+    name: RawDrive API Support
+    email: api@RawDrive.io
 
 servers:
-  - url: https://app.vdrive.io/api/v1
+  - url: https://app.RawDrive.io/api/v1
     description: Production
   - url: http://localhost:8009/api/v1
     description: AI/Search service (local)

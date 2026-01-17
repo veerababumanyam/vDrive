@@ -275,9 +275,9 @@ def generate_token() -> tuple[str, str]:
 
 **URL Structure**:
 ```
-https://vDrive.ai/g/{token}                    # Root gallery
-https://vDrive.ai/g/{token}/s/{sub_gallery_id} # Sub-gallery
-https://vDrive.ai/g/{token}/p/{photo_id}       # Individual photo
+https://RawDrive.ai/g/{token}                    # Root gallery
+https://RawDrive.ai/g/{token}/s/{sub_gallery_id} # Sub-gallery
+https://RawDrive.ai/g/{token}/p/{photo_id}       # Individual photo
 https://photos.studio.com/g/{token}              # Custom domain
 ```
 
@@ -2809,4 +2809,4 @@ Verification:
 
 *Last updated: 2025-12-26*
 *Version: 2.1.0*
-*Authors: vDrive Engineering Team*
+*Authors: RawDrive Engineering Team*

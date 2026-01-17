@@ -6,7 +6,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: billing-service
-  namespace: vDrive
+  namespace: RawDrive
   labels:
     app: billing-service
     app.kubernetes.io/name: billing-service
@@ -26,19 +26,19 @@ spec:
         prometheus.io/port: "8005"
         prometheus.io/path: "/metrics"
     spec:
-      serviceAccountName: vDrive-service
+      serviceAccountName: RawDrive-service
       containers:
         - name: billing-service
-          image: ghcr.io/vDrive/billing-service:latest
+          image: ghcr.io/RawDrive/billing-service:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8005
               name: http
           envFrom:
             - configMapRef:
-                name: vDrive-config
+                name: RawDrive-config
             - secretRef:
-                name: vDrive-secrets
+                name: RawDrive-secrets
           env:
             - name: SERVICE_NAME
               value: "billing-service"
@@ -66,13 +66,13 @@ spec:
             periodSeconds: 5
             timeoutSeconds: 3
       imagePullSecrets:
-        - name: vDrive-registry
+        - name: RawDrive-registry
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: billing-service
-  namespace: vDrive
+  namespace: RawDrive
   labels:
     app: billing-service
 spec:

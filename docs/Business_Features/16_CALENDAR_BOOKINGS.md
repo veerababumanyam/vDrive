@@ -6,7 +6,7 @@
 
 ## Business Value Proposition
 
-The Calendar & Booking module transforms vDrive from a delivery tool into a revenue-generating business hub. By allowing photographers to manage their availability and accept bookings directly, it streamlines the client acquisition process, reduces administrative overhead, and prevents double-booking errors.
+The Calendar & Booking module transforms RawDrive from a delivery tool into a revenue-generating business hub. By allowing photographers to manage their availability and accept bookings directly, it streamlines the client acquisition process, reduces administrative overhead, and prevents double-booking errors.
 
 ### Key Business Benefits
 - **Direct Revenue**: Capture bookings and deposits 24/7 without back-and-forth emails.
@@ -47,7 +47,7 @@ The Calendar & Booking module transforms vDrive from a delivery tool into a reve
 ### 2. Calendar Synchronization
 - **Two-Way Sync**:
     - **Read**: Checks external calendars (Google, Outlook) to block busy slots.
-    - **Write**: Pushes new vDrive bookings to the external calendar.
+    - **Write**: Pushes new RawDrive bookings to the external calendar.
 - **Multiple Calendars**: Support for checking multiple calendars for conflicts.
 
 ### 3. Booking Workflow

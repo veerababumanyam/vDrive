@@ -33,10 +33,10 @@
 Overview
 
 
-vDrive is **AI-native** and uses a **multi-provider AI layer** to deliver intelligent photo analysis, curation, organization, and search features. These capabilities help photographers save time, improve consistency, and provide better client experiences.
+RawDrive is **AI-native** and uses a **multi-provider AI layer** to deliver intelligent photo analysis, curation, organization, and search features. These capabilities help photographers save time, improve consistency, and provide better client experiences.
 
 **Provider strategy (default + options):**
-- **Default (vDrive-hosted): Google Gemini**
+- **Default (RawDrive-hosted): Google Gemini**
 - **Optional providers (admin-configurable):** OpenAI, Anthropic, Azure-hosted models (Azure OpenAI / Azure AI Foundry), and OpenAI-compatible local servers (Ollama, LM Studio)
 
 AI execution may run as:

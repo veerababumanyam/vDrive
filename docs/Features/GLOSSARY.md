@@ -1,6 +1,6 @@
-# vDrive Glossary (Canonical Terminology)
+# RawDrive Glossary (Canonical Terminology)
 
-This glossary is the **single source of truth** for product/architecture terminology across `docs/vDrive_Project`.
+This glossary is the **single source of truth** for product/architecture terminology across `docs/RawDrive_Project`.
 
 If another document uses a different term (e.g., “tenant”), treat this glossary as canonical and update the document to match.
 
@@ -9,18 +9,18 @@ If another document uses a different term (e.g., “tenant”), treat this gloss
 ## Canonical tenancy terminology
 
 ### Workspace
-- **Definition:** The unit of tenancy, isolation, billing, and policy enforcement in vDrive.
+- **Definition:** The unit of tenancy, isolation, billing, and policy enforcement in RawDrive.
 - **Synonyms (legacy):** *tenant*.
 - **Canonical ID field:** `workspace_id`.
 - **Legacy alias (avoid in new docs):** `tenant_id` (only acceptable when describing migration/compat).
 - **Rule:** Every record that can contain customer data MUST be scoped to exactly one `workspace_id`.
 
 ### Organization / Studio / Company
-- **Definition:** The real-world entity using vDrive.
+- **Definition:** The real-world entity using RawDrive.
 - **Mapping:** In almost all cases, one organization/studio maps to **one workspace**.
 
 ### Platform / Ops
-- **Definition:** vDrive’s internal administrative control plane used by vDrive staff.
+- **Definition:** RawDrive’s internal administrative control plane used by RawDrive staff.
 - **Note:** Platform admins can access multiple workspaces, but access must be auditable.
 
 ---
@@ -28,7 +28,7 @@ If another document uses a different term (e.g., “tenant”), treat this gloss
 ## Users & identities
 
 ### User
-- **Definition:** An authenticated identity in vDrive.
+- **Definition:** An authenticated identity in RawDrive.
 - **Membership:** A user can belong to one or more workspaces (directly or via org provisioning).
 
 ### Workspace member
@@ -47,7 +47,7 @@ If another document uses a different term (e.g., “tenant”), treat this gloss
 - **Examples:** `workspace_owner`, `workspace_admin`, `editor`, `finance`, `viewer`, `external_guest`.
 
 ### Platform role (Ops role)
-- **Definition:** A **global** role used for vDrive’s internal control plane (Ops/Admin Console). Platform roles are **not** tied to a specific workspace membership.
+- **Definition:** A **global** role used for RawDrive’s internal control plane (Ops/Admin Console). Platform roles are **not** tied to a specific workspace membership.
 - **Examples:** `super_admin`, `platform_admin`, `support_admin`, `billing_admin`, `security_admin`, `observability_admin`, `auditor_readonly`, `product_admin`.
 - **Rule:** Platform roles do **not** automatically grant access to customer content. Any cross-workspace customer data access must be explicitly granted and audited (e.g., support access sessions / break-glass).
 
@@ -82,10 +82,10 @@ If another document uses a different term (e.g., “tenant”), treat this gloss
 ## Storage
 
 ### Managed storage
-- **Definition:** vDrive-hosted object storage (e.g., Cloudflare R2) used when a customer does not bring their own storage.
+- **Definition:** RawDrive-hosted object storage (e.g., Cloudflare R2) used when a customer does not bring their own storage.
 
 ### BYOS (Bring Your Own Storage)
-- **Definition:** Customer-owned storage provider integrated with vDrive.
+- **Definition:** Customer-owned storage provider integrated with RawDrive.
 - **Examples:** Google Drive, Dropbox, S3-compatible, Azure Blob.
 - **Rule:** BYOS configurations and credentials are scoped to a workspace; access is policy-controlled and auditable.
 
@@ -97,7 +97,7 @@ If another document uses a different term (e.g., “tenant”), treat this gloss
 ## Infrastructure (Canonical Hosted SaaS Stack)
 
 ### Cloudflare Edge (CDN/WAF)
-- **Definition:** The default edge layer for vDrive-hosted environments.
+- **Definition:** The default edge layer for RawDrive-hosted environments.
 - **Includes:** CDN caching, WAF, DDoS protection, rate limiting, bot mitigation.
 
 ### Cloudflare Turnstile
@@ -105,15 +105,15 @@ If another document uses a different term (e.g., “tenant”), treat this gloss
 - **Use cases:** Signup, login abuse protection, and high-risk public forms (e.g., contact forms).
 
 ### Cloudflare R2
-- **Definition:** The default managed object storage for vDrive-hosted workspaces.
+- **Definition:** The default managed object storage for RawDrive-hosted workspaces.
 - **Note:** R2 is S3-compatible; access is via signed URLs and is delivered to end-users through the Cloudflare edge.
 
 ### Hostinger VPS (KVM)
-- **Definition:** The default hosting provider for vDrive-hosted environments.
-- **Note:** Hosts the compute layer that runs the vDrive Kubernetes cluster.
+- **Definition:** The default hosting provider for RawDrive-hosted environments.
+- **Note:** Hosts the compute layer that runs the RawDrive Kubernetes cluster.
 
 ### Kubernetes (self-managed via kubeadm)
-- **Definition:** The default orchestration platform for vDrive-hosted environments.
+- **Definition:** The default orchestration platform for RawDrive-hosted environments.
 - **Key components:** Traefik v3 API Gateway with KEDA autoscaling, cert-manager (Let’s Encrypt), network policies, and cluster/DB backup jobs.
 
 ---
@@ -124,7 +124,7 @@ If another document uses a different term (e.g., “tenant”), treat this gloss
 - **Definition:** The system that runs AI jobs (analysis, captions, embeddings, People scans), enforces credits/quotas, tracks cost/usage, and provides auditability.
 
 ### LLM Provider (AI Provider)
-- **Definition:** A configured backend that can execute vDrive AI tasks (text generation, vision analysis, embeddings, moderation).
+- **Definition:** A configured backend that can execute RawDrive AI tasks (text generation, vision analysis, embeddings, moderation).
 - **Examples:** Google Gemini (primary/default), OpenAI, Anthropic, Azure-hosted models (e.g., Azure OpenAI / Azure AI Foundry), and OpenAI-compatible local servers (e.g., Ollama, LM Studio).
 
 ### Model Profile
@@ -135,7 +135,7 @@ If another document uses a different term (e.g., “tenant”), treat this gloss
 - **Definition:** The AI Platform component that routes each AI request to the correct Model Profile (and thus provider/model), supports fallback, regional routing, and logs usage/costs per workspace.
 
 ### GEO (Generative Engine Optimization)
-- **Definition:** vDrive’s **internal** AI search optimization system (not external SEO).
+- **Definition:** RawDrive’s **internal** AI search optimization system (not external SEO).
 - **Purpose:** Improve discoverability of assets via semantic metadata, embeddings, relationships, and analytics.
 
 ### Embedding

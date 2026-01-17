@@ -1,8 +1,8 @@
-# vDrive Landing Page - Comprehensive Content Guide
+# RawDrive Landing Page - Comprehensive Content Guide
 
 ## Overview
 
-The vDrive landing page is a modern, responsive marketing website designed to convert photographers into users. It features lazy-loaded sections for optimal performance, AI-powered content, and a complete user journey from awareness to conversion.
+The RawDrive landing page is a modern, responsive marketing website designed to convert photographers into users. It features lazy-loaded sections for optimal performance, AI-powered content, and a complete user journey from awareness to conversion.
 
 **Location**: `frontend/src/pages/LandingPage.tsx`
 **Layout**: `frontend/src/components/layouts/MarketingLayout.tsx`
@@ -16,7 +16,7 @@ The vDrive landing page is a modern, responsive marketing website designed to co
 **Location**: Top of page, fixed position (z-50)
 
 #### Desktop Navigation
-- **Logo**: vDrive branding (clickable, links to home)
+- **Logo**: RawDrive branding (clickable, links to home)
 - **Navigation Links** (hidden on mobile, visible on md+):
   - Features → scrolls to #features
   - Pricing → scrolls to #pricing
@@ -95,14 +95,14 @@ The vDrive landing page is a modern, responsive marketing website designed to co
 
 #### Right Content (Visual)
 **Mobile Version** (hidden on lg+):
-- Simplified card with vDrive logo
+- Simplified card with RawDrive logo
 - 3 feature icons: Upload, Organize, Share
 - Glow effect background
 
 **Desktop Version** (hidden on md):
 - Browser frame mockup with:
   - Traffic light buttons (red, yellow, green)
-  - URL bar: "app.vDrive.io"
+  - URL bar: "app.RawDrive.io"
   - Dashboard preview showing:
     - "My Galleries" header (12 galleries, 2,450 photos)
     - "+ New Gallery" button
@@ -183,14 +183,14 @@ Each stat has:
    - Company: Priya Studios
    - Category: Wedding
    - Rating: 5/5
-   - Quote: "vDrive transformed how I deliver photos to my clients. The AI tagging saves me hours of work every week, and my clients absolutely love the beautiful galleries. It's been a game-changer for my business."
+   - Quote: "RawDrive transformed how I deliver photos to my clients. The AI tagging saves me hours of work every week, and my clients absolutely love the beautiful galleries. It's been a game-changer for my business."
    - Stat: 10hrs Saved weekly
 
 2. **Rahul Verma** - Portrait Photographer
    - Company: Verma Photography
    - Category: Portrait
    - Rating: 5/5
-   - Quote: "The print album designer is incredible. I've increased my album sales by 40% since switching to vDrive. The templates are gorgeous and clients can see proofs instantly."
+   - Quote: "The print album designer is incredible. I've increased my album sales by 40% since switching to RawDrive. The templates are gorgeous and clients can see proofs instantly."
    - Stat: 40% More sales
 
 3. **Ananya Patel** - Event Photographer
@@ -390,7 +390,7 @@ Each stat has:
 - Demo Images: 6 commercial photos
 
 #### Bottom Testimonial
-- Quote: "vDrive has completely transformed how I deliver photos to my [use case] clients. The AI features save me hours every week."
+- Quote: "RawDrive has completely transformed how I deliver photos to my [use case] clients. The AI features save me hours every week."
 - Avatar: First letter of use case
 - Name: Professional Photographer
 - Title: [Use Case] Specialist
@@ -548,10 +548,10 @@ Each stat has:
 #### 14 FAQ Items
 
 **Getting Started (2)**:
-1. "How do I get started with vDrive?"
+1. "How do I get started with RawDrive?"
    - Answer: Sign up, upload photos, create gallery. Upgrade anytime.
 
-2. "Can I try vDrive for free?"
+2. "Can I try RawDrive for free?"
    - Answer: Yes, Free plan includes 1GB, 3 galleries, 5 clients. No credit card required.
 
 **Features (5)**:
@@ -592,7 +592,7 @@ Each stat has:
 
 **Support (1)**:
 13. "How do I contact support?"
-    - Answer: Email info@vDrive.in or contactus@vDrive.in. In-app chat. Priority support for Pro/Power plans.
+    - Answer: Email info@RawDrive.in or contactus@RawDrive.in. In-app chat. Priority support for Pro/Power plans.
 
 #### Contact CTA
 - Icon: MessageCircle
@@ -656,7 +656,7 @@ Each stat has:
 - Description: "Professional photography client galleries made simple."
 - Newsletter signup form
 - Contact info:
-  - Email: info@vDrive.in
+  - Email: info@RawDrive.in
   - Phone: +49 178 5220533
   - Address: Heinrich Brauns str 17, Essen 45355, Germany
 
@@ -684,7 +684,7 @@ Each stat has:
 - Security
 
 #### Bottom Bar
-- Copyright: © [Year] vDrive. Made with ❤️ for photographers.
+- Copyright: © [Year] RawDrive. Made with ❤️ for photographers.
 - Social Links:
   - Instagram
   - Twitter
@@ -814,7 +814,7 @@ Each stat has:
 ## SEO & Meta Information
 
 ### Page Title
-- "vDrive - Professional Photography Client Galleries"
+- "RawDrive - Professional Photography Client Galleries"
 
 ### Meta Description
 - "Share, deliver, and sell your photos with AI-powered galleries. No technical skills needed. Start free, upgrade when you grow."

@@ -94,7 +94,7 @@ class WorkspaceMemberRepository:
         self,
         user_id: str,
         workspace_id: str,
-        role: WorkspaceRole = WorkspaceRole.OWNER,
+        role: str = "owner",
         invited_by: Optional[str] = None,
     ) -> WorkspaceMember:
         """
@@ -103,16 +103,19 @@ class WorkspaceMemberRepository:
         Args:
             user_id: UUID of the user
             workspace_id: UUID of the workspace
-            role: Member role (default OWNER for workspace creators)
+            role: Member role string (default "owner" for workspace creators)
             invited_by: UUID of user who invited this member (optional)
 
         Returns:
             Created WorkspaceMember instance
         """
+        # Convert enum to string value if needed
+        role_value = role.value if hasattr(role, 'value') else role
+
         member = WorkspaceMember(
             user_id=user_id,
             workspace_id=workspace_id,
-            role=role,
+            role=role_value,
             invited_by=invited_by,
         )
 
@@ -155,7 +158,7 @@ class WorkspaceMemberRepository:
             select(WorkspaceMember.id).where(
                 WorkspaceMember.user_id == user_id,
                 WorkspaceMember.workspace_id == workspace_id,
-                WorkspaceMember.role == WorkspaceRole.OWNER,
+                WorkspaceMember.role == "owner",
             )
         )
         return result.scalar_one_or_none() is not None

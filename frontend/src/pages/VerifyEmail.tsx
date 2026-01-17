@@ -130,6 +130,15 @@ function MorphingBlob({ className }: { className?: string }) {
   );
 }
 
+// Pre-generated particle data - generated once at module load to avoid impure render
+const VERIFY_PARTICLES = [...Array(20)].map((_, i) => ({
+  id: i,
+  left: `${Math.random() * 100}%`,
+  top: `${Math.random() * 100}%`,
+  animationDuration: `${6 + Math.random() * 4}s`,
+  animationDelay: `${Math.random() * 5}s`,
+}));
+
 function ParticleEffect() {
   const prefersReducedMotion = usePrefersReducedMotion();
 
@@ -137,15 +146,15 @@ function ParticleEffect() {
 
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {[...Array(20)].map((_, i) => (
+      {VERIFY_PARTICLES.map((particle) => (
         <div
-          key={i}
+          key={particle.id}
           className="absolute w-1 h-1 rounded-full bg-primary-400/25 dark:bg-primary-400/15"
           style={{
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
-            animation: `float ${6 + Math.random() * 4}s ease-in-out infinite`,
-            animationDelay: `${Math.random() * 5}s`,
+            left: particle.left,
+            top: particle.top,
+            animation: `float ${particle.animationDuration} ease-in-out infinite`,
+            animationDelay: particle.animationDelay,
           }}
         />
       ))}
@@ -282,7 +291,7 @@ export function VerifyEmailPage() {
         )}
       >
         <AppLogo size="md" />
-        <span className="text-2xl font-bold text-neutral-900 dark:text-white">vDrive</span>
+        <span className="text-2xl font-bold text-neutral-900 dark:text-white">RawDrive</span>
       </a>
 
       <AppCard
@@ -503,8 +512,8 @@ export function VerifyEmailPage() {
         !prefersReducedMotion && "animate-fade-in-up"
       )} style={{ animationDelay: '300ms' }}>
         Having trouble? Contact us at{' '}
-        <a href="mailto:support@vdrive.app" className="text-primary-500 dark:text-primary-400 hover:underline">
-          support@vdrive.app
+        <a href="mailto:support@RawDrive.app" className="text-primary-500 dark:text-primary-400 hover:underline">
+          support@RawDrive.app
         </a>
       </p>
     </div>

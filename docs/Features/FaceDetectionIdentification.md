@@ -2,7 +2,7 @@
 
 ## Overview
 
-vDrive's Face Detection and Identification service automatically detects, identifies, and groups faces across gallery photos. This enables photographers to organize photos by person, discover similar faces, and create face-based collections.
+RawDrive's Face Detection and Identification service automatically detects, identifies, and groups faces across gallery photos. This enables photographers to organize photos by person, discover similar faces, and create face-based collections.
 
 ## Key Capabilities
 

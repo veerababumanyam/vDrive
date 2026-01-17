@@ -10,7 +10,7 @@
 
 ## Business Value Proposition
 
-Digital Invitations is a comprehensive event invitation system designed for Indian photographers and event organizers to create, share, and manage beautiful digital invitations for weddings, festivals, and cultural events. The system integrates with vDrive's gallery infrastructure to leverage workspace-scoped assets, share links, and the centralized design system.
+Digital Invitations is a comprehensive event invitation system designed for Indian photographers and event organizers to create, share, and manage beautiful digital invitations for weddings, festivals, and cultural events. The system integrates with RawDrive's gallery infrastructure to leverage workspace-scoped assets, share links, and the centralized design system.
 
 ### Key Business Benefits
 - **Time Savings**: Create professional invitations in under 5 minutes

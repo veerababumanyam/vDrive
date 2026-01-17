@@ -32,7 +32,8 @@ export function formatRelativeTime(date: Date | string): string {
 /**
  * Debounce a function call
  */
-export function debounce<T extends (...args: any[]) => any>(
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function debounce<T extends (...args: any[]) => unknown>(
   fn: T,
   delay: number
 ): (...args: Parameters<T>) => void {

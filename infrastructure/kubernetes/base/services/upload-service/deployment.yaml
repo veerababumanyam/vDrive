@@ -6,7 +6,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: upload-service
-  namespace: vDrive
+  namespace: RawDrive
   labels:
     app: upload-service
     app.kubernetes.io/name: upload-service
@@ -26,19 +26,19 @@ spec:
         prometheus.io/port: "8008"
         prometheus.io/path: "/metrics"
     spec:
-      serviceAccountName: vDrive-service
+      serviceAccountName: RawDrive-service
       containers:
         - name: upload-service
-          image: ghcr.io/vDrive/upload-service:latest
+          image: ghcr.io/RawDrive/upload-service:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8008
               name: http
           envFrom:
             - configMapRef:
-                name: vDrive-config
+                name: RawDrive-config
             - secretRef:
-                name: vDrive-secrets
+                name: RawDrive-secrets
           env:
             - name: SERVICE_NAME
               value: "upload-service"
@@ -75,13 +75,13 @@ spec:
             periodSeconds: 5
             timeoutSeconds: 3
       imagePullSecrets:
-        - name: vDrive-registry
+        - name: RawDrive-registry
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: upload-service
-  namespace: vDrive
+  namespace: RawDrive
   labels:
     app: upload-service
 spec:

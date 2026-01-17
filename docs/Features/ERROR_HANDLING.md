@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document summarizes the current error handling patterns across the vDrive platform, identifying strengths, inconsistencies, and gaps based on a comprehensive codebase review.
+This document summarizes the current error handling patterns across the RawDrive platform, identifying strengths, inconsistencies, and gaps based on a comprehensive codebase review.
 
 ## Backend (Python/FastAPI)
 

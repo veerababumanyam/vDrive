@@ -1,0 +1,104 @@
+# ===========================================
+# AI Search Service Deployment
+# ===========================================
+# Semantic search (CLIP), RAG chat (Gemini), caption generation
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ai-search-service
+  namespace: RawDrive
+  labels:
+    app: ai-search-service
+    app.kubernetes.io/name: ai-search-service
+    app.kubernetes.io/component: api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ai-search-service
+  template:
+    metadata:
+      labels:
+        app: ai-search-service
+        app.kubernetes.io/name: ai-search-service
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8009"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: RawDrive-service
+      containers:
+        - name: ai-search-service
+          image: ghcr.io/RawDrive/ai-search-service:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8009
+              name: http
+          envFrom:
+            - configMapRef:
+                name: RawDrive-config
+            - secretRef:
+                name: RawDrive-secrets
+          env:
+            - name: SERVICE_NAME
+              value: "ai-search-service"
+            - name: PORT
+              value: "8009"
+            # CLIP embedding config
+            - name: CLIP_MODEL_NAME
+              value: "ViT-L/14"
+            - name: CLIP_EMBEDDING_DIMENSIONS
+              value: "1536"
+            # Gemini LLM config
+            - name: GEMINI_MODEL
+              value: "gemini-2.5-flash-preview-05-20"
+            - name: GEMINI_ENABLED
+              value: "true"
+            # Search config
+            - name: SEARCH_DEFAULT_LIMIT
+              value: "50"
+            - name: SIMILARITY_THRESHOLD
+              value: "0.7"
+            # Kafka topics
+            - name: KAFKA_TOPIC_EMBEDDING_GENERATED
+              value: "asset.embedding.generated"
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "2Gi"
+            limits:
+              cpu: "2000m"
+              memory: "8Gi"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            timeoutSeconds: 3
+      imagePullSecrets:
+        - name: RawDrive-registry
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ai-search-service
+  namespace: RawDrive
+  labels:
+    app: ai-search-service
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8009
+      targetPort: 8009
+      protocol: TCP
+      name: http
+  selector:
+    app: ai-search-service

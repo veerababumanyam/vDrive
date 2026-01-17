@@ -1,7 +1,7 @@
 ---
 name: project-structure
 aliases: [codebase, architecture, folders, conventions, layout, organization, file-placement]
-description: Project structure and coding conventions for vDrive. Use when creating new files, organizing code, or understanding the codebase layout. CRITICAL for preventing random file creation.
+description: Project structure and coding conventions for RawDrive. Use when creating new files, organizing code, or understanding the codebase layout. CRITICAL for preventing random file creation.
 ---
 
 # Project Structure & Coding Conventions
@@ -59,15 +59,15 @@ description: Project structure and coding conventions for vDrive. Use when creat
 
 ## Architecture Overview
 
-vDrive is an enterprise SaaS photography platform with a **microservices architecture** and **pnpm monorepo**:
+RawDrive is an enterprise SaaS photography platform with a **microservices architecture** and **pnpm monorepo**:
 
 ```
-vDrive/
+RawDrive/
 ├── packages/              # Shared npm packages (pnpm workspace)
-│   ├── shared-types/      # @vDrive/shared-types - Domain enums & types
-│   ├── shared-constants/  # @vDrive/shared-constants - Config values
-│   ├── shared-validation/ # @vDrive/shared-validation - Zod schemas
-│   └── shared-utils/      # @vDrive/shared-utils - Date/format utils
+│   ├── shared-types/      # @RawDrive/shared-types - Domain enums & types
+│   ├── shared-constants/  # @RawDrive/shared-constants - Config values
+│   ├── shared-validation/ # @RawDrive/shared-validation - Zod schemas
+│   └── shared-utils/      # @RawDrive/shared-utils - Date/format utils
 │
 ├── frontend/              # React 19 + Vite + TypeScript
 │   ├── src/
@@ -100,14 +100,14 @@ vDrive/
 │   │   ├── middleware/    # FastAPI middleware
 │   │   ├── config/        # Configuration modules
 │   │   ├── utils/         # Utility functions
-│   │   ├── shared/        # Generated Python types from @vDrive/shared-*
+│   │   ├── shared/        # Generated Python types from @RawDrive/shared-*
 │   │   └── workers/       # Background job workers (Celery tasks)
 │   ├── migrations/        # Alembic migrations
 │   │   └── versions/      # Migration files (0001_*, 0002_*, etc.)
 │   └── tests/             # pytest tests
 │
 ├── services/              # Microservices (11 services)
-│   ├── website/           # Public website (Astro) - www.vdrive.io :8011
+│   ├── website/           # Public website (Astro) - www.RawDrive.io :8011
 │   │   ├── src/
 │   │   │   ├── pages/     # Astro pages (index, features, pricing, blog/, docs/)
 │   │   │   ├── components/ # Astro/React components (landing/, layout/, ui/)
@@ -187,8 +187,8 @@ vDrive/
 │   ├── kubernetes/        # Kubernetes manifests
 │   │   └── base/
 │   │       ├── services/
-│   │       │   ├── website/   # Website deployment (www.vdrive.io)
-│   │       │   ├── frontend/  # Frontend deployment (app.vdrive.io)
+│   │       │   ├── website/   # Website deployment (www.RawDrive.io)
+│   │       │   ├── frontend/  # Frontend deployment (app.RawDrive.io)
 │   │       │   ├── backend/
 │   │       │   ├── billing-service/
 │   │       │   ├── gallery-service/
@@ -380,10 +380,10 @@ import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
 // 2. Shared packages (preferred for cross-platform types)
-import { InvitationStatus, GalleryStatus } from '@vDrive/shared-types';
-import { API_BASE, PAGINATION, FILE_TYPES } from '@vDrive/shared-constants';
-import { isValidHexColor, sanitizeHtml } from '@vDrive/shared-validation';
-import { formatRelativeDate, formatFileSize } from '@vDrive/shared-utils';
+import { InvitationStatus, GalleryStatus } from '@RawDrive/shared-types';
+import { API_BASE, PAGINATION, FILE_TYPES } from '@RawDrive/shared-constants';
+import { isValidHexColor, sanitizeHtml } from '@RawDrive/shared-validation';
+import { formatRelativeDate, formatFileSize } from '@RawDrive/shared-utils';
 
 // 3. Type imports (local)
 import type { Gallery } from '@/types/gallery';
@@ -426,9 +426,9 @@ from app.api.dependencies import get_db, get_current_user
 // frontend/src/components/features/gallery/GalleryCard.tsx
 
 import React, { memo } from 'react';
-import { Gallery } from '@vDrive/shared-types';
+import { Gallery } from '@RawDrive/shared-types';
 import { AppCard } from '@/components/ui/AppCard';
-import { formatRelativeDate } from '@vDrive/shared-utils';
+import { formatRelativeDate } from '@RawDrive/shared-utils';
 
 interface GalleryCardProps {
   gallery: Gallery;
@@ -585,7 +585,7 @@ services/[service-name]/
 
 1. **Multi-Tenant Isolation**: Every DB query MUST filter by `workspace_id`
 2. **File Placement**: Follow the file structure rules - NO random file creation
-3. **Shared Types**: Use `@vDrive/shared-*` packages for cross-platform types
+3. **Shared Types**: Use `@RawDrive/shared-*` packages for cross-platform types
 4. **Type Generation**: Run `pnpm generate:python` after modifying shared packages
 5. **Storage Keys**: Format: `workspaces/{workspace_id}/assets/{asset_id}/...`
 6. **No Hardcoded Secrets**: ALWAYS use environment variables
@@ -690,7 +690,7 @@ result = await db.execute(
 const API_URL = "http://localhost:8000";
 
 // CORRECT
-import { API_BASE } from '@vDrive/shared-constants';
+import { API_BASE } from '@RawDrive/shared-constants';
 ```
 
 ## Quick Reference

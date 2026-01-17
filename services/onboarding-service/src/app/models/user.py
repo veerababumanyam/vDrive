@@ -1,5 +1,5 @@
 """
-User model for vDrive authentication.
+User model for RawDrive authentication.
 
 Represents an individual account holder with authentication metadata.
 """
@@ -16,6 +16,7 @@ from src.app.core.database import Base, GUID
 if TYPE_CHECKING:
     from src.app.models.onboarding_state import OnboardingState
     from src.app.models.verification_token import VerificationToken
+    from src.app.models.workspace import Workspace
     from src.app.models.workspace_member import WorkspaceMember
 
 
@@ -122,6 +123,12 @@ class User(Base):
         "OnboardingState",
         back_populates="user",
         uselist=False,
+        lazy="selectin",
+        cascade="all, delete-orphan",
+    )
+    owned_workspaces: Mapped[List["Workspace"]] = relationship(
+        "Workspace",
+        back_populates="owner",
         lazy="selectin",
         cascade="all, delete-orphan",
     )

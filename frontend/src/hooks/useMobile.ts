@@ -9,7 +9,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 // BREAKPOINT HOOKS
 // ============================================================================
 
-const breakpoints = {
+export const breakpoints = {
   xs: 0,
   sm: 360,
   md: 480,
@@ -57,15 +57,22 @@ export const useBreakpoint = () => {
  * Hook to check if a specific breakpoint is active
  */
 export const useMediaQuery = (query: string) => {
-  const [matches, setMatches] = useState(false);
+  const [matches, setMatches] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return window.matchMedia(query).matches;
+  });
 
   useEffect(() => {
     const mediaQuery = window.matchMedia(query);
-    setMatches(mediaQuery.matches);
+    // Use requestAnimationFrame to avoid sync setState warning while still syncing initial state
+    const frame = requestAnimationFrame(() => setMatches(mediaQuery.matches));
 
     const handler = (e: MediaQueryListEvent) => setMatches(e.matches);
     mediaQuery.addEventListener('change', handler);
-    return () => mediaQuery.removeEventListener('change', handler);
+    return () => {
+      cancelAnimationFrame(frame);
+      mediaQuery.removeEventListener('change', handler);
+    };
   }, [query]);
 
   return matches;
@@ -337,6 +344,12 @@ interface DeviceCapabilities {
   hardwareConcurrency: number;
 }
 
+// Extended Navigator interface for device capabilities
+interface NavigatorExtended extends Navigator {
+  deviceMemory?: number;
+  connection?: { effectiveType?: string };
+}
+
 /**
  * Hook to detect device capabilities for adaptive UI
  */
@@ -351,9 +364,9 @@ export const useDeviceCapabilities = (): DeviceCapabilities => {
   });
 
   useEffect(() => {
+    const nav = navigator as NavigatorExtended;
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    const hasLowMemory =
-      (navigator as any).deviceMemory && (navigator as any).deviceMemory < 4;
+    const hasLowMemory = nav.deviceMemory !== undefined && nav.deviceMemory < 4;
     const hasSlowCPU =
       navigator.hardwareConcurrency && navigator.hardwareConcurrency < 4;
     const hasReducedMotion = window.matchMedia(
@@ -363,18 +376,22 @@ export const useDeviceCapabilities = (): DeviceCapabilities => {
       'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
     // Network information
-    const connection = (navigator as any).connection;
-    const connectionType = connection?.effectiveType || 'unknown';
+    const connectionType = nav.connection?.effectiveType || 'unknown';
     const isSlowConnection = ['slow-2g', '2g', '3g'].includes(connectionType);
 
-    setCapabilities({
-      isLowPower: isMobile || hasLowMemory || hasSlowCPU || isSlowConnection,
-      isTouchDevice,
-      hasReducedMotion,
-      connectionType,
-      deviceMemory: (navigator as any).deviceMemory || 8,
-      hardwareConcurrency: navigator.hardwareConcurrency || 4,
+    // Use requestAnimationFrame to avoid sync setState in effect
+    const frame = requestAnimationFrame(() => {
+      setCapabilities({
+        isLowPower: isMobile || hasLowMemory || hasSlowCPU || isSlowConnection,
+        isTouchDevice,
+        hasReducedMotion,
+        connectionType,
+        deviceMemory: nav.deviceMemory || 8,
+        hardwareConcurrency: navigator.hardwareConcurrency || 4,
+      });
     });
+
+    return () => cancelAnimationFrame(frame);
   }, []);
 
   return capabilities;
@@ -384,15 +401,24 @@ export const useDeviceCapabilities = (): DeviceCapabilities => {
  * Hook for reduced motion preference
  */
 export const usePrefersReducedMotion = () => {
-  const [prefersReduced, setPrefersReduced] = useState(false);
+  const [prefersReduced, setPrefersReduced] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  });
 
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    setPrefersReduced(mediaQuery.matches);
+    // Sync on mount with requestAnimationFrame to avoid lint warning
+    const frame = requestAnimationFrame(() =>
+      setPrefersReduced(mediaQuery.matches)
+    );
 
     const handler = (e: MediaQueryListEvent) => setPrefersReduced(e.matches);
     mediaQuery.addEventListener('change', handler);
-    return () => mediaQuery.removeEventListener('change', handler);
+    return () => {
+      cancelAnimationFrame(frame);
+      mediaQuery.removeEventListener('change', handler);
+    };
   }, []);
 
   return prefersReduced;
@@ -402,16 +428,27 @@ export const usePrefersReducedMotion = () => {
  * Hook for color scheme preference
  */
 export const usePrefersColorScheme = () => {
-  const [scheme, setScheme] = useState<'light' | 'dark'>('light');
+  const [scheme, setScheme] = useState<'light' | 'dark'>(() => {
+    if (typeof window === 'undefined') return 'light';
+    return window.matchMedia('(prefers-color-scheme: dark)').matches
+      ? 'dark'
+      : 'light';
+  });
 
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    setScheme(mediaQuery.matches ? 'dark' : 'light');
+    // Sync on mount with requestAnimationFrame to avoid lint warning
+    const frame = requestAnimationFrame(() =>
+      setScheme(mediaQuery.matches ? 'dark' : 'light')
+    );
 
     const handler = (e: MediaQueryListEvent) =>
       setScheme(e.matches ? 'dark' : 'light');
     mediaQuery.addEventListener('change', handler);
-    return () => mediaQuery.removeEventListener('change', handler);
+    return () => {
+      cancelAnimationFrame(frame);
+      mediaQuery.removeEventListener('change', handler);
+    };
   }, []);
 
   return scheme;

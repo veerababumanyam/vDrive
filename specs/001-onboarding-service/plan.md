@@ -5,13 +5,13 @@
 
 ## Summary
 
-Build a production-grade Onboarding Service microservice that handles user registration (email/password and Google OAuth), email verification with token management, and workspace initialization with trial subscription provisioning. The service runs on port 8006, integrates with PostgreSQL and Redis, and scales via KEDA Prometheus metrics (2-20 replicas). It follows vDrive's established microservice patterns with FastAPI, SQLAlchemy async, and Argon2id password hashing.
+Build a production-grade Onboarding Service microservice that handles user registration (email/password and Google OAuth), email verification with token management, and workspace initialization with trial subscription provisioning. The service runs on port 8006, integrates with PostgreSQL and Redis, and scales via KEDA Prometheus metrics (2-20 replicas). It follows RawDrive's established microservice patterns with FastAPI, SQLAlchemy async, and Argon2id password hashing.
 
 ## Technical Context
 
 **Language/Version**: Python 3.11
 **Primary Dependencies**: FastAPI 0.104+, SQLAlchemy 2.0+, asyncpg, Pydantic 2.0+, argon2-cffi, python-jose, redis, kafka-python, prometheus-client
-**Storage**: PostgreSQL 16 (shared with existing vDrive database), Redis 7 (rate limiting, caching)
+**Storage**: PostgreSQL 16 (shared with existing RawDrive database), Redis 7 (rate limiting, caching)
 **Testing**: pytest, pytest-asyncio, httpx (async test client), factory_boy
 **Target Platform**: Linux containers (Docker), Kubernetes with KEDA autoscaling
 **Project Type**: Microservice (backend API only - frontend components exist in main frontend app)
@@ -23,7 +23,7 @@ Build a production-grade Onboarding Service microservice that handles user regis
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-The project constitution template has not been customized for vDrive. Using vDrive CLAUDE.md principles instead:
+The project constitution template has not been customized for RawDrive. Using RawDrive CLAUDE.md principles instead:
 
 | Principle | Status | Notes |
 |-----------|--------|-------|
@@ -132,8 +132,8 @@ infrastructure/kubernetes/base/keda/
 └── onboarding-scaledobject.yaml          # KEDA scaling config
 ```
 
-**Structure Decision**: Using the vDrive microservice pattern with dedicated service directory under `services/onboarding-service/`. The service follows the established FastAPI structure with separated layers (API, Services, Repositories, Models, Schemas). Database migrations are managed centrally in the backend service.
+**Structure Decision**: Using the RawDrive microservice pattern with dedicated service directory under `services/onboarding-service/`. The service follows the established FastAPI structure with separated layers (API, Services, Repositories, Models, Schemas). Database migrations are managed centrally in the backend service.
 
 ## Complexity Tracking
 
-No constitution violations to justify. The design follows established vDrive patterns.
+No constitution violations to justify. The design follows established RawDrive patterns.

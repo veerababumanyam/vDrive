@@ -1,0 +1,654 @@
+openapi: 3.1.0
+info:
+  title: RawDrive Upload Service API
+  description: |
+    TUS v1.0.0 compliant resumable upload service with AES-256 encryption.
+    Supports large file uploads, progress tracking, and event publishing.
+  version: 1.0.0
+  contact:
+    name: RawDrive Engineering
+    email: engineering@RawDrive.io
+
+servers:
+  - url: https://api.RawDrive.io/upload
+    description: Production
+  - url: http://localhost:8008
+    description: Development
+
+tags:
+  - name: TUS Protocol
+    description: TUS v1.0.0 resumable upload endpoints
+  - name: Progress
+    description: Upload progress and status endpoints
+  - name: Management
+    description: Upload management and cleanup
+
+paths:
+  /files:
+    post:
+      operationId: createUpload
+      tags: [TUS Protocol]
+      summary: Create new upload session
+      description: |
+        Creates a new resumable upload session. Returns upload URL for chunk uploads.
+        Implements TUS POST Creation extension.
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/TusResumable'
+        - name: Upload-Length
+          in: header
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 10737418240  # 10GB
+          description: Total file size in bytes
+        - name: Upload-Metadata
+          in: header
+          required: true
+          schema:
+            type: string
+          description: |
+            Base64-encoded metadata. Required keys:
+            - filename: Original filename
+            - filetype: MIME type
+            - workspace_id: Target workspace UUID
+            - gallery_id: Optional target gallery
+          example: "filename ZXhhbXBsZS5qcGc=,filetype aW1hZ2UvanBlZw==,workspace_id YWJjZC0xMjM0"
+        - name: Upload-Checksum
+          in: header
+          required: false
+          schema:
+            type: string
+          description: SHA-256 checksum of complete file (hex-encoded)
+      responses:
+        '201':
+          description: Upload session created
+          headers:
+            Location:
+              description: Upload URL for PATCH requests
+              schema:
+                type: string
+                format: uri
+            Upload-Expires:
+              description: ISO 8601 expiration timestamp
+              schema:
+                type: string
+                format: date-time
+            Tus-Resumable:
+              schema:
+                type: string
+                enum: ['1.0.0']
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '413':
+          description: File size exceeds limit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '415':
+          description: Unsupported MIME type
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    options:
+      operationId: tusOptions
+      tags: [TUS Protocol]
+      summary: TUS protocol discovery
+      description: Returns TUS protocol capabilities
+      responses:
+        '204':
+          description: TUS capabilities
+          headers:
+            Tus-Resumable:
+              schema:
+                type: string
+                enum: ['1.0.0']
+            Tus-Version:
+              schema:
+                type: string
+                example: '1.0.0'
+            Tus-Extension:
+              schema:
+                type: string
+                example: 'creation,expiration,termination,checksum'
+            Tus-Max-Size:
+              schema:
+                type: integer
+                example: 10737418240
+            Tus-Checksum-Algorithm:
+              schema:
+                type: string
+                example: 'sha256'
+
+  /files/{uploadId}:
+    parameters:
+      - $ref: '#/components/parameters/UploadId'
+    head:
+      operationId: getUploadOffset
+      tags: [TUS Protocol]
+      summary: Get current upload offset
+      description: |
+        Returns the current byte offset for resumable uploads.
+        Implements TUS HEAD request.
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/TusResumable'
+      responses:
+        '200':
+          description: Current upload state
+          headers:
+            Upload-Offset:
+              description: Current byte offset
+              schema:
+                type: integer
+            Upload-Length:
+              description: Total expected size
+              schema:
+                type: integer
+            Upload-Metadata:
+              description: Original metadata
+              schema:
+                type: string
+            Upload-Expires:
+              schema:
+                type: string
+                format: date-time
+            Tus-Resumable:
+              schema:
+                type: string
+                enum: ['1.0.0']
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '410':
+          description: Upload expired
+    patch:
+      operationId: uploadChunk
+      tags: [TUS Protocol]
+      summary: Upload file chunk
+      description: |
+        Uploads a chunk of data at the specified offset.
+        Implements TUS PATCH request.
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/TusResumable'
+        - name: Upload-Offset
+          in: header
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+          description: Byte offset for this chunk
+        - name: Content-Length
+          in: header
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 104857600  # 100MB max chunk
+          description: Chunk size in bytes
+        - name: Upload-Checksum
+          in: header
+          required: false
+          schema:
+            type: string
+          description: Checksum algorithm and hash (e.g., "sha256 base64hash")
+      requestBody:
+        required: true
+        content:
+          application/offset+octet-stream:
+            schema:
+              type: string
+              format: binary
+      responses:
+        '204':
+          description: Chunk uploaded successfully
+          headers:
+            Upload-Offset:
+              description: New byte offset after this chunk
+              schema:
+                type: integer
+            Upload-Expires:
+              schema:
+                type: string
+                format: date-time
+            Tus-Resumable:
+              schema:
+                type: string
+                enum: ['1.0.0']
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: Offset mismatch - resume from reported offset
+          headers:
+            Upload-Offset:
+              description: Current server offset
+              schema:
+                type: integer
+        '410':
+          description: Upload expired
+        '460':
+          description: Checksum mismatch
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      operationId: cancelUpload
+      tags: [TUS Protocol]
+      summary: Cancel upload
+      description: |
+        Cancels an in-progress upload and cleans up resources.
+        Implements TUS DELETE Termination extension.
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/TusResumable'
+      responses:
+        '204':
+          description: Upload cancelled
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /uploads/{uploadId}/status:
+    get:
+      operationId: getUploadStatus
+      tags: [Progress]
+      summary: Get detailed upload status
+      description: Returns detailed upload progress and processing status
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UploadId'
+      responses:
+        '200':
+          description: Upload status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadStatus'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /uploads:
+    get:
+      operationId: listUploads
+      tags: [Management]
+      summary: List uploads for workspace
+      description: Returns paginated list of uploads for the authenticated workspace
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: workspace_id
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [created, uploading, completed, failed, expired]
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 50
+        - name: cursor
+          in: query
+          schema:
+            type: string
+          description: Pagination cursor
+      responses:
+        '200':
+          description: List of uploads
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadList'
+
+  /assets/{assetId}:
+    get:
+      operationId: getAsset
+      tags: [Management]
+      summary: Get asset details
+      description: Returns asset details including derivative URLs
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: assetId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Asset details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Asset'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /assets/{assetId}/processing:
+    get:
+      operationId: getProcessingStatus
+      tags: [Progress]
+      summary: Get asset processing status
+      description: Returns status of all processing tasks for an asset
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: assetId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Processing status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProcessingStatus'
+
+  /health:
+    get:
+      operationId: healthCheck
+      tags: [Management]
+      summary: Health check
+      description: Returns service health status
+      responses:
+        '200':
+          description: Service healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [healthy]
+                  version:
+                    type: string
+                  uptime_seconds:
+                    type: integer
+
+  /metrics:
+    get:
+      operationId: getMetrics
+      tags: [Management]
+      summary: Prometheus metrics
+      description: Returns Prometheus-formatted metrics
+      responses:
+        '200':
+          description: Metrics in Prometheus format
+          content:
+            text/plain:
+              schema:
+                type: string
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token from auth service
+
+  parameters:
+    TusResumable:
+      name: Tus-Resumable
+      in: header
+      required: true
+      schema:
+        type: string
+        enum: ['1.0.0']
+      description: TUS protocol version
+    UploadId:
+      name: uploadId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: Upload session identifier
+
+  responses:
+    BadRequest:
+      description: Invalid request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Authentication required
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Forbidden:
+      description: Insufficient permissions
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+  schemas:
+    Error:
+      type: object
+      required: [error, message]
+      properties:
+        error:
+          type: string
+          description: Error code
+          example: 'UPLOAD_EXPIRED'
+        message:
+          type: string
+          description: Human-readable message
+          example: 'Upload session has expired'
+        details:
+          type: object
+          additionalProperties: true
+
+    UploadStatus:
+      type: object
+      required: [id, workspace_id, filename, status, expected_size, received_bytes]
+      properties:
+        id:
+          type: string
+          format: uuid
+        workspace_id:
+          type: string
+          format: uuid
+        filename:
+          type: string
+        mime_type:
+          type: string
+        status:
+          type: string
+          enum: [created, uploading, assembling, completed, failed, expired, cancelled]
+        expected_size:
+          type: integer
+          format: int64
+        received_bytes:
+          type: integer
+          format: int64
+        progress_percent:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 100
+        upload_url:
+          type: string
+          format: uri
+        expires_at:
+          type: string
+          format: date-time
+        asset_id:
+          type: string
+          format: uuid
+          description: Available after upload completes
+        error_message:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    UploadList:
+      type: object
+      required: [items, has_more]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/UploadStatus'
+        next_cursor:
+          type: string
+        has_more:
+          type: boolean
+        total_count:
+          type: integer
+
+    Asset:
+      type: object
+      required: [id, workspace_id, mime_type, file_size, processing_status]
+      properties:
+        id:
+          type: string
+          format: uuid
+        workspace_id:
+          type: string
+          format: uuid
+        upload_id:
+          type: string
+          format: uuid
+        mime_type:
+          type: string
+        file_size:
+          type: integer
+          format: int64
+        width:
+          type: integer
+        height:
+          type: integer
+        duration_seconds:
+          type: number
+        is_encrypted:
+          type: boolean
+        processing_status:
+          type: string
+          enum: [pending, processing, completed, failed, partial]
+        urls:
+          type: object
+          properties:
+            original:
+              type: string
+              format: uri
+            thumbnail:
+              type: string
+              format: uri
+            preview:
+              type: string
+              format: uri
+            lqip:
+              type: string
+              description: Base64-encoded LQIP
+        metadata:
+          $ref: '#/components/schemas/AssetMetadata'
+        faces_count:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+
+    AssetMetadata:
+      type: object
+      properties:
+        camera_make:
+          type: string
+        camera_model:
+          type: string
+        lens_model:
+          type: string
+        aperture:
+          type: number
+        shutter_speed:
+          type: string
+        iso:
+          type: integer
+        focal_length:
+          type: number
+        captured_at:
+          type: string
+          format: date-time
+        gps:
+          type: object
+          properties:
+            latitude:
+              type: number
+            longitude:
+              type: number
+            altitude:
+              type: number
+
+    ProcessingStatus:
+      type: object
+      required: [asset_id, overall_status, tasks]
+      properties:
+        asset_id:
+          type: string
+          format: uuid
+        overall_status:
+          type: string
+          enum: [pending, processing, completed, failed, partial]
+        tasks:
+          type: array
+          items:
+            type: object
+            properties:
+              task_type:
+                type: string
+                enum: [thumbnail_generation, exif_extraction, face_detection, encryption]
+              status:
+                type: string
+                enum: [pending, processing, completed, failed, cancelled, retrying]
+              progress_percent:
+                type: number
+              error_message:
+                type: string
+              started_at:
+                type: string
+                format: date-time
+              completed_at:
+                type: string
+                format: date-time
+
+security:
+  - bearerAuth: []

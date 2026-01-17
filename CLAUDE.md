@@ -1,9 +1,9 @@
-﻿# CLAUDE.md - vDrive
-vDrive is an enterprise SaaS photography platform with microservices architecture.
+﻿# CLAUDE.md - RawDrive
+RawDrive is an enterprise SaaS photography platform with microservices architecture.
 
-Website (vdrive.io) - Public marketing pages for visitors, SEO, conversions
-Frontend (app.vdrive.io) - Private application for registered users only
-Backend (api.vdrive.io) - API endpoints for frontend and microservices
+Website (RawDrive.io) - Public marketing pages for visitors, SEO, conversions
+Frontend (app.RawDrive.io) - Private application for registered users only
+Backend (api.RawDrive.io) - API endpoints for frontend and microservices
 Website (services/website/) → Microservice running in Docker on port 8020
 Frontend (frontend/) → Local development with Vite on port 5173
 
@@ -20,15 +20,19 @@ Frontend (frontend/) → Local development with Vite on port 5173
 ## Project Structure
 
 ```
-vDrive/
-├── packages/           # Shared npm packages (@vDrive/shared-*)
-├── frontend/           # React 19 + TypeScript + Vite (app.vdrive.io)
+RawDrive/
+├── packages/           # Shared npm packages (@RawDrive/shared-*)
+├── frontend/           # React 19 + TypeScript + Vite (app.RawDrive.io)
 ├── backend/            # Python 3.11 + FastAPI + SQLAlchemy
-├── services/           # Microservices (11 services)
-│   ├── website/        # Astro public website (www.vdrive.io)
-│   ├── billing-service/
+├── services/           # Microservices (8 services)
+│   ├── website/        # Astro public website (www.RawDrive.io)
 │   ├── gallery-service/
-│   └── ...
+│   ├── upload-service/
+│   ├── export-service/
+│   ├── onboarding-service/
+│   ├── ai-search-service/
+│   ├── face-service/
+│   └── processing-service/
 ├── infrastructure/     # Docker, Kubernetes, Traefik
 ├── docs/               # Documentation
 ├── specs/              # Feature specifications
@@ -39,9 +43,9 @@ vDrive/
 
 | Domain | Service | Purpose |
 |--------|---------|---------|
-| `www.vdrive.io` | Website Service (Astro) | Public marketing, blog, docs |
-| `app.vdrive.io` | Frontend (React) | Authenticated application |
-| `app.vdrive.io/api/*` | Backend + Microservices | API endpoints |
+| `www.RawDrive.io` | Website Service (Astro) | Public marketing, blog, docs |
+| `app.RawDrive.io` | Frontend (React) | Authenticated application |
+| `app.RawDrive.io/api/*` | Backend + Microservices | API endpoints |
 
 ## Coding Practices
 
@@ -250,7 +254,7 @@ Example: "Use the Frontend Design agent to build a gallery component"
 ## Environment Variables
 
 ```bash
-DATABASE_URL=postgresql://user:pass@localhost:5432/vDrive
+DATABASE_URL=postgresql://user:pass@localhost:5432/RawDrive
 REDIS_URL=redis://localhost:6379/0
 JWT_SECRET=<64-byte-hex>
 R2_ACCESS_KEY_ID=<cloudflare-r2-key>
@@ -266,176 +270,39 @@ R2_SECRET_ACCESS_KEY=<cloudflare-r2-secret>
 - **Infrastructure**: Docker Compose (dev), Kubernetes (prod), Traefik v3, KEDA
 - **AI/MCP**: FastMCP for Model Context Protocol integration
 
-## FastMCP Integration (FastAPI)
-
-vDrive uses FastMCP for Model Context Protocol integration with FastAPI services.
-
-### Setup Pattern
-
-```python
-# backend/src/app/main.py
-from fastapi import FastAPI
-from fastmcp import FastMCP
-
-app = FastAPI(title="vDrive API")
-mcp = FastMCP("vDrive MCP Server")
-
-# Mount MCP at /mcp endpoint
-app.mount("/mcp", mcp.sse_app())
-```
-
-### Defining MCP Tools
-
-```python
-from fastmcp import FastMCP, Context
-
-mcp = FastMCP("vDrive")
-
-@mcp.tool()
-async def get_gallery_photos(
-    gallery_id: str,
-    ctx: Context,
-    limit: int = 50
-) -> list[dict]:
-    """Retrieve photos from a gallery."""
-    # Access database via context or dependency injection
-    async with get_db_session() as db:
-        photos = await db.execute(
-            select(Photo)
-            .where(Photo.gallery_id == gallery_id)
-            .limit(limit)
-        )
-        return [photo.to_dict() for photo in photos.scalars()]
-```
-
-### Defining MCP Resources
-
-```python
-@mcp.resource("gallery://{gallery_id}")
-async def get_gallery_resource(gallery_id: str) -> str:
-    """Expose gallery data as MCP resource."""
-    async with get_db_session() as db:
-        gallery = await db.get(Gallery, gallery_id)
-        return gallery.to_json()
-
-@mcp.resource("user://{user_id}/workspaces")
-async def get_user_workspaces(user_id: str) -> str:
-    """List user's workspaces."""
-    async with get_db_session() as db:
-        workspaces = await db.execute(
-            select(Workspace).where(Workspace.owner_id == user_id)
-        )
-        return json.dumps([w.to_dict() for w in workspaces.scalars()])
-```
-
-### Defining MCP Prompts
-
-```python
-@mcp.prompt()
-def analyze_photo_prompt(photo_id: str) -> str:
-    """Generate prompt for photo analysis."""
-    return f"""Analyze the photo with ID {photo_id}.
-    Describe composition, lighting, and suggest improvements."""
-
-@mcp.prompt()
-def gallery_summary_prompt(gallery_id: str) -> list[dict]:
-    """Multi-turn prompt for gallery summary."""
-    return [
-        {"role": "user", "content": f"Summarize gallery {gallery_id}"},
-        {"role": "assistant", "content": "I'll analyze the gallery..."},
-        {"role": "user", "content": "Focus on photo quality and themes."}
-    ]
-```
-
-### Authentication with MCP
-
-```python
-from fastapi import Depends
-from src.app.core.auth import get_current_user
-
-# Create authenticated MCP instance
-mcp = FastMCP("vDrive", dependencies=[Depends(get_current_user)])
-
-@mcp.tool()
-async def get_my_galleries(ctx: Context) -> list[dict]:
-    """Get galleries for authenticated user."""
-    user = ctx.request_context.get("user")  # From dependency
-    async with get_db_session() as db:
-        galleries = await db.execute(
-            select(Gallery)
-            .where(Gallery.workspace_id.in_(user.workspace_ids))
-        )
-        return [g.to_dict() for g in galleries.scalars()]
-```
-
-### Multi-Tenancy in MCP Tools
-
-Always enforce workspace isolation in MCP tools:
-
-```python
-@mcp.tool()
-async def search_photos(
-    query: str,
-    workspace_id: str,  # Required parameter
-    ctx: Context
-) -> list[dict]:
-    """Search photos within a workspace."""
-    user = ctx.request_context.get("user")
-
-    # Verify user has access to workspace
-    if workspace_id not in user.workspace_ids:
-        raise PermissionError("Access denied to workspace")
-
-    async with get_db_session() as db:
-        photos = await db.execute(
-            select(Photo)
-            .where(Photo.workspace_id == workspace_id)
-            .where(Photo.tags.contains([query]))
-        )
-        return [p.to_dict() for p in photos.scalars()]
-```
-
-### File Structure for MCP
-
-```
-backend/src/app/
-├── main.py              # FastAPI + FastMCP mount
-├── mcp/
-│   ├── __init__.py      # MCP server instance
-│   ├── tools.py         # @mcp.tool() definitions
-│   ├── resources.py     # @mcp.resource() definitions
-│   └── prompts.py       # @mcp.prompt() definitions
-```
-
-### Testing MCP Endpoints
-
-```bash
-# Test MCP SSE endpoint
-curl -N http://localhost:8000/mcp/sse
-
-# Test with MCP client
-python -c "
-from mcp import Client
-client = Client('http://localhost:8000/mcp')
-result = await client.call_tool('get_gallery_photos', {'gallery_id': 'xxx'})
-print(result)
-"
-```
-
 ## Service Ports
 
-| Service | Port | Domain |
-|---------|------|--------|
-| Website | 8020 | www.vdrive.io |
-| Frontend | 3000/80 | app.vdrive.io |
-| Backend | 8000 | app.vdrive.io/api |
-| Gallery | 8004 | - |
-| Billing | 8005 | - |
-| Upload | 8008 | - |
+### Application Services
+| Service | Port | Description |
+|---------|------|-------------|
+| Website | 8020 | Astro public website (www.RawDrive.io) |
+| Frontend | 3000 | React app (app.RawDrive.io) |
+| Backend | 8000 | FastAPI core API |
+| Face Service | 8002 | Face detection & recognition |
+| Gallery Service | 8004 | Gallery management |
+| Onboarding Service | 8006 | User onboarding flows |
+| Upload Service | 8008 | File upload handling |
+| AI Search Service | 8009 | AI-powered search |
+| Processing Service | 8010 | Image processing workers |
+| Export Service | 8023 | Bulk export functionality |
+
+### Infrastructure Services
+| Service | Port | Purpose |
+|---------|------|---------|
+| PostgreSQL | 5432 | Primary database |
+| Redis | 6379 | Cache & message broker |
+| Kafka | 9092 | Event streaming |
+| Zookeeper | 2181 | Kafka coordination |
+| Traefik | 80/443/8080 | API gateway & dashboard |
+| Prometheus | 9090 | Metrics collection |
+| Grafana | 3001 | Dashboards |
+| Loki | 3100 | Log aggregation |
+| Kafka UI | 8081 | Kafka admin interface |
+| Flower | 5555 | Celery monitoring |
 
 ## Docker Development (IMPORTANT)
 
-**All vDrive services run in Docker containers for development.** Always use Docker commands for local development and testing.
+**All RawDrive services run in Docker containers for development.** Always use Docker commands for local development and testing.
 
 - **Development**: Docker Compose (current)
 - **Production**: Kubernetes (after development complete)
@@ -451,77 +318,13 @@ infrastructure/docker/docker-compose.dev.yml  # Dev-specific overrides (keep thi
 | Category | Services |
 |----------|----------|
 | **Core Application** | `frontend`, `backend`, `website` |
-| **Microservices** | `onboarding-service` |
+| **Microservices** | `gallery-service`, `upload-service`, `export-service`, `onboarding-service`, `ai-search-service`, `face-service`, `processing-service` |
 | **Data Stores** | `postgres`, `redis`, `kafka`, `zookeeper` |
 | **Routing** | `traefik` |
 | **Monitoring** | `prometheus`, `grafana`, `loki`, `promtail`, `alertmanager` |
 | **Exporters** | `postgres-exporter`, `redis-exporter`, `kafka-exporter` |
 | **Tools** | `kafka-ui`, `kafka-init`, `flower` |
 
-### Common Docker Commands
-
-```bash
-# Start all services
-cd infrastructure/docker && docker compose up -d
-
-# Start specific service
-docker compose up -d website
-
-# Rebuild and start a service (after code changes)
-docker compose up -d --build website
-
-# View logs
-docker compose logs -f website
-docker compose logs -f backend
-
-# Stop all services
-docker compose down
-
-# Restart a service
-docker compose restart website
-
-# Check service status
-docker compose ps
-
-# Enter a container shell
-docker compose exec backend bash
-docker compose exec website sh
-```
-
-### Rebuilding After Code Changes
-
-When you modify code in any service, you MUST rebuild the Docker container:
-
-```bash
-# Rebuild single service
-cd infrastructure/docker && docker compose up -d --build <service-name>
-
-# Rebuild multiple services
-docker compose up -d --build frontend backend
-
-# Full rebuild (clean)
-docker compose down && docker compose build --no-cache && docker compose up -d
-```
-
-### Service Health Checks
-
-```bash
-# Check if services are healthy
-docker compose ps
-
-# Check specific service logs for errors
-docker compose logs --tail=50 <service-name>
-
-# Test service endpoints
-curl http://localhost:8020  # Website
-curl http://localhost:8000/health  # Backend
-curl http://localhost:3000  # Frontend
-```
 
 ## Recent Changes
-- 001-gallery-service: Added Python 3.11 + FastAPI, SQLAlchemy, asyncpg, Pillow, boto3 (Cloudflare R2), Redis, Kafka, KEDA
-- 001-gallery-service: Added [if applicable, e.g., PostgreSQL, CoreData, files or N/A]
-
-## Active Technologies
-- Python 3.11 + FastAPI, SQLAlchemy, asyncpg, Pillow, boto3 (Cloudflare R2), Redis, Kafka, KEDA (001-gallery-service)
-- PostgreSQL 16 (pgvector), Redis 7 (cache/pub-sub), Cloudflare R2 (S3-compatible object storage) (001-gallery-service)
+- 008-face-service: Face detection and recognition service (port 8002)

@@ -1,14 +1,14 @@
 ---
 name: doc-coauthoring
 aliases: [docs, documentation, specs, adr, prd, rfc, proposals]
-description: Guide users through structured documentation workflows for vDrive. Use when creating specs, proposals, feature docs, ADRs, or technical documentation. Provides three-stage co-authoring process.
+description: Guide users through structured documentation workflows for RawDrive. Use when creating specs, proposals, feature docs, ADRs, or technical documentation. Provides three-stage co-authoring process.
 ---
 
-# vDrive Doc Co-Authoring Workflow
+# RawDrive Doc Co-Authoring Workflow
 
-Structured workflow for collaborative documentation in the vDrive project. Three stages: Context Gathering, Refinement & Structure, and Reader Testing.
+Structured workflow for collaborative documentation in the RawDrive project. Three stages: Context Gathering, Refinement & Structure, and Reader Testing.
 
-## vDrive Documentation Structure
+## RawDrive Documentation Structure
 
 | Type | Location | Purpose |
 |------|----------|---------|
@@ -50,7 +50,7 @@ Want to try this approach, or prefer freeform?
 4. Any existing templates or format requirements?
 5. Related features or dependencies?
 
-### vDrive-Specific Context
+### RawDrive-Specific Context
 
 For feature specs, gather:
 - **Workspace isolation** - How does workspace_id affect this?
@@ -76,7 +76,7 @@ Encourage dumping all context:
 
 **Goal:** Build document section by section through brainstorming and iteration.
 
-### vDrive Document Templates
+### RawDrive Document Templates
 
 #### Feature Spec (`specs/{feature}/spec.md`)
 
@@ -160,7 +160,7 @@ For each section:
 
 After 3 iterations with no substantial changes:
 - Ask if anything can be removed without losing value
-- Check for vDrive-specific requirements (workspace_id, permissions)
+- Check for RawDrive-specific requirements (workspace_id, permissions)
 - Verify code examples use correct tech stack (Python/FastAPI, React/TS)
 
 ## Stage 3: Reader Testing
@@ -197,11 +197,11 @@ for (const question of testQuestions) {
 Document is ready when Reader Claude:
 - Answers questions correctly
 - Doesn't surface new ambiguities
-- Understands the vDrive context from the doc alone
+- Understands the RawDrive context from the doc alone
 
-## vDrive-Specific Checklist
+## RawDrive-Specific Checklist
 
-Before finalizing any vDrive document:
+Before finalizing any RawDrive document:
 
 - [ ] Workspace isolation addressed (workspace_id in all queries)
 - [ ] Permissions defined (RBAC requirements)
@@ -223,9 +223,9 @@ Before finalizing any vDrive document:
 
 **Context Management:**
 - Address gaps as they come up
-- For vDrive, always check workspace isolation early
+- For RawDrive, always check workspace isolation early
 
 **File Management:**
 - Create files in appropriate `specs/` or `docs/` directory
 - Use `str_replace` for edits, never reprint whole doc
-- Follow vDrive naming conventions
+- Follow RawDrive naming conventions

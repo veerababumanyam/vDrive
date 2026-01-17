@@ -4,7 +4,7 @@
 
 ## Overview
 
-vDrive implements a comprehensive Role-Based Access Control (RBAC) system to manage user permissions across the platform. The system supports multiple user roles with distinct capabilities, subscription tiers that determine feature access, and granular permission controls for photographers managing their galleries and clients.
+RawDrive implements a comprehensive Role-Based Access Control (RBAC) system to manage user permissions across the platform. The system supports multiple user roles with distinct capabilities, subscription tiers that determine feature access, and granular permission controls for photographers managing their galleries and clients.
 
 ## Purpose
 
@@ -19,21 +19,21 @@ The RBAC system serves to:
 
 ### Roles and scopes
 
-vDrive uses **two RBAC scopes**:
+RawDrive uses **two RBAC scopes**:
 
 1) **Workspace RBAC (customer-facing)**
 - Evaluated within the active `workspace_id`.
 - Backed by workspace membership (`workspace_memberships`) and workspace roles (`roles`).
 - Applies to Studio App + Client Portal + Corporate Workspace UI.
 
-2) **Platform RBAC (vDrive Ops / Admin Console)**
+2) **Platform RBAC (RawDrive Ops / Admin Console)**
 - Evaluated outside any single workspace.
-- Used for vDrive internal administration (support, billing ops, moderation, security).
+- Used for RawDrive internal administration (support, billing ops, moderation, security).
 - **Does not automatically grant access to customer content**. Any customer data access must be explicitly granted and audited (see “Support Access” below).
 
 ### Workspace roles (customer-facing)
 
-vDrive defines workspace roles (examples; exact sets can vary by workspace type):
+RawDrive defines workspace roles (examples; exact sets can vary by workspace type):
 
 #### Workspace Owner (primary account)
 The top-level admin within a workspace (often the “photographer/studio owner” in self-serve workspaces).
@@ -98,7 +98,7 @@ External identity that views or interacts with shared content (often via Share L
 - Cannot access photographer settings
 - Cannot invite other users
 
-### Platform admin roles (vDrive Ops)
+### Platform admin roles (RawDrive Ops)
 
 Platform admins operate the multi-tenant SaaS via an internal **Admin Console**.
 
@@ -224,7 +224,7 @@ Client Level
 
 ### Workspace-Scoped Architecture (Multi-tenant)
 
-vDrive is a **multi-tenant SaaS**. A **workspace** is the unit of tenancy and billing.
+RawDrive is a **multi-tenant SaaS**. A **workspace** is the unit of tenancy and billing.
 
 **Rules:**
 - Every customer-data record is scoped to exactly one workspace via `workspace_id` (legacy alias: `tenant_id` — avoid in new schemas/docs).
@@ -555,17 +555,17 @@ const createGallery = async (userId: string, galleryData: GalleryData) => {
 ### Platform Administrators
 
 1. **Super Admin**
-   - Email: `superadmin@vDrive.com`
+   - Email: `superadmin@RawDrive.com`
    - Password: `Test@123`
    - Access: Full platform administration
 
 2. **Platform Admin**
-   - Email: `admin@vDrive.com`
+   - Email: `admin@RawDrive.com`
    - Password: `Test@123`
    - Access: Platform management
 
 3. **Product Manager**
-   - Email: `productmanager@vDrive.com`
+   - Email: `productmanager@RawDrive.com`
    - Password: `Test@123`
    - Access: Subscription management
 

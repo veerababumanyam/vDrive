@@ -342,7 +342,7 @@ vCard 3.0 format download endpoint:
 
 QR code PNG image endpoint:
 - Endpoint: `/api/v1/public/personal-profiles/{slug}/qr-code`
-- Contains: Public profile URL (`https://vDrive.ai/u/{slug}`)
+- Contains: Public profile URL (`https://RawDrive.ai/u/{slug}`)
 - Format: PNG image
 - Size: Configurable (default 256x256px)
 

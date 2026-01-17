@@ -1,7 +1,7 @@
 ---
 name: security
 aliases: [auth, authentication, authorization, rbac, encryption, soc2, gdpr, jwt]
-description: Security and data protection guidelines for vDrive. Use when implementing authentication, handling user data, validating inputs, or reviewing security-sensitive code.
+description: Security and data protection guidelines for RawDrive. Use when implementing authentication, handling user data, validating inputs, or reviewing security-sensitive code.
 ---
 
 # Security & Data Protection Guidelines

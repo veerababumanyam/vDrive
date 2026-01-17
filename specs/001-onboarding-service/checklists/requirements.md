@@ -57,4 +57,4 @@
 
 - Specification is ready for `/speckit.plan` phase
 - All items passed validation on first iteration
-- The spec aligns with existing vDrive documentation patterns found in `docs/Business_Features/20_ONBOARDING_AND_WORKSPACE_SETUP.md` and `docs/project/05-ONBOARDING_FLOWS.md`
+- The spec aligns with existing RawDrive documentation patterns found in `docs/Business_Features/20_ONBOARDING_AND_WORKSPACE_SETUP.md` and `docs/project/05-ONBOARDING_FLOWS.md`

@@ -1,4 +1,4 @@
-# vDrive Project Starter Kit
+# RawDrive Project Starter Kit
 
 **Version:** 0.3.3 | **Last Updated:** January 2026
 
@@ -6,7 +6,7 @@
 
 ## Overview
 
-This starter kit contains all essential documentation needed to develop vDrive from scratch. It consolidates architecture, features, design system, branding, and technical guidelines into a single comprehensive resource.
+This starter kit contains all essential documentation needed to develop RawDrive from scratch. It consolidates architecture, features, design system, branding, and technical guidelines into a single comprehensive resource.
 
 ---
 
@@ -64,11 +64,11 @@ This starter kit contains all essential documentation needed to develop vDrive f
 
 ---
 
-## vDrive at a Glance
+## RawDrive at a Glance
 
-### What is vDrive?
+### What is RawDrive?
 
-vDrive is an enterprise-grade SaaS platform for professional photography management:
+RawDrive is an enterprise-grade SaaS platform for professional photography management:
 
 - **Gallery Management** - Beautiful, branded client galleries
 - **AI Intelligence** - Smart curation, face recognition, semantic search
@@ -108,12 +108,12 @@ vDrive is an enterprise-grade SaaS platform for professional photography managem
 ## Project Structure
 
 ```
-vDrive/
+RawDrive/
 ├── packages/                 # Shared npm packages (pnpm workspaces)
-│   ├── shared-types/        # @vDrive/shared-types
-│   ├── shared-constants/    # @vDrive/shared-constants
-│   ├── shared-validation/   # @vDrive/shared-validation
-│   └── shared-utils/        # @vDrive/shared-utils
+│   ├── shared-types/        # @RawDrive/shared-types
+│   ├── shared-constants/    # @RawDrive/shared-constants
+│   ├── shared-validation/   # @RawDrive/shared-validation
+│   └── shared-utils/        # @RawDrive/shared-utils
 ├── frontend/                # React 19 + TypeScript + Vite
 ├── backend/                 # Python FastAPI + SQLAlchemy
 ├── services/                # Microservices (9 services)
@@ -152,7 +152,7 @@ docker compose -f infrastructure/docker/docker-compose.yml up -d
 cd frontend && pnpm dev
 
 # Test login
-Email: free@test.vDrive.in
+Email: free@test.RawDrive.in
 Password: Test@123
 ```
 
@@ -160,14 +160,14 @@ Password: Test@123
 
 ```bash
 # Database migrations
-docker exec vDrive-backend alembic upgrade head
+docker exec RawDrive-backend alembic upgrade head
 
 # Build shared packages
 pnpm build:packages
 
 # Run tests
 cd frontend && pnpm test
-docker exec vDrive-backend pytest
+docker exec RawDrive-backend pytest
 
 # View logs
 docker compose logs -f backend

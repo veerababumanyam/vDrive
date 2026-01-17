@@ -2,7 +2,7 @@
 
 ## Overview
 
-vDrive uses [KEDA](https://keda.sh/) (Kubernetes Event-Driven Autoscaling) to automatically scale services based on real-time metrics.
+RawDrive uses [KEDA](https://keda.sh/) (Kubernetes Event-Driven Autoscaling) to automatically scale services based on real-time metrics.
 
 ## Installation
 
@@ -23,7 +23,7 @@ apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
 metadata:
   name: backend-scaledobject
-  namespace: vDrive
+  namespace: RawDrive
 spec:
   scaleTargetRef:
     name: backend                    # Deployment to scale
@@ -169,20 +169,20 @@ Scale based on queue depth:
 ### Check ScaledObjects
 
 ```bash
-kubectl get scaledobjects -n vDrive
-kubectl describe scaledobject backend-scaledobject -n vDrive
+kubectl get scaledobjects -n RawDrive
+kubectl describe scaledobject backend-scaledobject -n RawDrive
 ```
 
 ### Check HPA Created by KEDA
 
 ```bash
-kubectl get hpa -n vDrive
+kubectl get hpa -n RawDrive
 ```
 
 ### View Scaling Events
 
 ```bash
-kubectl get events -n vDrive --field-selector reason=SuccessfulRescale
+kubectl get events -n RawDrive --field-selector reason=SuccessfulRescale
 ```
 
 ## Tuning Parameters
@@ -227,12 +227,12 @@ advanced:
 
 1. Check ScaledObject status:
 ```bash
-kubectl describe scaledobject backend-scaledobject -n vDrive
+kubectl describe scaledobject backend-scaledobject -n RawDrive
 ```
 
 2. Verify Prometheus query:
 ```bash
-kubectl port-forward svc/prometheus 9090:9090 -n vDrive
+kubectl port-forward svc/prometheus 9090:9090 -n RawDrive
 # Open http://localhost:9090 and test the query
 ```
 

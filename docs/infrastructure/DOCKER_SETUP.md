@@ -2,7 +2,7 @@
 
 ## Overview
 
-vDrive provides two Docker Compose configurations:
+RawDrive provides two Docker Compose configurations:
 
 | File | Purpose | Services |
 |------|---------|----------|
@@ -103,9 +103,9 @@ Key variables in `.env`:
 
 ```bash
 # Database
-POSTGRES_USER=vDrive
+POSTGRES_USER=RawDrive
 POSTGRES_PASSWORD=<secure-password>
-DATABASE_URL=postgresql://vDrive:password@postgres:5432/vDrive
+DATABASE_URL=postgresql://RawDrive:password@postgres:5432/RawDrive
 
 # Redis
 REDIS_URL=redis://redis:6379/0
@@ -127,7 +127,7 @@ All services include health checks:
 
 ```yaml
 healthcheck:
-  test: ["CMD", "pg_isready", "-U", "vDrive"]
+  test: ["CMD", "pg_isready", "-U", "RawDrive"]
   interval: 10s
   timeout: 5s
   retries: 5
@@ -135,13 +135,13 @@ healthcheck:
 
 ## Networking
 
-All services share the `vDrive-network` bridge:
+All services share the `RawDrive-network` bridge:
 
 ```yaml
 networks:
-  vDrive-network:
+  RawDrive-network:
     driver: bridge
-    name: vDrive-network
+    name: RawDrive-network
 ```
 
 Services communicate via DNS: `postgres`, `redis`, `kafka`, etc.
@@ -156,7 +156,7 @@ docker compose ps
 docker compose logs -f postgres
 
 # Execute command in container
-docker compose exec postgres psql -U vDrive -d vDrive
+docker compose exec postgres psql -U RawDrive -d RawDrive
 
 # Restart single service
 docker compose restart backend
@@ -179,7 +179,7 @@ docker compose up -d --build
 docker compose logs postgres
 
 # Verify volume permissions
-docker volume inspect vDrive-postgres-data
+docker volume inspect RawDrive-postgres-data
 ```
 
 ### Kafka connection issues

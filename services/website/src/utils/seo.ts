@@ -2,8 +2,8 @@
  * SEO utility functions for meta tags and Open Graph
  */
 
-const SITE_URL = import.meta.env.SITE_URL || 'https://www.vdrive.io';
-const SITE_NAME = 'vDrive';
+const SITE_URL = import.meta.env.SITE_URL || 'https://www.RawDrive.io';
+const SITE_NAME = 'RawDrive';
 const DEFAULT_DESCRIPTION =
   'Professional Photography Client Galleries Made Simple. Share, deliver, and sell your photos with AI-powered galleries. No technical skills needed.';
 const DEFAULT_IMAGE = '/og-image.png';
@@ -102,8 +102,8 @@ export function generateMetaTags(props: SEOProps): Record<string, string> {
 
     // Twitter Card
     'twitter:card': 'summary_large_image',
-    'twitter:site': '@vdriveio',
-    'twitter:creator': '@vdriveio',
+    'twitter:site': '@RawDriveio',
+    'twitter:creator': '@RawDriveio',
     'twitter:title': fullTitle,
     'twitter:description': truncatedDescription,
     'twitter:image': imageUrl,
@@ -191,7 +191,7 @@ export const pageSEO = {
   features: {
     title: 'Features',
     description:
-      'Discover vDrive features: AI-powered gallery management, beautiful client portals, print album designer, face tagging, client management, and secure cloud storage.',
+      'Discover RawDrive features: AI-powered gallery management, beautiful client portals, print album designer, face tagging, client management, and secure cloud storage.',
   },
   pricing: {
     title: 'Pricing',
@@ -201,11 +201,11 @@ export const pageSEO = {
   blog: {
     title: 'Blog',
     description:
-      'Photography tips, industry insights, and vDrive updates. Learn how to grow your photography business and deliver exceptional client experiences.',
+      'Photography tips, industry insights, and RawDrive updates. Learn how to grow your photography business and deliver exceptional client experiences.',
   },
   docs: {
     title: 'Documentation',
     description:
-      'Learn how to use vDrive with comprehensive guides, tutorials, and API documentation. Get started in minutes.',
+      'Learn how to use RawDrive with comprehensive guides, tutorials, and API documentation. Get started in minutes.',
   },
 };

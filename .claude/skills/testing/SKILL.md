@@ -1,7 +1,7 @@
 ---
 name: testing
 aliases: [tests, vitest, pytest, coverage, fixtures, unit-tests, integration-tests]
-description: Testing standards for vDrive. Use when writing tests, setting up test fixtures, or reviewing test coverage.
+description: Testing standards for RawDrive. Use when writing tests, setting up test fixtures, or reviewing test coverage.
 ---
 
 # Testing Standards
@@ -35,7 +35,7 @@ cd ai-service && pytest
 # Shared Packages
 pnpm test:packages           # Test all shared packages
 pnpm test:parity             # Cross-platform TS/Python parity tests
-pnpm --filter @vDrive/shared-types test  # Single package
+pnpm --filter @RawDrive/shared-types test  # Single package
 ```
 
 ## Directory Structure

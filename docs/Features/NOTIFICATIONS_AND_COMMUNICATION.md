@@ -4,7 +4,7 @@
 
 ## Overview
 
-vDrive implements a comprehensive notification and communication system to keep photographers and clients informed about important events, updates, and actions. The system supports multiple channels including in-app notifications, emails, and SMS.
+RawDrive implements a comprehensive notification and communication system to keep photographers and clients informed about important events, updates, and actions. The system supports multiple channels including in-app notifications, emails, and SMS.
 
 ## Purpose
 

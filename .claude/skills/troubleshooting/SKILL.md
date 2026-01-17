@@ -1,6 +1,6 @@
 ---
 name: troubleshooting
-description: Systematic debugging workflow for vDrive issues. Use when troubleshooting bugs, performance problems, service failures, or unexpected behavior.
+description: Systematic debugging workflow for RawDrive issues. Use when troubleshooting bugs, performance problems, service failures, or unexpected behavior.
 ---
 
 # Troubleshooting & Debugging
@@ -8,7 +8,7 @@ description: Systematic debugging workflow for vDrive issues. Use when troublesh
 ## When to Use This Skill
 
 Use this skill when:
-- Debugging bugs or errors in vDrive services
+- Debugging bugs or errors in RawDrive services
 - Investigating performance issues or high latency
 - Troubleshooting service failures or crashes
 - Analyzing unexpected behavior

@@ -1,6 +1,7 @@
 import {
   forwardRef,
   useState,
+  useId,
   type InputHTMLAttributes,
   type ReactNode,
 } from 'react';
@@ -75,7 +76,8 @@ export const AppInput = forwardRef<HTMLInputElement, AppInputProps>(
     ref
   ) => {
     const [isFocused, setIsFocused] = useState(false);
-    const inputId = id || `input-${Math.random().toString(36).substring(2, 9)}`;
+    const generatedId = useId();
+    const inputId = id || generatedId;
     const hasError = Boolean(error);
     const hasSuccess = Boolean(success);
     const hasValue = Boolean(props.value || props.defaultValue);
@@ -137,8 +139,8 @@ export const AppInput = forwardRef<HTMLInputElement, AppInputProps>(
               // Icon padding
               leftIcon && 'pl-12',
               rightIcon && 'pr-12',
-              // Floating label padding
-              label && 'pt-6 pb-2',
+              // Always-floated label padding - balanced for label above input text
+              label && 'pt-5 pb-3',
               className
             )}
             onFocus={(e) => {
@@ -160,25 +162,23 @@ export const AppInput = forwardRef<HTMLInputElement, AppInputProps>(
             {...props}
           />
 
-          {/* Floating label */}
+          {/* Always-floated label - stays above input to prevent text overlap */}
           {label && (
             <label
               htmlFor={inputId}
               className={cn(
-                'absolute left-4 transition-all duration-200 pointer-events-none',
+                'absolute left-4 top-2 text-xs z-10',
+                'transition-colors duration-200 pointer-events-none',
                 // Light mode
                 'text-neutral-500',
                 // Dark mode
                 'dark:text-white/70',
+                // Adjust for left icon
                 leftIcon && 'left-12',
-                // Floating state
-                (isFocused || hasValue)
-                  ? 'top-2 text-xs'
-                  : 'top-1/2 -translate-y-1/2 text-base',
                 // Focus state (theme-aware)
                 isFocused && 'text-primary-600 dark:text-primary-400',
                 // Error state
-                hasError && isFocused && 'text-error-500 dark:text-error-400'
+                hasError && 'text-error-500 dark:text-error-400'
               )}
             >
               {label}

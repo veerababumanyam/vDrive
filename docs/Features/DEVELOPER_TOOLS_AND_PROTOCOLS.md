@@ -4,7 +4,7 @@
 
 ## Overview
 
-vDrive provides comprehensive developer tools and protocols including Model Context Protocol (MCP), Application-to-Application (A2A) communication, Software Development Kits (SDKs), and Application Development Kits (ADKs). These tools enable developers to build integrations, extend functionality, and create custom applications.
+RawDrive provides comprehensive developer tools and protocols including Model Context Protocol (MCP), Application-to-Application (A2A) communication, Software Development Kits (SDKs), and Application Development Kits (ADKs). These tools enable developers to build integrations, extend functionality, and create custom applications.
 
 ## Purpose
 
@@ -23,7 +23,7 @@ Developer tools serve to:
 
 ### MCP Overview
 
-Model Context Protocol enables AI models and applications to access vDrive data and functionality through a standardized interface.
+Model Context Protocol enables AI models and applications to access RawDrive data and functionality through a standardized interface.
 
 **MCP Purpose:**
 - Provide context to AI models
@@ -34,11 +34,11 @@ Model Context Protocol enables AI models and applications to access vDrive data 
 
 ### MCP Server Implementation
 
-Implement MCP server for vDrive.
+Implement MCP server for RawDrive.
 
 #### Reference implementation: FastAPI + FastMCP (Python)
 
-vDrive’s **recommended** MCP server reference architecture is:
+RawDrive’s **recommended** MCP server reference architecture is:
 
 - **FastAPI** as the HTTP runtime (routing, auth middleware, rate limits)
 - **FastMCP** as the MCP protocol layer (tools/resources/prompts + transport adapters)
@@ -63,7 +63,7 @@ Notes:
 ```typescript
 interface MCPServerConfig {
   // Server
-  name: 'vDrive-mcp',
+  name: 'RawDrive-mcp',
   version: '1.0.0',
   
   // Protocol
@@ -99,7 +99,7 @@ interface MCPServerConfig {
 
 ### MCP Resources
 
-Expose vDrive data as MCP resources.
+Expose RawDrive data as MCP resources.
 
 **Available Resources:**
 ```typescript
@@ -143,7 +143,7 @@ interface MCPResources {
 
 ### MCP Tools
 
-Expose vDrive functionality as MCP tools.
+Expose RawDrive functionality as MCP tools.
 
 **Available Tools:**
 ```typescript
@@ -296,7 +296,7 @@ interface MCPAuthentication {
   /**
    * First-party user session (optional): user JWT/cookie session.
    *
-   * Use only when MCP is consumed by vDrive-owned clients
+   * Use only when MCP is consumed by RawDrive-owned clients
    * (e.g., internal Studio UI or Admin UI).
    */
   userSession: {
@@ -514,27 +514,27 @@ Install SDK via package manager.
 **Installation Methods:**
 ```bash
 # JavaScript/TypeScript
-npm install @vDrive/sdk
-yarn add @vDrive/sdk
-pnpm add @vDrive/sdk
+npm install @RawDrive/sdk
+yarn add @RawDrive/sdk
+pnpm add @RawDrive/sdk
 
 # Python
-pip install vDrive-sdk
+pip install RawDrive-sdk
 
 # Ruby
-gem install vDrive
+gem install RawDrive
 
 # PHP
-composer require vDrive/sdk
+composer require RawDrive/sdk
 
 # Go
-go get github.com/vDrive/sdk-go
+go get github.com/RawDrive/sdk-go
 
 # Java
 # Add to pom.xml or build.gradle
 
 # C#/.NET
-dotnet add package vDrive.SDK
+dotnet add package RawDrive.SDK
 
 # Swift
 # Add to Package.swift
@@ -592,10 +592,10 @@ Common SDK usage patterns.
 
 **JavaScript/TypeScript Example:**
 ```typescript
-import { vDrive } from '@vDrive/sdk';
+import { RawDrive } from '@RawDrive/sdk';
 
 // Initialize
-const client = new vDrive({
+const client = new RawDrive({
   apiKey: 'sk_live_...',
 });
 
@@ -636,10 +636,10 @@ const booking = await client.bookings.create({
 
 **Python Example:**
 ```python
-from vDrive import vDrive
+from RawDrive import RawDrive
 
 # Initialize
-client = vDrive(api_key='sk_live_...')
+client = RawDrive(api_key='sk_live_...')
 
 # List galleries
 galleries = client.galleries.list(page=1, limit=10)
@@ -723,11 +723,11 @@ interface SDKErrors {
 try {
   const gallery = await client.galleries.get('gal_123456');
 } catch (error) {
-  if (error instanceof vDrive.NotFoundError) {
+  if (error instanceof RawDrive.NotFoundError) {
     console.error('Gallery not found');
-  } else if (error instanceof vDrive.AuthenticationError) {
+  } else if (error instanceof RawDrive.AuthenticationError) {
     console.error('Authentication failed');
-  } else if (error instanceof vDrive.RateLimitError) {
+  } else if (error instanceof RawDrive.RateLimitError) {
     console.error(`Rate limited, retry after ${error.retryAfter}s`);
   } else {
     console.error('Unknown error:', error);
@@ -772,7 +772,7 @@ Cache responses for performance.
 
 **Caching Configuration:**
 ```typescript
-const client = new vDrive({
+const client = new RawDrive({
   apiKey: 'sk_live_...',
   cache: {
     enabled: true,
@@ -788,7 +788,7 @@ const client = new vDrive({
 
 ### ADK Overview
 
-Complete toolkit for building vDrive applications.
+Complete toolkit for building RawDrive applications.
 
 **ADK Components:**
 - UI components library
@@ -806,22 +806,22 @@ Install ADK for your framework.
 **Framework Support:**
 ```bash
 # React
-npm install @vDrive/adk-react
+npm install @RawDrive/adk-react
 
 # Vue
-npm install @vDrive/adk-vue
+npm install @RawDrive/adk-vue
 
 # Angular
-npm install @vDrive/adk-angular
+npm install @RawDrive/adk-angular
 
 # Svelte
-npm install @vDrive/adk-svelte
+npm install @RawDrive/adk-svelte
 
 # Next.js
-npm install @vDrive/adk-next
+npm install @RawDrive/adk-next
 
 # Nuxt
-npm install @vDrive/adk-nuxt
+npm install @RawDrive/adk-nuxt
 ```
 
 ### ADK Components
@@ -894,7 +894,7 @@ interface ADKHooks {
 
 **Hook Usage Example:**
 ```typescript
-import { useGalleries, useCreateGallery } from '@vDrive/adk-react';
+import { useGalleries, useCreateGallery } from '@RawDrive/adk-react';
 
 function MyComponent() {
   const { galleries, loading, error } = useGalleries();
@@ -1031,7 +1031,7 @@ Combine MCP and SDK for powerful integrations.
 const mcpContext = await mcpClient.getResource('gallery://gal_123456');
 
 // Use SDK to perform operations
-const sdk = new vDrive({ apiKey: 'sk_live_...' });
+const sdk = new RawDrive({ apiKey: 'sk_live_...' });
 const gallery = await sdk.galleries.get(mcpContext.id);
 
 // Process with AI
@@ -1052,7 +1052,7 @@ await eventBus.publish('gallery.created', {
 
 // Service B subscribes and uses SDK
 eventBus.subscribe('gallery.created', async (event) => {
-  const sdk = new vDrive({ apiKey: 'sk_live_...' });
+  const sdk = new RawDrive({ apiKey: 'sk_live_...' });
   const gallery = await sdk.galleries.get(event.galleryId);
   // Process gallery
 });
@@ -1141,23 +1141,23 @@ const response = await fetch('/api/galleries', {
 
 ### Documentation
 
-- SDK Documentation: https://docs.vDrive.com/sdk
-- ADK Documentation: https://docs.vDrive.com/adk
-- MCP Documentation: https://docs.vDrive.com/mcp
-- API Reference: https://api.vDrive.com/docs
+- SDK Documentation: https://docs.RawDrive.com/sdk
+- ADK Documentation: https://docs.RawDrive.com/adk
+- MCP Documentation: https://docs.RawDrive.com/mcp
+- API Reference: https://api.RawDrive.com/docs
 
 ### Community
 
-- GitHub: https://github.com/vDrive
-- Discord: https://discord.gg/vDrive
-- Forum: https://forum.vDrive.com
-- Stack Overflow: Tag `vDrive`
+- GitHub: https://github.com/RawDrive
+- Discord: https://discord.gg/RawDrive
+- Forum: https://forum.RawDrive.com
+- Stack Overflow: Tag `RawDrive`
 
 ### Support
 
-- Email: support@vDrive.com
-- Chat: https://support.vDrive.com
-- Status: https://status.vDrive.com
+- Email: support@RawDrive.com
+- Chat: https://support.RawDrive.com
+- Status: https://status.RawDrive.com
 
 ---
 

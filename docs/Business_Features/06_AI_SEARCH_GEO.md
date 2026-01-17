@@ -319,7 +319,7 @@ ai_inference_service.py         - Multi-provider AI calls
 ### AI Provider Architecture
 
 **Multi-Provider Support**
-- **Default**: Google Gemini (vDrive-hosted)
+- **Default**: Google Gemini (RawDrive-hosted)
 - **Optional**: OpenAI, Anthropic, Azure OpenAI
 - **Local**: OpenAI-compatible servers (Ollama, LM Studio)
 

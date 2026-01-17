@@ -2,7 +2,7 @@
 
 ## Overview
 
-vDrive handles sensitive customer data including photos, personal information, and payment details for 20,000+ photographers. This document outlines comprehensive security requirements to protect user data, prevent unauthorized access, and ensure compliance with industry standards and regulations.
+RawDrive handles sensitive customer data including photos, personal information, and payment details for 20,000+ photographers. This document outlines comprehensive security requirements to protect user data, prevent unauthorized access, and ensure compliance with industry standards and regulations.
 
 ## Security Principles
 

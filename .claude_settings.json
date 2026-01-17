@@ -1,0 +1,39 @@
+{
+  "sandbox": {
+    "enabled": true,
+    "autoAllowBashIfSandboxed": true
+  },
+  "permissions": {
+    "defaultMode": "acceptEdits",
+    "allow": [
+      "Read(./**)",
+      "Write(./**)",
+      "Edit(./**)",
+      "Glob(./**)",
+      "Grep(./**)",
+      "Read(/Users/v13478/Desktop/RawDrive/.auto-claude/worktrees/tasks/003-batch-watermark-application/**)",
+      "Write(/Users/v13478/Desktop/RawDrive/.auto-claude/worktrees/tasks/003-batch-watermark-application/**)",
+      "Edit(/Users/v13478/Desktop/RawDrive/.auto-claude/worktrees/tasks/003-batch-watermark-application/**)",
+      "Glob(/Users/v13478/Desktop/RawDrive/.auto-claude/worktrees/tasks/003-batch-watermark-application/**)",
+      "Grep(/Users/v13478/Desktop/RawDrive/.auto-claude/worktrees/tasks/003-batch-watermark-application/**)",
+      "Read(/Users/v13478/Desktop/RawDrive/.auto-claude/worktrees/tasks/003-batch-watermark-application/.auto-claude/specs/003-batch-watermark-application/**)",
+      "Write(/Users/v13478/Desktop/RawDrive/.auto-claude/worktrees/tasks/003-batch-watermark-application/.auto-claude/specs/003-batch-watermark-application/**)",
+      "Edit(/Users/v13478/Desktop/RawDrive/.auto-claude/worktrees/tasks/003-batch-watermark-application/.auto-claude/specs/003-batch-watermark-application/**)",
+      "Read(/Users/v13478/Desktop/RawDrive/.auto-claude/**)",
+      "Write(/Users/v13478/Desktop/RawDrive/.auto-claude/**)",
+      "Edit(/Users/v13478/Desktop/RawDrive/.auto-claude/**)",
+      "Glob(/Users/v13478/Desktop/RawDrive/.auto-claude/**)",
+      "Grep(/Users/v13478/Desktop/RawDrive/.auto-claude/**)",
+      "Bash(*)",
+      "WebFetch(*)",
+      "WebSearch(*)",
+      "mcp__context7__resolve-library-id(*)",
+      "mcp__context7__get-library-docs(*)",
+      "mcp__graphiti-memory__search_nodes(*)",
+      "mcp__graphiti-memory__search_facts(*)",
+      "mcp__graphiti-memory__add_episode(*)",
+      "mcp__graphiti-memory__get_episodes(*)",
+      "mcp__graphiti-memory__get_entity_edge(*)"
+    ]
+  }
+}

@@ -1,4 +1,4 @@
-# vDrive Website Service Dockerfile
+# RawDrive Website Service Dockerfile
 # Multi-stage build for Astro static site
 
 # ===========================================
@@ -24,8 +24,8 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 # Set build-time environment variables
-ARG SITE_URL=https://www.vdrive.io
-ARG APP_URL=https://app.vdrive.io
+ARG SITE_URL=https://www.RawDrive.io
+ARG APP_URL=https://app.RawDrive.io
 ENV SITE_URL=$SITE_URL
 ENV APP_URL=$APP_URL
 

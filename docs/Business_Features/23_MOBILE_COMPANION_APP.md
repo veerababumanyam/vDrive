@@ -6,7 +6,7 @@
 
 ## Business Value Proposition
 
-While the **Customer Web Portal** is optimized for *clients* to view photos, the **Mobile Companion App** is a native iOS and Android application built specifically for *photographers* and *studio owners*. It brings the power of vDrive to their pocket, enabling them to manage their business from anywhere, shoot-and-deliver instantly, and maintain rapid responsiveness with clients.
+While the **Customer Web Portal** is optimized for *clients* to view photos, the **Mobile Companion App** is a native iOS and Android application built specifically for *photographers* and *studio owners*. It brings the power of RawDrive to their pocket, enabling them to manage their business from anywhere, shoot-and-deliver instantly, and maintain rapid responsiveness with clients.
 
 ### Key Business Benefits
 - **Shoot-to-Delivery Speed**: Mobile upload enables "Behind-the-Scenes" (BTS) content delivery while still on location.

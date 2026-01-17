@@ -1,5 +1,5 @@
 # ===========================================
-# vDrive Onboarding Service Dependencies
+# RawDrive Onboarding Service Dependencies
 # ===========================================
 # FastAPI and ASGI
 fastapi[all]==0.104.1

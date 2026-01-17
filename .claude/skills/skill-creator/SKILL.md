@@ -1,10 +1,10 @@
 ---
 name: skill-creator
 aliases: [skills, claude-skills, skill-template]
-description: Create and maintain Claude Code skills for vDrive. Use when building new skills, reviewing skill structure, or updating existing skills.
+description: Create and maintain Claude Code skills for RawDrive. Use when building new skills, reviewing skill structure, or updating existing skills.
 ---
 
-# vDrive Skill Creator
+# RawDrive Skill Creator
 
 ## Existing Skills
 
@@ -21,10 +21,10 @@ description: Create and maintain Claude Code skills for vDrive. Use when buildin
 | `frontend-design` | Premium UI aesthetics |
 | `ide` | Claude Code IDE integration |
 
-## vDrive Project Structure
+## RawDrive Project Structure
 
 ```
-vDrive/
+RawDrive/
 ├── frontend/              # React 19 + Vite + TypeScript
 │   └── src/
 │       ├── components/ui/     # Design system components

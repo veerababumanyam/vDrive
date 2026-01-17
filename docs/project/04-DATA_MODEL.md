@@ -2,7 +2,7 @@
 
 ## Overview
 
-The vDrive data model defines the structure, relationships, and constraints for all data stored in the system. This document provides a comprehensive reference for the database schema, entity relationships, and data integrity rules.
+The RawDrive data model defines the structure, relationships, and constraints for all data stored in the system. This document provides a comprehensive reference for the database schema, entity relationships, and data integrity rules.
 
 ## Purpose
 

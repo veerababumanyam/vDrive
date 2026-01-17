@@ -23,12 +23,12 @@ The support playbook serves to:
 Support available through multiple channels.
 
 **Support Channels:**
-- Email: support@vDrive.com
-- Chat: https://support.vDrive.com (live chat)
-- Phone: +1-555-vDrive (Business/Enterprise only)
-- Help Center: https://help.vDrive.com
-- Community Forum: https://community.vDrive.com
-- Social Media: @vDrive on Twitter/Instagram
+- Email: support@RawDrive.com
+- Chat: https://support.RawDrive.com (live chat)
+- Phone: +1-555-RawDrive (Business/Enterprise only)
+- Help Center: https://help.RawDrive.com
+- Community Forum: https://community.RawDrive.com
+- Social Media: @RawDrive on Twitter/Instagram
 
 ### Response Time SLA
 
@@ -311,7 +311,7 @@ Support availability.
 - Close other applications
 
 **Server Status:**
-- Check status page: https://status.vDrive.com
+- Check status page: https://status.RawDrive.com
 - Check for ongoing incidents
 - Check maintenance windows
 - Provide ETA if applicable
@@ -669,11 +669,11 @@ Use templates for consistent communication.
 
 **Welcome Email:**
 ```
-Subject: Welcome to vDrive!
+Subject: Welcome to RawDrive!
 
 Hi [Name],
 
-Welcome to vDrive! We're excited to have you on board.
+Welcome to RawDrive! We're excited to have you on board.
 
 Here's what you can do:
 ✓ Upload and organize photos
@@ -686,7 +686,7 @@ Get started: [Dashboard Link]
 Questions? Check our help center: [Help Center Link]
 
 Welcome aboard!
-vDrive Team
+RawDrive Team
 ```
 
 **Support Response Email:**
@@ -695,14 +695,14 @@ Subject: Re: [Issue Title]
 
 Hi [Name],
 
-Thank you for contacting vDrive support.
+Thank you for contacting RawDrive support.
 
 [Provide solution or next steps]
 
 If you have any questions, please reply to this email.
 
 Best regards,
-vDrive Support Team
+RawDrive Support Team
 ```
 
 **Issue Resolution Email:**
@@ -720,7 +720,7 @@ Please verify that everything is working correctly.
 If you have any questions, please let us know.
 
 Best regards,
-vDrive Support Team
+RawDrive Support Team
 ```
 
 ### Tone and Style

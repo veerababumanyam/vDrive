@@ -29,7 +29,7 @@ const {
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const socialImageURL = new URL(image, Astro.site);
-const fullTitle = title ? `${title} | vDrive` : 'vDrive - Professional Photography Client Galleries';
+const fullTitle = title ? `${title} | RawDrive` : 'RawDrive - Professional Photography Client Galleries';
 ---
 
 <!doctype html>
@@ -57,7 +57,7 @@ const fullTitle = title ? `${title} | vDrive` : 'vDrive - Professional Photograp
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:image" content={socialImageURL} />
-    <meta property="og:site_name" content="vDrive" />
+    <meta property="og:site_name" content="RawDrive" />
     <meta property="og:locale" content="en_US" />
 
     {type === 'article' && publishedTime && (
@@ -79,8 +79,8 @@ const fullTitle = title ? `${title} | vDrive` : 'vDrive - Professional Photograp
     <meta property="twitter:title" content={fullTitle} />
     <meta property="twitter:description" content={description} />
     <meta property="twitter:image" content={socialImageURL} />
-    <meta property="twitter:site" content="@vdriveio" />
-    <meta property="twitter:creator" content="@vdriveio" />
+    <meta property="twitter:site" content="@RawDriveio" />
+    <meta property="twitter:creator" content="@RawDriveio" />
 
     <!-- Favicons with Theme Support -->
     <link rel="icon" type="image/png" sizes="16x16" href="/logo-light-16x16.png" media="(prefers-color-scheme: light)" />

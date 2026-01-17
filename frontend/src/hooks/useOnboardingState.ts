@@ -66,7 +66,7 @@ const STEPS: OnboardingStep[] = [
   'completed',
 ];
 
-const STORAGE_KEY = 'vdrive-onboarding-state';
+const STORAGE_KEY = 'RawDrive-onboarding-state';
 
 // ============================================
 // Local Storage Helpers
@@ -169,31 +169,36 @@ export function useOnboardingState(): UseOnboardingStateReturn {
   useEffect(() => {
     if (isInitialized) return;
 
-    // Try remote state first
-    if (hasFetched && remoteState) {
-      setCurrentStepInternal(remoteState.current_step);
-      setCompletedSteps(remoteState.completed_steps);
-      if (remoteState.workspace_data) {
-        setWorkspaceData({
-          name: remoteState.workspace_data.name,
-          slug: remoteState.workspace_data.slug,
-          businessType: remoteState.workspace_data.business_type,
-        });
+    // Use requestAnimationFrame to avoid sync setState in effect
+    const frame = requestAnimationFrame(() => {
+      // Try remote state first
+      if (hasFetched && remoteState) {
+        setCurrentStepInternal(remoteState.current_step);
+        setCompletedSteps(remoteState.completed_steps);
+        if (remoteState.workspace_data) {
+          setWorkspaceData({
+            name: remoteState.workspace_data.name,
+            slug: remoteState.workspace_data.slug,
+            businessType: remoteState.workspace_data.business_type,
+          });
+        }
+        setIsInitialized(true);
+        return;
       }
-      setIsInitialized(true);
-      return;
-    }
 
-    // Fall back to local state
-    if (!isFetching) {
-      const localState = getLocalState();
-      if (localState) {
-        setCurrentStepInternal(localState.currentStep);
-        setCompletedSteps(localState.completedSteps);
-        setWorkspaceData(localState.workspaceData);
+      // Fall back to local state
+      if (!isFetching) {
+        const localState = getLocalState();
+        if (localState) {
+          setCurrentStepInternal(localState.currentStep);
+          setCompletedSteps(localState.completedSteps);
+          setWorkspaceData(localState.workspaceData);
+        }
+        setIsInitialized(true);
       }
-      setIsInitialized(true);
-    }
+    });
+
+    return () => cancelAnimationFrame(frame);
   }, [hasFetched, remoteState, isFetching, isInitialized]);
 
   // Persist to local storage on changes

@@ -1,18 +1,18 @@
 ---
 name: webapp-testing
 aliases: [e2e, playwright, browser-testing, screenshots, ui-testing]
-description: E2E and browser testing for vDrive using Playwright MCP. Use for testing UI flows, verifying frontend functionality, debugging visual issues, and capturing screenshots.
+description: E2E and browser testing for RawDrive using Playwright MCP. Use for testing UI flows, verifying frontend functionality, debugging visual issues, and capturing screenshots.
 ---
 
-# vDrive E2E Testing
+# RawDrive E2E Testing
 
-Browser-based testing for vDrive using **Playwright MCP** integration.
+Browser-based testing for RawDrive using **Playwright MCP** integration.
 
 > **For unit/integration tests**: See the `testing` skill (Vitest, pytest).
 
 ## Playwright MCP Tools
 
-vDrive has Playwright MCP configured. Use these tools directly:
+RawDrive has Playwright MCP configured. Use these tools directly:
 
 | Tool | Purpose |
 |------|---------|
@@ -24,7 +24,7 @@ vDrive has Playwright MCP configured. Use these tools directly:
 | `mcp__playwright__browser_take_screenshot` | Capture screenshot |
 | `mcp__playwright__browser_console_messages` | Get browser console logs |
 
-## vDrive Test URLs
+## RawDrive Test URLs
 
 | Environment | URL |
 |-------------|-----|
@@ -120,7 +120,7 @@ await mcp__playwright__browser_click({ element: '...', ref: 'discovered-ref' });
 
 ### Wait for Dynamic Content
 
-vDrive uses React Query - content loads asynchronously:
+RawDrive uses React Query - content loads asynchronously:
 
 ```typescript
 // Wait for specific text to appear
@@ -139,14 +139,14 @@ const logs = await mcp__playwright__browser_console_messages({ level: 'error' })
 
 ## Test Data (Seed Users)
 
-vDrive seeds test users. See `docs/TEST_USERS.md`:
+RawDrive seeds test users. See `docs/TEST_USERS.md`:
 
 | User | Email | Password | Workspace |
 |------|-------|----------|-----------|
-| Demo Photographer | demo@vDrive.com | demo123 | Demo Studio |
-| Test Admin | admin@vDrive.com | admin123 | Admin Workspace |
+| Demo Photographer | demo@RawDrive.com | demo123 | Demo Studio |
+| Test Admin | admin@RawDrive.com | admin123 | Admin Workspace |
 
-## vDrive-Specific Selectors
+## RawDrive-Specific Selectors
 
 Common UI elements and their typical selectors:
 

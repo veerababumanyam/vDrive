@@ -6,7 +6,7 @@
 
 ## Overview
 
-This document consolidates research findings for implementing the Onboarding Service microservice. All NEEDS CLARIFICATION items have been resolved through codebase analysis and vDrive documentation review.
+This document consolidates research findings for implementing the Onboarding Service microservice. All NEEDS CLARIFICATION items have been resolved through codebase analysis and RawDrive documentation review.
 
 ---
 
@@ -16,7 +16,7 @@ This document consolidates research findings for implementing the Onboarding Ser
 
 **Rationale**:
 - OWASP recommended algorithm for password hashing
-- vDrive security guidelines specify Argon2id with parameters: time_cost=3, memory_cost=65536 (64MB), parallelism=4
+- RawDrive security guidelines specify Argon2id with parameters: time_cost=3, memory_cost=65536 (64MB), parallelism=4
 - Provides resistance to both side-channel and GPU-based attacks
 - Already documented in `docs/project-starter-kit/09-SECURITY-GUIDELINES.md`
 
@@ -183,7 +183,7 @@ class RateLimiter:
 
 **Rationale**:
 - Google OAuth is primary signup method per documentation
-- Use authlib library (already in vDrive ecosystem)
+- Use authlib library (already in RawDrive ecosystem)
 - Account linking: if email exists, link Google identity
 - Auto-verify email for Google users (Google already verified)
 
@@ -319,7 +319,7 @@ class OnboardingStateService:
 **Alternatives Considered**:
 - All sync HTTP: Creates tight coupling, failure cascades
 - All async Kafka: Harder to get immediate email delivery confirmation
-- gRPC: vDrive doesn't use gRPC, HTTP is standard
+- gRPC: RawDrive doesn't use gRPC, HTTP is standard
 
 **Event Topics**:
 | Event | Topic | Consumer |
@@ -404,7 +404,7 @@ CREATE INDEX idx_onboarding_states_step ON onboarding_states(current_step);
 
 ## Summary
 
-All technical decisions align with vDrive's established patterns and the feature specification requirements. Key integrations:
+All technical decisions align with RawDrive's established patterns and the feature specification requirements. Key integrations:
 
 1. **Security**: Argon2id for passwords, secure random tokens, Turnstile for bot protection
 2. **Performance**: Redis caching, async PostgreSQL, parallel operations

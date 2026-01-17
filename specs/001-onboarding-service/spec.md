@@ -9,7 +9,7 @@
 
 ### User Story 1 - New Photographer Registration (Priority: P1)
 
-A new photographer discovers vDrive and wants to create an account to manage their photography business. They enter their email and password, receive a verification email, confirm their account, and are guided to set up their first workspace.
+A new photographer discovers RawDrive and wants to create an account to manage their photography business. They enter their email and password, receive a verification email, confirm their account, and are guided to set up their first workspace.
 
 **Why this priority**: Account creation is the fundamental entry point to the platform. Without registration, no other features are accessible. This is the conversion point from visitor to user.
 
@@ -33,13 +33,13 @@ A photographer wants to quickly create an account using their existing Google ac
 
 **Why this priority**: Google OAuth is the preferred signup method, reducing friction and increasing conversion rates. Equal priority with email registration as an entry point.
 
-**Independent Test**: Can be fully tested by clicking "Sign up with Google", authorizing vDrive, and verifying account creation with pre-filled profile data.
+**Independent Test**: Can be fully tested by clicking "Sign up with Google", authorizing RawDrive, and verifying account creation with pre-filled profile data.
 
 **Acceptance Scenarios**:
 
-1. **Given** a visitor on the registration page, **When** they click "Sign up with Google" and authorize vDrive access, **Then** the system creates a verified user account using Google's email and name, and redirects to workspace setup.
+1. **Given** a visitor on the registration page, **When** they click "Sign up with Google" and authorize RawDrive access, **Then** the system creates a verified user account using Google's email and name, and redirects to workspace setup.
 
-2. **Given** a Google user whose email already exists in vDrive (local account), **When** they sign up with Google, **Then** the accounts are linked and the user is logged in to their existing account.
+2. **Given** a Google user whose email already exists in RawDrive (local account), **When** they sign up with Google, **Then** the accounts are linked and the user is logged in to their existing account.
 
 3. **Given** a Google OAuth authorization, **When** the user revokes access or authorization fails, **Then** the system displays a user-friendly error message and offers alternative signup methods.
 

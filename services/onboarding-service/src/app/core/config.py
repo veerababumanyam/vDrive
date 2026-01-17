@@ -1,5 +1,5 @@
 """
-vDrive Onboarding Service Configuration
+RawDrive Onboarding Service Configuration
 
 Pydantic Settings for type-safe configuration from environment variables.
 """
@@ -39,7 +39,7 @@ class Settings(BaseSettings):
     # Database Configuration
     # ===========================================
     DATABASE_URL: str = Field(
-        default="postgresql+asyncpg://vDrive:vDrive@localhost:5432/vDrive",
+        default="postgresql+asyncpg://RawDrive:RawDrive@localhost:5432/RawDrive",
         description="PostgreSQL connection URL with asyncpg driver",
     )
     DB_POOL_MIN_SIZE: int = Field(default=2, ge=1, description="Minimum database pool size")
@@ -77,7 +77,7 @@ class Settings(BaseSettings):
         description="Email verification token expiry in hours",
     )
     EMAIL_FROM: str = Field(
-        default="noreply@vdrive.io",
+        default="noreply@RawDrive.io",
         description="From address for verification emails",
     )
 
@@ -139,11 +139,11 @@ class Settings(BaseSettings):
     # Application URLs
     # ===========================================
     APP_URL: str = Field(
-        default="https://app.vdrive.io",
+        default="https://app.RawDrive.io",
         description="Frontend application URL",
     )
     WEBSITE_URL: str = Field(
-        default="https://www.vdrive.io",
+        default="https://www.RawDrive.io",
         description="Public website URL",
     )
 
@@ -180,8 +180,8 @@ class Settings(BaseSettings):
         default=[
             "http://localhost:3000",
             "http://localhost:5173",
-            "https://app.vdrive.io",
-            "https://www.vdrive.io",
+            "https://app.RawDrive.io",
+            "https://www.RawDrive.io",
         ],
         description="Allowed CORS origins",
     )

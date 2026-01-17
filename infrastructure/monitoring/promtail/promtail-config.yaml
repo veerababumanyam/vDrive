@@ -1,7 +1,7 @@
 # ===========================================
 # Promtail Configuration
 # ===========================================
-# vDrive Log Collection Agent
+# RawDrive Log Collection Agent
 
 server:
   http_listen_port: 9080
@@ -12,7 +12,7 @@ positions:
 
 clients:
   - url: http://loki:3100/loki/api/v1/push
-    tenant_id: vDrive
+    tenant_id: RawDrive
     batchwait: 1s
     batchsize: 1048576
     timeout: 10s

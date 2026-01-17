@@ -94,17 +94,17 @@
 ## Test Scripts Created
 
 1. **test_auth_integration.sh** - Full signin → refresh → logout flow
-   - Location: `/Users/v13478/Desktop/vDrive/infrastructure/docker/`
+   - Location: `/Users/v13478/Desktop/RawDrive/infrastructure/docker/`
    - Tests complete authentication lifecycle
    - Verifies token rotation and session invalidation
 
 2. **test_endpoints.sh** - Endpoint availability verification
-   - Location: `/Users/v13478/Desktop/vDrive/infrastructure/docker/`
+   - Location: `/Users/v13478/Desktop/RawDrive/infrastructure/docker/`
    - Tests all authentication endpoints
    - Validates correct error responses
 
 3. **test_auth_flow.py** - Pytest integration tests
-   - Location: `/Users/v13478/Desktop/vDrive/services/onboarding-service/tests/integration/`
+   - Location: `/Users/v13478/Desktop/RawDrive/services/onboarding-service/tests/integration/`
    - Comprehensive async test suite
    - Ready for CI/CD integration
 

@@ -146,8 +146,8 @@ export interface ActivationChecklistProps {
 // Storage Keys
 // ============================================
 
-const DISMISSED_KEY = 'vdrive-checklist-dismissed';
-const CELEBRATION_KEY = 'vdrive-checklist-celebrated';
+const DISMISSED_KEY = 'RawDrive-checklist-dismissed';
+const CELEBRATION_KEY = 'RawDrive-checklist-celebrated';
 
 // ============================================
 // Component
@@ -184,16 +184,22 @@ export function ActivationChecklist({
   // Check for completion celebration (T127)
   useEffect(() => {
     if (data && data.progress_percentage === 100 && !hasCelebrated) {
-      setShowCelebration(true);
-      setHasCelebrated(true);
-      localStorage.setItem(CELEBRATION_KEY, 'true');
+      // Use requestAnimationFrame to avoid synchronous setState in effect
+      const frame = requestAnimationFrame(() => {
+        setShowCelebration(true);
+        setHasCelebrated(true);
+        localStorage.setItem(CELEBRATION_KEY, 'true');
+      });
 
       // Auto-hide celebration after 5 seconds
       const timer = setTimeout(() => {
         setShowCelebration(false);
       }, 5000);
 
-      return () => clearTimeout(timer);
+      return () => {
+        cancelAnimationFrame(frame);
+        clearTimeout(timer);
+      };
     }
   }, [data, hasCelebrated]);
 

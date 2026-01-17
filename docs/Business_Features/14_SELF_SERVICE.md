@@ -1,6 +1,6 @@
 # Self-Service Features
 
-> **Business Feature Documentation** | vDrive Platform
+> **Business Feature Documentation** | RawDrive Platform
 > 
 > **Purpose**: Enable users to manage their accounts independently, reducing administrative overhead and support tickets while ensuring GDPR/CCPA compliance.
 
@@ -8,7 +8,7 @@
 
 ## Executive Summary
 
-vDrive provides comprehensive self-service capabilities that empower users to manage their accounts, security settings, and data without requiring administrator intervention. These features reduce support costs, improve user satisfaction, and ensure regulatory compliance.
+RawDrive provides comprehensive self-service capabilities that empower users to manage their accounts, security settings, and data without requiring administrator intervention. These features reduce support costs, improve user satisfaction, and ensure regulatory compliance.
 
 ### Business Value
 
@@ -405,7 +405,7 @@ PATCH /api/v1/users/me/privacy    # Update settings
 - Secure download link (R2 presigned URL)
 
 **Export Schema (JSON Structure)**:
-The export will be a ZIP file containing `vDrive_export.json` and associated media summaries.
+The export will be a ZIP file containing `RawDrive_export.json` and associated media summaries.
 
 ```json
 {
@@ -436,7 +436,7 @@ The export will be a ZIP file containing `vDrive_export.json` and associated med
 2.  **Worker**:
     - Aggregates data from `users`, `galleries`, `assets`, `audit_logs`.
     - Generates JSON file.
-    - Uploads to `s3://vDrive-exports/{user_id}/{export_id}.zip` (Lifecycle rule: 7 days).
+    - Uploads to `s3://RawDrive-exports/{user_id}/{export_id}.zip` (Lifecycle rule: 7 days).
 3.  **Completion**:
     - Updates job status in DB.
     - Sends email with Download Link.
@@ -619,5 +619,5 @@ Critical actions require password confirmation:
 
 **Last Updated**: January 5, 2026  
 **Version**: 1.0  
-**Owner**: vDrive Product Team  
+**Owner**: RawDrive Product Team  
 **Status**: Active

@@ -6,7 +6,7 @@ import react from '@astrojs/react';
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://www.vdrive.io',
+  site: 'https://www.RawDrive.io',
   output: 'static',
 
   integrations: [
@@ -48,13 +48,13 @@ export default defineConfig({
         type: 'string',
         context: 'client',
         access: 'public',
-        default: 'https://www.vdrive.io',
+        default: 'https://www.RawDrive.io',
       },
       APP_URL: {
         type: 'string',
         context: 'client',
         access: 'public',
-        default: 'https://app.vdrive.io',
+        default: 'https://app.RawDrive.io',
       },
     },
   },

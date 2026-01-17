@@ -1,6 +1,6 @@
 # Common Issues & Solutions
 
-Known issues in vDrive and their solutions, organized by category.
+Known issues in RawDrive and their solutions, organized by category.
 
 ## Service Startup Issues
 
@@ -58,7 +58,7 @@ docker compose ps postgres redis
 docker compose logs --tail=100 [service-name]
 
 # Check restart policy
-docker inspect vDrive-[service-name] | jq '.[0].HostConfig.RestartPolicy'
+docker inspect RawDrive-[service-name] | jq '.[0].HostConfig.RestartPolicy'
 ```
 
 **Common Causes:**
@@ -70,7 +70,7 @@ docker inspect vDrive-[service-name] | jq '.[0].HostConfig.RestartPolicy'
    DATABASE_URL = os.environ["DATABASE_URL"]  # KeyError if missing
 
    # Good
-   DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://localhost/vDrive")
+   DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://localhost/RawDrive")
    if not DATABASE_URL:
        raise ValueError("DATABASE_URL environment variable required")
    ```
@@ -153,6 +153,82 @@ docker inspect vDrive-[service-name] | jq '.[0].HostConfig.RestartPolicy'
 1. Verify OAuth credentials in env vars
 2. Ensure redirect URI matches provider settings exactly
 3. Store state in Redis before redirect: `await redis.setex(f"oauth:state:{state}", 300, session_id)`
+
+### Issue: Silent Logout When Making API Calls
+
+**Symptoms:**
+- User clicks button (e.g., "Create Gallery") and gets redirected to login
+- No error message shown
+- Happens sporadically or consistently
+
+**Investigation:**
+```bash
+# Check browser Network tab for 401 responses
+# Look for failed /auth/refresh calls
+
+# Check service logs for JWT errors
+docker compose logs -f onboarding-service | grep -i "jwt\|token\|401"
+docker compose logs -f gallery-service | grep -i "jwt\|token\|401"
+```
+
+**Common Causes:**
+
+1. **Token refresh endpoint not implemented**
+   - Check: Does `/auth/refresh` return 401 always?
+   - Fix: Implement actual refresh logic (see auth-service skill)
+
+2. **JWT algorithm mismatch between services**
+   - Check: Compare JWT_ALGORITHM in each service config
+   - Fix: Align all services to HS256
+   ```bash
+   grep -r "JWT_ALGORITHM" services/*/src/app/core/
+   ```
+
+3. **Different JWT secrets**
+   - Check: Compare JWT_SECRET env vars
+   - Fix: Use same secret across all services
+
+**Flow to Debug:**
+```
+User action → API call → 401 response
+                           ↓
+              Axios interceptor → /auth/refresh
+                                        ↓
+                              If 401: redirect to /signin (silent logout)
+```
+
+### Issue: JWT "alg value not allowed" Error
+
+**Symptoms:**
+- 401 Unauthorized on API calls
+- Log shows: "alg value not allowed" or "Invalid token"
+- Works on one service, fails on another
+
+**Root Cause:** Services using different JWT algorithms.
+
+**Investigation:**
+```bash
+# Check algorithm in each service
+grep -r "JWT_ALGORITHM" services/*/src/app/core/
+
+# Example output showing mismatch:
+# services/onboarding-service/src/app/core/security.py:JWT_ALGORITHM = "HS256"
+# services/gallery-service/src/app/core/config.py:JWT_ALGORITHM = "EdDSA"  # WRONG!
+```
+
+**Solution:**
+1. Identify the canonical algorithm (RawDrive uses HS256)
+2. Update mismatched services:
+   ```python
+   # In config.py
+   JWT_ALGORITHM: str = Field(default="HS256")  # Must match all services
+   ```
+3. Rebuild affected services:
+   ```bash
+   docker compose up -d --build gallery-service
+   ```
+
+**Prevention:** All new services must use HS256 algorithm (documented in auth-service skill).
 
 ## Performance Issues
 

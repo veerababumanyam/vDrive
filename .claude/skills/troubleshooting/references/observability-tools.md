@@ -1,6 +1,6 @@
 # Observability Tools Guide
 
-Comprehensive guide to using vDrive's observability stack: Prometheus, Grafana, Loki, and Alertmanager.
+Comprehensive guide to using RawDrive's observability stack: Prometheus, Grafana, Loki, and Alertmanager.
 
 ## Overview
 
@@ -25,7 +25,7 @@ open http://localhost:3001
 
 ### Key Dashboards
 
-**vDrive Services Overview**
+**RawDrive Services Overview**
 - Service health (up/down)
 - Request rate per second
 - Error rate (5xx errors)
@@ -34,7 +34,7 @@ open http://localhost:3001
 - Redis memory usage
 - Kafka consumer lag
 
-**Navigation:** Home → Dashboards → vDrive Services Overview
+**Navigation:** Home → Dashboards → RawDrive Services Overview
 
 ### Common Tasks
 
@@ -140,7 +140,7 @@ histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{job="backend"
 # Database
 pg_stat_activity_count                                 # Active connections
 pg_stat_activity_count / pg_settings_max_connections * 100  # Pool usage %
-rate(pg_stat_database_deadlocks{datname="vDrive"}[5m]) # Deadlocks
+rate(pg_stat_database_deadlocks{datname="RawDrive"}[5m]) # Deadlocks
 
 # Redis
 redis_memory_used_bytes / redis_memory_max_bytes * 100 # Memory %

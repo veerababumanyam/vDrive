@@ -2,7 +2,7 @@
 
 ## Business Value Proposition
 
-The Admin Roles system provides the governance layer for the vDrive SaaS platform. Unlike Workspace roles which manage content and members within a single tenant, **Platform Roles** facilitate the management of the business itself—ensuring operational stability, customer support, revenue assurance, and safety.
+The Admin Roles system provides the governance layer for the RawDrive SaaS platform. Unlike Workspace roles which manage content and members within a single tenant, **Platform Roles** facilitate the management of the business itself—ensuring operational stability, customer support, revenue assurance, and safety.
 
 ### Key Business Benefits
 - **Operational Security**: Least-privilege access for employees (e.g., Support agents cannot change system configs).

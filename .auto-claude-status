@@ -1,0 +1,25 @@
+{
+  "active": true,
+  "spec": "003-batch-watermark-application",
+  "state": "building",
+  "subtasks": {
+    "completed": 19,
+    "total": 21,
+    "in_progress": 1,
+    "failed": 0
+  },
+  "phase": {
+    "current": "Integration & E2E Testing",
+    "id": null,
+    "total": 3
+  },
+  "workers": {
+    "active": 0,
+    "max": 1
+  },
+  "session": {
+    "number": 18,
+    "started_at": "2026-01-17T10:16:41.180956"
+  },
+  "last_update": "2026-01-17T11:17:29.500616"
+}

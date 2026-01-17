@@ -6,7 +6,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: postgres
-  namespace: vDrive
+  namespace: RawDrive
   labels:
     app: postgres
     app.kubernetes.io/name: postgres
@@ -43,7 +43,7 @@ spec:
                   name: postgres-secret
                   key: password
             - name: POSTGRES_DB
-              value: vDrive
+              value: RawDrive
             - name: PGDATA
               value: /home/postgres/pgdata/data
           resources:
@@ -65,7 +65,7 @@ spec:
                 - -U
                 - $(POSTGRES_USER)
                 - -d
-                - vDrive
+                - RawDrive
             initialDelaySeconds: 30
             periodSeconds: 10
             timeoutSeconds: 5
@@ -77,7 +77,7 @@ spec:
                 - -U
                 - $(POSTGRES_USER)
                 - -d
-                - vDrive
+                - RawDrive
             initialDelaySeconds: 5
             periodSeconds: 5
             timeoutSeconds: 3
@@ -105,10 +105,10 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: postgres-secret
-  namespace: vDrive
+  namespace: RawDrive
 type: Opaque
 stringData:
-  username: vDrive
+  username: RawDrive
   password: changeme_in_production  # CHANGE THIS!
 ---
 # ConfigMap for init scripts
@@ -116,7 +116,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: postgres-init-scripts
-  namespace: vDrive
+  namespace: RawDrive
 data:
   init-db.sql: |
     -- Enable required extensions
@@ -130,5 +130,5 @@ data:
     CREATE SCHEMA IF NOT EXISTS audit;
 
     -- Grant permissions
-    GRANT ALL ON SCHEMA app TO vDrive;
-    GRANT ALL ON SCHEMA audit TO vDrive;
+    GRANT ALL ON SCHEMA app TO RawDrive;
+    GRANT ALL ON SCHEMA audit TO RawDrive;

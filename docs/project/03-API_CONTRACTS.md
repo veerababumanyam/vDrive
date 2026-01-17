@@ -2,7 +2,7 @@
 
 ## Overview
 
-API contracts define the formal agreements between client and server for all API endpoints. This document specifies request/response schemas, error handling, versioning, and backward compatibility guarantees for vDrive's REST API.
+API contracts define the formal agreements between client and server for all API endpoints. This document specifies request/response schemas, error handling, versioning, and backward compatibility guarantees for RawDrive's REST API.
 
 ## Purpose
 
@@ -21,7 +21,7 @@ API contracts serve to:
 
 ### Version Strategy
 
-vDrive uses semantic versioning for API versions.
+RawDrive uses semantic versioning for API versions.
 
 **Versioning Scheme:**
 ```
@@ -87,7 +87,7 @@ Standardized request format for all endpoints.
 **HTTP Request Structure:**
 ```
 METHOD /api/v1/resource HTTP/1.1
-Host: api.vDrive.com
+Host: api.RawDrive.com
 Authorization: Bearer {token}
 Content-Type: application/json
 X-Request-ID: {uuid}
@@ -841,13 +841,13 @@ interface WebhookRetryPolicy {
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
-  name: vDrive-api
-  namespace: vDrive
+  name: RawDrive-api
+  namespace: RawDrive
 spec:
   entryPoints:
     - websecure
   routes:
-    - match: Host(`api.vDrive.com`) && PathPrefix(`/api/v1`)
+    - match: Host(`api.RawDrive.com`) && PathPrefix(`/api/v1`)
       kind: Rule
       middlewares:
         - name: rate-limit-api

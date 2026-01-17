@@ -129,7 +129,7 @@ Digital Album(Design Studio) should feel like a modern, AI‑assisted digital al
 
 ## Overview
 
-vDrive provides a comprehensive Digital Albumdesigner that enables photographers to create professional photo albums with drag-and-drop simplicity. The system includes design tools, templates, proofing workflows, and print integration.
+RawDrive provides a comprehensive Digital Albumdesigner that enables photographers to create professional photo albums with drag-and-drop simplicity. The system includes design tools, templates, proofing workflows, and print integration.
 
 ## Purpose
 

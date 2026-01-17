@@ -4,7 +4,7 @@
 
 ## Overview
 
-vDrive implements comprehensive data retention and customer removal policies to balance customer data protection with operational efficiency. These policies govern how long data is retained, when customers are removed, and how data is handled during the removal process.
+RawDrive implements comprehensive data retention and customer removal policies to balance customer data protection with operational efficiency. These policies govern how long data is retained, when customers are removed, and how data is handled during the removal process.
 
 ## Purpose
 
@@ -910,11 +910,11 @@ Email templates for removal notifications.
 
 **Template 1: Initial Removal Notice**
 ```
-Subject: Your vDrive Account Will Be Removed
+Subject: Your RawDrive Account Will Be Removed
 
 Dear [Name],
 
-Your vDrive subscription has expired and your account is eligible for removal.
+Your RawDrive subscription has expired and your account is eligible for removal.
 
 Account Details:
 - Email: [Email]
@@ -924,10 +924,10 @@ Account Details:
 Action Required:
 To keep your account and data, please renew your subscription by [Date].
 
-If you have questions, please contact support@vDrive.com
+If you have questions, please contact support@RawDrive.com
 
 Best regards,
-vDrive Team
+RawDrive Team
 ```
 
 **Template 2: Final Removal Warning**
@@ -936,7 +936,7 @@ Subject: Final Notice: Your Account Will Be Removed in 2 Days
 
 Dear [Name],
 
-This is your final notice before your vDrive account is permanently removed.
+This is your final notice before your RawDrive account is permanently removed.
 
 Removal Details:
 - Current Date: [Date]
@@ -951,16 +951,16 @@ After removal, all your data will be permanently deleted and cannot be recovered
 Renew Now: [Link]
 
 Best regards,
-vDrive Team
+RawDrive Team
 ```
 
 **Template 3: Removal Confirmation**
 ```
-Subject: Your vDrive Account Has Been Removed
+Subject: Your RawDrive Account Has Been Removed
 
 Dear [Name],
 
-Your vDrive account has been permanently removed as of [Date].
+Your RawDrive account has been permanently removed as of [Date].
 
 Removal Details:
 - Email: [Email]
@@ -970,10 +970,10 @@ Removal Details:
 Data Status:
 All your data has been permanently deleted and cannot be recovered.
 
-If you believe this was an error, please contact support@vDrive.com
+If you believe this was an error, please contact support@RawDrive.com
 
 Best regards,
-vDrive Team
+RawDrive Team
 ```
 
 ## Related Files

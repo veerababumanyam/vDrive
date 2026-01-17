@@ -1,5 +1,5 @@
 # ===========================================
-# vDrive Kubernetes Kustomization (Complete)
+# RawDrive Kubernetes Kustomization (Complete)
 # ===========================================
 # Usage: kubectl apply -k infrastructure/kubernetes/overlays/dev
 
@@ -7,7 +7,7 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 metadata:
-  name: vDrive-platform
+  name: RawDrive-platform
 
 # All resources in deployment order
 resources:
@@ -51,30 +51,30 @@ resources:
 
 # Common labels for all resources
 commonLabels:
-  app.kubernetes.io/part-of: vDrive-platform
+  app.kubernetes.io/part-of: RawDrive-platform
   app.kubernetes.io/managed-by: kustomize
   app.kubernetes.io/version: "0.3.2"
 
 # Default namespace
-namespace: vDrive
+namespace: RawDrive
 
 # Image customization (can be overridden in overlays)
 images:
-  - name: ghcr.io/vDrive/backend
+  - name: ghcr.io/RawDrive/backend
     newTag: latest
-  - name: ghcr.io/vDrive/gallery-service
+  - name: ghcr.io/RawDrive/gallery-service
     newTag: latest
-  - name: ghcr.io/vDrive/billing-service
+  - name: ghcr.io/RawDrive/billing-service
     newTag: latest
-  - name: ghcr.io/vDrive/upload-service
+  - name: ghcr.io/RawDrive/upload-service
     newTag: latest
-  - name: ghcr.io/vDrive/face-service
+  - name: ghcr.io/RawDrive/face-service
     newTag: latest
-  - name: ghcr.io/vDrive/webhooks-service
+  - name: ghcr.io/RawDrive/webhooks-service
     newTag: latest
-  - name: ghcr.io/vDrive/onboarding-service
+  - name: ghcr.io/RawDrive/onboarding-service
     newTag: latest
-  - name: ghcr.io/vDrive/invitations-service
+  - name: ghcr.io/RawDrive/invitations-service
     newTag: latest
-  - name: ghcr.io/vDrive/notifications-service
+  - name: ghcr.io/RawDrive/notifications-service
     newTag: latest

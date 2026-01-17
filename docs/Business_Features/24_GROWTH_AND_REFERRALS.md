@@ -5,7 +5,7 @@
 
 ## Business Value Proposition
 
-To reduce Customer Acquisition Cost (CAC) and drive organic growth, vDrive implements a multi-tiered **Growth Engine**. This system incentivizes existing users to invite peers, rewards partners for driving volume, and gamifies the onboarding process to ensure activation.
+To reduce Customer Acquisition Cost (CAC) and drive organic growth, RawDrive implements a multi-tiered **Growth Engine**. This system incentivizes existing users to invite peers, rewards partners for driving volume, and gamifies the onboarding process to ensure activation.
 
 ### Key Business Benefits
 - **Lower CAC**: Organic referrals are cheaper than paid ads.

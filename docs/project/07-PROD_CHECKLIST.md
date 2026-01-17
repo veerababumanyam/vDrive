@@ -2,7 +2,7 @@
 
 ## Overview
 
-The production checklist provides a comprehensive guide for deploying vDrive to production. This document covers pre-deployment verification, deployment procedures, post-deployment validation, and rollback procedures.
+The production checklist provides a comprehensive guide for deploying RawDrive to production. This document covers pre-deployment verification, deployment procedures, post-deployment validation, and rollback procedures.
 
 ## Purpose
 
@@ -651,7 +651,7 @@ Resolution: [What we did]
 
 We apologize for any inconvenience.
 
-vDrive Team
+RawDrive Team
 ```
 
 ### Internal Communication

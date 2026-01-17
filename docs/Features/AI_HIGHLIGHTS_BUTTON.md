@@ -139,7 +139,7 @@ Added AI Mode button between theme toggle and notifications:
 ## Design System Integration
 
 ### Colors
-- Uses design tokens from `@vDrive/shared-constants`
+- Uses design tokens from `@RawDrive/shared-constants`
 - Gradient badges: `primary-500` to `accent-500`
 - Severity colors: `success-500`, `warning-500`, `error-500`, `info-500`
 
@@ -226,7 +226,7 @@ frontend/src/
 
 - `lucide-react`: Sparkles icon
 - `react-router-dom`: Navigation
-- `@vDrive/shared-types`: Type definitions
+- `@RawDrive/shared-types`: Type definitions
 - Existing curation services
 
 ## Browser Support

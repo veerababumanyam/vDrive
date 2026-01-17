@@ -4,7 +4,7 @@ Authentication API endpoints.
 Handles user login, logout, and token refresh.
 """
 
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import BaseModel, EmailStr
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -101,15 +101,25 @@ async def login(
     # if not user.email_verified:
     #     raise EmailNotVerifiedError()
 
-    # Check workspace membership
+    # Check workspace membership and get workspace_id
     workspace_result = await db.execute(
-        select(func.count()).select_from(WorkspaceMember).where(WorkspaceMember.user_id == user.id)
+        select(WorkspaceMember.workspace_id)
+        .where(WorkspaceMember.user_id == user.id)
+        .limit(1)
     )
-    workspace_count = workspace_result.scalar()
-    has_workspace = workspace_count > 0
+    workspace_row = workspace_result.first()
+    workspace_id = workspace_row[0] if workspace_row else None
+    has_workspace = workspace_id is not None
 
-    # Create tokens
-    access_token = create_access_token({"sub": user.id, "email": user.email})
+    # Create tokens (include email_verified and workspace_id for middleware checks)
+    token_data = {
+        "sub": user.id,
+        "email": user.email,
+        "email_verified": user.email_verified,
+    }
+    if workspace_id:
+        token_data["workspace_id"] = workspace_id
+    access_token = create_access_token(token_data)
     refresh_token = create_refresh_token({"sub": user.id})
 
     # Set refresh token as HTTP-only cookie
@@ -165,6 +175,7 @@ async def login_form(
     },
 )
 async def refresh_token(
+    request: Request,
     response: Response,
     db: AsyncSession = Depends(get_db),
 ) -> RefreshResponse:
@@ -175,15 +186,70 @@ async def refresh_token(
     - Issues new access token
     - Rotates refresh token
     """
-    from fastapi import Request
-    from starlette.requests import Request as StarletteRequest
+    # 1. Get refresh token from HTTP-only cookie
+    token = request.cookies.get("refresh_token")
+    if not token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Refresh token required in cookie",
+        )
 
-    # This will be called with the request context
-    # For now, return error - need request object
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Refresh token required in cookie",
+    # 2. Verify refresh token
+    payload = verify_token(token, expected_type="refresh")
+    if payload is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired refresh token",
+        )
+
+    # 3. Get user from database
+    user_id = payload.get("sub")
+    result = await db.execute(select(User).where(User.id == user_id))
+    user = result.scalar_one_or_none()
+
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User not found",
+        )
+
+    if not user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User account is disabled",
+        )
+
+    # 4. Get workspace_id (same logic as login)
+    workspace_result = await db.execute(
+        select(WorkspaceMember.workspace_id)
+        .where(WorkspaceMember.user_id == user.id)
+        .limit(1)
     )
+    workspace_row = workspace_result.first()
+    workspace_id = workspace_row[0] if workspace_row else None
+
+    # 5. Create new access token
+    token_data = {
+        "sub": user.id,
+        "email": user.email,
+        "email_verified": user.email_verified,
+    }
+    if workspace_id:
+        token_data["workspace_id"] = workspace_id
+    new_access_token = create_access_token(token_data)
+
+    # 6. Rotate refresh token (issue new one for security)
+    new_refresh_token = create_refresh_token({"sub": user.id})
+    response.set_cookie(
+        key="refresh_token",
+        value=new_refresh_token,
+        httponly=True,
+        secure=True,
+        samesite="lax",
+        max_age=60 * 60 * 24 * 7,  # 7 days
+    )
+
+    return RefreshResponse(access_token=new_access_token)
 
 
 @router.post(

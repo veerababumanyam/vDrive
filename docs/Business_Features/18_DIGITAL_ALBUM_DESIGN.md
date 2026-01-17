@@ -6,7 +6,7 @@
 
 ## Business Value Proposition
 
-The Digital Album module (Design Studio) is a powerful upsell engine that allows photographers to design, proof, and sell physical albums directly within vDrive. By integrating the design process with the gallery, it removes friction, speeds up client approvals, and creates a seamless path from digital delivery to physical heirloom.
+The Digital Album module (Design Studio) is a powerful upsell engine that allows photographers to design, proof, and sell physical albums directly within RawDrive. By integrating the design process with the gallery, it removes friction, speeds up client approvals, and creates a seamless path from digital delivery to physical heirloom.
 
 ### Key Business Benefits
 - **Increased Revenue**: Simplifies the process of selling high-margin physical albums.
@@ -38,7 +38,7 @@ The Digital Album module (Design Studio) is a powerful upsell engine that allows
 - **Lab Presets**: Built-in specifications for popular labs (sizes, bleed, safe zones).
 - **Custom Sizes**: Ability to define custom album dimensions.
 - **Live Validation**: Real-time warnings if elements are in the bleed or gutter areas.
- - **Lab Profiles**: Distinguish between vDrive-maintained lab profiles and user-defined custom presets.
+ - **Lab Profiles**: Distinguish between RawDrive-maintained lab profiles and user-defined custom presets.
 
 ### 2. Designer Workspace
 - **Drag-and-Drop**: Intuitive interface for placing photos onto spreads.

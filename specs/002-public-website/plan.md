@@ -1,11 +1,11 @@
-# Implementation Plan: vDrive Public Website
+# Implementation Plan: RawDrive Public Website
 
 **Branch**: `002-public-website` | **Date**: 2026-01-13 | **Spec**: [spec.md](./spec.md)
 **Input**: Feature specification from `/specs/002-public-website/spec.md`
 
 ## Summary
 
-Enhance the existing vDrive public website microservice to production-grade quality with:
+Enhance the existing RawDrive public website microservice to production-grade quality with:
 - Updated landing page with specific headline/subheadline and trust indicators
 - INR pricing (₹) for Indian market with 5 tiers
 - 2026 SEO standards including Lighthouse 100/100 and AI agent optimization

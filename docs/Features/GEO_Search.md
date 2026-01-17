@@ -4,12 +4,12 @@
 
 ## Introduction
 
-This specification defines the Generative Engine Optimization (GEO) system for vDrive's internal AI-powered search capabilities. GEO optimizes photo metadata, embeddings, and database structures to enable AI models to efficiently discover, understand, and retrieve relevant photos from the local database. Unlike traditional SEO which targets external search engines, GEO focuses on making internal data maximally discoverable and contextually rich for AI-powered queries within the vDrive platform.
+This specification defines the Generative Engine Optimization (GEO) system for RawDrive's internal AI-powered search capabilities. GEO optimizes photo metadata, embeddings, and database structures to enable AI models to efficiently discover, understand, and retrieve relevant photos from the local database. Unlike traditional SEO which targets external search engines, GEO focuses on making internal data maximally discoverable and contextually rich for AI-powered queries within the RawDrive platform.
 
 ## Glossary
 
 - **GEO (Generative Engine Optimization)**: The practice of structuring and enriching data to maximize discoverability and relevance for AI-powered search and retrieval systems
-- **System**: The vDrive photography platform
+- **System**: The RawDrive photography platform
 - **Photographer**: The primary user who uploads and manages photo galleries
 - **Photo Metadata**: Structured information about photos including tags, descriptions, EXIF data, AI-generated analysis, and embeddings
 - **Vector Embedding**: A 768-dimensional numerical representation of a photo's visual content used for similarity search
@@ -363,7 +363,7 @@ This specification defines the Generative Engine Optimization (GEO) system for v
 
 ## Overview
 
-The GEO system optimizes vDrive's internal photo database for AI-powered search and discovery. Unlike traditional SEO which targets external search engines, GEO focuses on making photos maximally discoverable through semantic metadata enrichment, vector embeddings, relationship graphs, and intelligent indexing strategies. The system automatically analyzes photos to generate rich contextual data that enables natural language queries, visual similarity search, and intelligent recommendations.
+The GEO system optimizes RawDrive's internal photo database for AI-powered search and discovery. Unlike traditional SEO which targets external search engines, GEO focuses on making photos maximally discoverable through semantic metadata enrichment, vector embeddings, relationship graphs, and intelligent indexing strategies. The system automatically analyzes photos to generate rich contextual data that enables natural language queries, visual similarity search, and intelligent recommendations.
 
 ## Architecture
 

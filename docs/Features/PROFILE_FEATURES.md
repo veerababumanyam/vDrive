@@ -1,6 +1,6 @@
 # Profile Features Documentation
 
-vDrive provides two distinct profile types for photographers and studios: **Personal Profile** (individual photographers) and **Company Profile** (business/studio accounts). Both are workspace-scoped entities with public-facing pages, visibility controls, and branding options.
+RawDrive provides two distinct profile types for photographers and studios: **Personal Profile** (individual photographers) and **Company Profile** (business/studio accounts). Both are workspace-scoped entities with public-facing pages, visibility controls, and branding options.
 
 ## Table of Contents
 
@@ -53,7 +53,7 @@ vDrive provides two distinct profile types for photographers and studios: **Pers
 
 The Personal Profile is a **Digital Visiting Card** feature that allows photographers to create a professional public-facing profile page.
 
-- **Public URL:** `/u/{slug}` (e.g., `https://vDrive.com/u/john-photographer`)
+- **Public URL:** `/u/{slug}` (e.g., `https://RawDrive.com/u/john-photographer`)
 - **Database Table:** `personal_profiles`
 - **Avatar Storage:** `personal_profile_avatars` (multi-size WebP)
 
@@ -302,7 +302,7 @@ Supports 11 social platforms with URL validation:
 
 The Company Profile allows studios and photography businesses to create a branded public-facing business profile.
 
-- **Public URL:** `/company/{slug}` (e.g., `https://vDrive.com/company/stellar-studios`)
+- **Public URL:** `/company/{slug}` (e.g., `https://RawDrive.com/company/stellar-studios`)
 - **Database Table:** `company_profiles`
 - **Logo Storage:** `company_profile_logos` (multi-size WebP)
 

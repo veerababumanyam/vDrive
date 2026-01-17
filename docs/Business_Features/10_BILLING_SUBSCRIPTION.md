@@ -2,7 +2,7 @@
 
 ## Business Value Proposition
 
-Billing & Subscription Management enables vDrive to monetize the platform through flexible subscription plans, usage-based billing, and India-first payment processing with Razorpay and Stripe integration.
+Billing & Subscription Management enables RawDrive to monetize the platform through flexible subscription plans, usage-based billing, and India-first payment processing with Razorpay and Stripe integration.
 
 ### Key Business Benefits
 - **Revenue Generation**: Monetize platform through subscriptions

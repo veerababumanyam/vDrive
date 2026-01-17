@@ -1,6 +1,6 @@
 {
-  "name": "vDrive - Professional Photography Client Galleries",
-  "short_name": "vDrive",
+  "name": "RawDrive - Professional Photography Client Galleries",
+  "short_name": "RawDrive",
   "description": "Professional photography client gallery platform with AI-powered organization and beautiful client portals.",
   "start_url": "/",
   "display": "standalone",

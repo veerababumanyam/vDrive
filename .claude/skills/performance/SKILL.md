@@ -1,7 +1,7 @@
 ---
 name: performance
 aliases: [optimization, caching, scaling, web-vitals, latency, speed]
-description: Performance and scalability guidelines for vDrive. Use when optimizing code, implementing features at scale, or reviewing performance-critical code.
+description: Performance and scalability guidelines for RawDrive. Use when optimizing code, implementing features at scale, or reviewing performance-critical code.
 ---
 
 # Performance & Scalability Guidelines
@@ -215,7 +215,7 @@ CACHE_TTL = {
 
 from celery import Celery
 
-celery = Celery('vDrive', broker=os.environ['REDIS_URL'])
+celery = Celery('RawDrive', broker=os.environ['REDIS_URL'])
 
 @celery.task(bind=True, max_retries=3)
 def process_photo(self, photo_id: str, workspace_id: str):
@@ -339,4 +339,4 @@ traefik_middleware_requests_total   # Rate limiting (429s)
 
 Key dashboards in `infrastructure/monitoring/grafana/dashboards/`:
 - `traefik-keda.json` - Traffic, latency, KEDA scaling
-- `vDrive-overview.json` - System overview
+- `RawDrive-overview.json` - System overview

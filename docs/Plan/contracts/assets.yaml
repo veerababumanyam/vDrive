@@ -1,14 +1,14 @@
 openapi: 3.1.0
 info:
-  title: vDrive Assets API
+  title: RawDrive Assets API
   description: Asset upload, management, and processing endpoints
   version: 1.0.0
   contact:
-    name: vDrive API Support
-    email: api@vdrive.io
+    name: RawDrive API Support
+    email: api@RawDrive.io
 
 servers:
-  - url: https://app.vdrive.io/api/v1
+  - url: https://app.RawDrive.io/api/v1
     description: Production
   - url: http://localhost:8008/api/v1
     description: Upload service (local)

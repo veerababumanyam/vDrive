@@ -247,7 +247,7 @@ export function WorkspaceWizard({ onComplete, className }: WorkspaceWizardProps)
           <BuildingIcon className="w-6 h-6 text-white" />
         </div>
         <h1 className="text-2xl font-bold text-white mb-2">Create Your Workspace</h1>
-        <p className="text-white/60">Set up your photography business on vDrive</p>
+        <p className="text-white/60">Set up your photography business on RawDrive</p>
       </div>
 
       {/* Step Indicator */}

@@ -1,6 +1,6 @@
-# vDrive Step-by-Step Development Plan
+# RawDrive Step-by-Step Development Plan
 
-This document outlines the development order for the vDrive platform based on service dependencies, event-driven architecture patterns, and KEDA scaling configurations.
+This document outlines the development order for the RawDrive platform based on service dependencies, event-driven architecture patterns, and KEDA scaling configurations.
 
 ## Development Overview
 
@@ -123,11 +123,11 @@ search.query.logged       (3 partitions, 30d retention)
 
 | Service | Consumer Group |
 |---------|----------------|
-| Celery Workers | `vdrive-celery` |
-| Upload Service | `vdrive-upload-processor` |
-| Face Service | `vdrive-face-detector` |
-| Webhooks Service | `vdrive-webhooks-processor` |
-| Notifications | `vdrive-notifications` |
+| Celery Workers | `RawDrive-celery` |
+| Upload Service | `RawDrive-upload-processor` |
+| Face Service | `RawDrive-face-detector` |
+| Webhooks Service | `RawDrive-webhooks-processor` |
+| Notifications | `RawDrive-notifications` |
 
 ### 1.8 Health Check Configuration
 
@@ -163,11 +163,11 @@ search.query.logged       (3 partitions, 30d retention)
 
 | Volume | Service | Purpose |
 |--------|---------|---------|
-| `vdrive-postgres-data` | PostgreSQL | Database files |
-| `vdrive-redis-data` | Redis | RDB/AOF persistence |
-| `vdrive-kafka-data` | Kafka | Message log segments |
-| `vdrive-zookeeper-data` | Zookeeper | Coordination data |
-| `vdrive-traefik-certs` | Traefik | Let's Encrypt certificates |
+| `RawDrive-postgres-data` | PostgreSQL | Database files |
+| `RawDrive-redis-data` | Redis | RDB/AOF persistence |
+| `RawDrive-kafka-data` | Kafka | Message log segments |
+| `RawDrive-zookeeper-data` | Zookeeper | Coordination data |
+| `RawDrive-traefik-certs` | Traefik | Let's Encrypt certificates |
 
 ### 1.12 Database Strategy & Setup
 
@@ -678,7 +678,7 @@ Before "Go-Live", ensure the following are completed (ref: `docs/project/07-PROD
 1. **Phase 1 Verification**
    ```bash
    # Verify PostgreSQL
-   docker compose exec postgres pg_isready -U vdrive
+   docker compose exec postgres pg_isready -U RawDrive
 
    # Verify Redis
    docker compose exec redis redis-cli ping
@@ -687,7 +687,7 @@ Before "Go-Live", ensure the following are completed (ref: `docs/project/07-PROD
    docker compose exec kafka kafka-topics --bootstrap-server localhost:9092 --list
 
    # Verify PostgreSQL extensions
-   docker compose exec postgres psql -U vdrive -c "SELECT extname FROM pg_extension;"
+   docker compose exec postgres psql -U RawDrive -c "SELECT extname FROM pg_extension;"
 
    # Verify Kafka UI is accessible
    curl -s http://localhost:8081/actuator/health | grep UP
@@ -709,9 +709,9 @@ Before "Go-Live", ensure the following are completed (ref: `docs/project/07-PROD
 
 3. **KEDA Verification**
    ```bash
-   kubectl get scaledobjects -n vdrive
-   kubectl get hpa -n vdrive
-   kubectl describe scaledobject backend-scaledobject -n vdrive
+   kubectl get scaledobjects -n RawDrive
+   kubectl get hpa -n RawDrive
+   kubectl describe scaledobject backend-scaledobject -n RawDrive
    ```
 
 ### Manual Testing

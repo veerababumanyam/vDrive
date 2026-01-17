@@ -236,7 +236,7 @@ export function SlugInput({
           error={displayError}
           helperText={
             !displayError && value
-              ? `Your gallery will be at vdrive.io/${value}`
+              ? `Your gallery will be at RawDrive.io/${value}`
               : undefined
           }
           autoComplete="off"

@@ -3,10 +3,12 @@
  * Protects routes that require authentication
  *
  * T073-T074: Create ProtectedRoute.tsx with redirect to signin
+ * Subtask 5-1: Wrap with AppLayout for persistent SyncStatus
  */
 
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { AppLayout } from '../layout/AppLayout';
 
 /**
  * ProtectedRoute Props
@@ -58,6 +60,6 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
     return <Navigate to={`/signin?return=${encodeURIComponent(location.pathname)}`} replace />;
   }
 
-  // User is authenticated - render protected content
-  return <>{children}</>;
+  // User is authenticated - render protected content with AppLayout
+  return <AppLayout>{children}</AppLayout>;
 }
