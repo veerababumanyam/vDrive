@@ -19,7 +19,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-0.3.2-blue.svg" alt="Version">
+  <img src="https://img.shields.io/badge/version-0.0.3-blue.svg" alt="Version">
   <img src="https://img.shields.io/badge/license-Proprietary-red.svg" alt="License">
   <img src="https://img.shields.io/badge/python-3.11+-blue.svg" alt="Python Version">
   <img src="https://img.shields.io/badge/node-20+-green.svg" alt="Node Version">
@@ -132,8 +132,8 @@ RawDrive is a comprehensive multi-tenant SaaS platform designed for photographer
 ### 1️⃣ Clone the Repository
 
 ```bash
-git clone https://github.com/RawDrive/RawDrive.git
-cd RawDrive
+git clone https://github.com/veerababumanyam/vDrive.git
+cd vDrive
 ```
 
 ### 2️⃣ Start Infrastructure
